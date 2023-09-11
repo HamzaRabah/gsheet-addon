@@ -43,7 +43,7 @@ export class Auth {
           .setScope(
               "offline_access openid profile accounting.read availability.read reports.read reservations.read identity:account-users.read"
           )
-          .setCallbackFunction("authCallback");
+          .setCallbackFunction("Auth.authCallback");
     } else {
       service
           .setScope(
@@ -84,22 +84,6 @@ export class Auth {
         .evaluate()
         .setTitle(title)
         .setSandboxMode(HtmlService.SandboxMode.IFRAME);
-  }
-
-  /**
-   * Builds and returns the authorization URL from the service object.
-   * @return {String} The authorization URL.
-   */
-  static getAuthorizationUrl() {
-    return Auth.getApaleoAuthService().getAuthorizationUrl();
-  }
-
-  /**
-   * Resets the API service, forcing re-authorization before
-   * additional authorization-required API calls can be made.
-   */
-  static signOut() {
-    Auth.getApaleoAuthService().reset();
   }
 
   static getClient() {
@@ -170,3 +154,18 @@ export class Auth {
   }
 }
 
+/**
+ * Builds and returns the authorization URL from the service object.
+ * @return {String} The authorization URL.
+ */
+export function getAuthorizationUrl() {
+  return Auth.getApaleoAuthService().getAuthorizationUrl();
+}
+
+/**
+ * Resets the API service, forcing re-authorization before
+ * additional authorization-required API calls can be made.
+ */
+export function signOut() {
+  Auth.getApaleoAuthService().reset();
+}
