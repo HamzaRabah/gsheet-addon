@@ -1,5 +1,5 @@
-import { ReportsModels } from 'api/schema';
-import { LRReportRowItemModel, VatInfo } from './interfaces';
+import {ReportsModels} from 'api/schema';
+import {LRReportRowItemModel, VatInfo} from './interfaces';
 import {FormatUtility, MathUtility} from "../../shared";
 import {APIData} from "../../api/data";
 
@@ -23,26 +23,40 @@ const NUMARIC_COLUMNS_COUNT = 5;
  * @param previousLineNumber
  */
 export function generateORLReport(
-  property: string,
-  startDate: string,
-  endDate: string,
-  previousDatasheet: string,
-  previousLineNumber: number
+    property: string,
+    startDate: string,
+    endDate: string,
+    previousDatasheet: string,
+    previousLineNumber: number
 ) {
-  // const clock = new Clock();
+    // const clock = new Clock();
+    // @ts-ignore
+    const moment = Moment.load();
+    const diffInMonths = moment(endDate).diff(moment(startDate), 'months');
 
-  const data = APIData.getGrossTransactions(property, startDate, endDate);
+    const data = [];
 
-  // Logger.log(`Retrieved ${data.length} transactions - ${clock.check()}`);
-  // clock.set();
+    for (var i = 0; i <= diffInMonths; i++) {
+        var durationStart = startDate;
+        var durationEnd = endDate;
+        if (i > 0) {
+            durationStart = moment(startDate).add(i, 'months').startOf('month').format('YYYY-MM-DD');
+        }
+        if (i < diffInMonths) {
+            durationEnd = moment(startDate).add(i, 'months').endOf('month').format('YYYY-MM-DD');
+        }
+        data.push(...APIData.getGrossTransactions(property, durationStart, durationEnd))
+    }
+    // Logger.log(`Retrieved ${data.length} transactions - ${clock.check()}`);
+    // clock.set();
 
-  const transactions = data.filter(
-    (transaction) =>
-      transaction.referenceType == "Guest" ||
-      transaction.referenceType == "External"
-  );
+    const transactions = data.filter(
+        (transaction) =>
+            transaction.referenceType == "Guest" ||
+            transaction.referenceType == "External"
+    );
 
-  const intialState: Record<string, LRReportRowItemModel> = {};
+    const intialState: Record<string, LRReportRowItemModel> = {};
   const groupedRecords = Object.values(
     transactions.reduce((groups, transaction) => {
       const groupId = getRecordId(transaction);
