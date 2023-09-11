@@ -1,18 +1,18 @@
 import {BerlinCityTaxRowItemModel, CityTax} from "./interfaces";
-import {addDays, alert, formattedExecutionTime, getDates, lodash} from "shared";
-import {getAccountTransactions, getReservations} from "api/data";
+import {AlertUtility, DateUtility, FormatUtility} from "shared";
 import {BookingModels, FinanceModels} from "api/schema";
+import {APIData} from "../../api/data";
 
 
 export function generateCityTaxReport(city: CityTax, property: string, startDate: string, endDate: string) {
     if (city == CityTax.HAMBURG) {
-        alert('Hamburg city tax report will be implemented soon!')
+        AlertUtility.alert('Hamburg city tax report will be implemented soon!')
         return;
     }
-    const transactionStartDate = addDays(startDate, -7);
-    const transactionEndDate = addDays(endDate, 7);
+    const transactionStartDate = DateUtility.addDays(startDate, -7);
+    const transactionEndDate = DateUtility.addDays(endDate, 7);
     const transactions = getTransactions(property, transactionStartDate, transactionEndDate, startDate, endDate);
-    const reservations = getReservations(property, transactionStartDate, transactionEndDate);
+    const reservations = APIData.getReservations(property, transactionStartDate, transactionEndDate);
 
     const sheet = createSheetWithReportInfo(city, property, endDate, startDate);
 
@@ -30,7 +30,7 @@ export function getCities() {
 function generateBerlinCityTax(sheet: GoogleAppsScript.Spreadsheet.Sheet, transactions: FinanceModels["AccountingTransactionModel"][], reservations: BookingModels["ReservationItemModel"][]) {
     let rows: any[][] = [];
 
-    const _ = lodash();
+    const _ = DateUtility.lodash();
 
     const transactionsWithReservations = _.map(transactions, item => _.merge(item, _.find(reservations, {'id': item.reference})));
     const summarizedData = _(transactionsWithReservations)
@@ -89,13 +89,13 @@ function createSheetWithReportInfo(city: string, property: string, endDate: stri
         .setValue(`for property ${property} from ${startDate} to ${endDate}`);
     datasheet
         .getRange(3, 1)
-        .setValue("Executed: " + formattedExecutionTime());
+        .setValue("Executed: " + FormatUtility.formattedExecutionTime());
 
     return datasheet;
 }
 
 function getTransactions(property: string, transactionStartDate: Date, transactionEndDate: Date, startDate: string, endDate: string) {
-    const transactions = getAccountTransactions(property, 'CityTax_Reduced:7.00', transactionStartDate, transactionEndDate);
-    const reportDaysList = getDates(startDate, endDate).map(d => d.toISOString().slice(0, 10));
+    const transactions = APIData.getAccountTransactions(property, 'CityTax_Reduced:7.00', transactionStartDate, transactionEndDate);
+    const reportDaysList = DateUtility.getDates(startDate, endDate).map(d => d.toISOString().slice(0, 10));
     return transactions.filter(transaction => transaction.command == "PostCharge" && reportDaysList.includes(transaction.date));
 }

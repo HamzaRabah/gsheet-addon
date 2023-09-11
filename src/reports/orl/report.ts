@@ -1,7 +1,7 @@
-import { getGrossTransactions } from 'api/data';
 import { ReportsModels } from 'api/schema';
-import {formattedExecutionTime, round} from 'shared';
 import { LRReportRowItemModel, VatInfo } from './interfaces';
+import {FormatUtility, MathUtility} from "../../shared";
+import {APIData} from "../../api/data";
 
 const REPORT_TABLE_STARTING_ROW_NUMBER = 5;
 const NUMARIC_COLUMNS_COUNT = 5;
@@ -31,7 +31,7 @@ export function generateORLReport(
 ) {
   // const clock = new Clock();
 
-  const data = getGrossTransactions(property, startDate, endDate);
+  const data = APIData.getGrossTransactions(property, startDate, endDate);
 
   // Logger.log(`Retrieved ${data.length} transactions - ${clock.check()}`);
   // clock.set();
@@ -73,7 +73,7 @@ export function generateORLReport(
 
   // Calculate Receivables/Liabilities for all reservations found and push them to reservation details
   for (let record of groupedRecords) {
-    const receivables = round(
+    const receivables = MathUtility.round(
       record.transactions
         .filter((t) => t.debitedAccount.type === "Receivables")
         .reduce((sum, t) => sum + Number(t.grossAmount), 0)
@@ -101,12 +101,12 @@ export function generateORLReport(
         { total: 0 } as Record<string, number>
       );
 
-    if (receivables || round(liabilities.total)) {
+    if (receivables || MathUtility.round(liabilities.total)) {
       record.receivables = receivables;
       totals.receivables = totals.receivables + receivables;
 
       for (let key in liabilities) {
-        const amount = round(liabilities[key]);
+        const amount = MathUtility.round(liabilities[key]);
 
         record.liabilities[key] = amount;
         totals.liabilities[key] = (totals.liabilities[key] || 0) + amount;
@@ -184,9 +184,9 @@ export function generateORLReport(
     "", // arrival
     "", // departure
     "Total", // status
-    round(totals.receivables),
-    round(totals.liabilities.total),
-    ...liabilitiesColumns.map((c) => round(totals.liabilities[c.key] ?? 0)),
+    MathUtility.round(totals.receivables),
+    MathUtility.round(totals.liabilities.total),
+    ...liabilitiesColumns.map((c) => MathUtility.round(totals.liabilities[c.key] ?? 0)),
   ];
 
   // Logger.log(
@@ -244,7 +244,7 @@ export function generateORLReport(
     .setValue(`for property ${property} from ${startDate} to ${endDate}`);
   datasheet
       .getRange(3, 1)
-      .setValue("Executed: " + formattedExecutionTime());
+      .setValue("Executed: " + FormatUtility.formattedExecutionTime());
 
   datasheet.appendRow([" "]);
   datasheet.appendRow([

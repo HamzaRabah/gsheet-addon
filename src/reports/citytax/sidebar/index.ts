@@ -1,16 +1,20 @@
-import { getApaleoAuthService, isApaleoApp } from 'api/auth';
+import {Auth} from 'api/auth';
 
-export function openCityTaxSidebar() {
-    const service = getApaleoAuthService();
+export class CityTaxReport {
 
-    const template = HtmlService.createTemplateFromFile("reports/citytax/sidebar/sidebar");
-    template.isSignedIn = service.hasAccess();
-    template.isCustomApp = !isApaleoApp();
+    static openSidebar() {
+        const service = Auth.getApaleoAuthService();
 
-    const sidebar = template
-      .evaluate()
-      .setTitle("City Tax Report")
-      .setSandboxMode(HtmlService.SandboxMode.IFRAME);
+        const template = HtmlService.createTemplateFromFile("reports/citytax/sidebar/sidebar");
+        template.isSignedIn = service.hasAccess();
+        template.isCustomApp = !Auth.isApaleoApp();
 
-    SpreadsheetApp.getUi().showSidebar(sidebar);
+        const sidebar = template
+            .evaluate()
+            .setTitle("City Tax Report")
+            .setSandboxMode(HtmlService.SandboxMode.IFRAME);
+
+        SpreadsheetApp.getUi().showSidebar(sidebar);
+    }
+
 }

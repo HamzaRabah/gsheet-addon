@@ -1,16 +1,19 @@
-import { getApaleoAuthService, isApaleoApp } from 'api/auth';
+import {Auth} from 'api/auth';
 
-export function openORLSidebar() {
-    const service = getApaleoAuthService();
+export class ORLReport {
+    static openSidebar() {
+        const service = Auth.getApaleoAuthService();
 
-    const template = HtmlService.createTemplateFromFile("reports/orl/sidebar/sidebar");
-    template.isSignedIn = service.hasAccess();
-    template.isCustomApp = !isApaleoApp();
+        const template = HtmlService.createTemplateFromFile("reports/orl/sidebar/sidebar");
+        template.isSignedIn = service.hasAccess();
+        template.isCustomApp = !Auth.isApaleoApp();
 
-    const sidebar = template
-      .evaluate()
-      .setTitle("Open Receivables & Liabilities")
-      .setSandboxMode(HtmlService.SandboxMode.IFRAME);
+        const sidebar = template
+            .evaluate()
+            .setTitle("Open Receivables & Liabilities")
+            .setSandboxMode(HtmlService.SandboxMode.IFRAME);
 
-    SpreadsheetApp.getUi().showSidebar(sidebar);
+        SpreadsheetApp.getUi().showSidebar(sidebar);
+    }
+
 }
