@@ -5,5 +5,10 @@ export interface BerlinCityTaxRowItemModel {
     netAccommodationRevenue: number
 }
 
+export interface HamburgCityTaxRowItemModel {
+    cityTaxAmount: number,
+    correctedNumberOfGuests: number,
+    label: string
+}
 
 export enum CityTax { BERLIN = 'BERLIN', HAMBURG = 'HAMBURG'}

@@ -26,7 +26,10 @@
   ],
   "exceptionLogging": "STACKDRIVER",
   "runtimeVersion": "V8",
-
+  "urlFetchWhitelist": [
+    "https://api.apaleo.com",
+    "https://identity.apaleo.com"
+  ],
   "addOns": {
     "common": {
       "name": "apaleo for Sheets",
