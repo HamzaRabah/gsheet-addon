@@ -34,7 +34,7 @@ export function generateORLReport(
     const moment = Moment.load();
     const diffInMonths = moment(endDate).diff(moment(startDate), 'months');
 
-    const data = [];
+    const data: ReportsModels["TransactionsGrossExportListItemModel"][] = [];
 
     for (var i = 0; i <= diffInMonths; i++) {
         var durationStart = startDate;
@@ -50,10 +50,11 @@ export function generateORLReport(
     // Logger.log(`Retrieved ${data.length} transactions - ${clock.check()}`);
     // clock.set();
 
-    const transactions = data.filter(
-        (transaction) =>
+    const transactions: ReportsModels["TransactionsGrossExportListItemModel"][] = data.filter(
+        (transaction: ReportsModels["TransactionsGrossExportListItemModel"]) =>
             transaction.referenceType == "Guest" ||
-            transaction.referenceType == "External"
+            transaction.referenceType == "External" ||
+            transaction.referenceType == "Booking"
     );
 
     const intialState: Record<string, LRReportRowItemModel> = {};
@@ -75,8 +76,7 @@ export function generateORLReport(
   );
 
   const vatTypesInfo: Record<string, VatInfo> = {};
-  const guestRecords = [];
-  const externalRecords = [];
+  const reportRecords = [];
 
   const totals = {
     receivables: 0,
@@ -115,23 +115,21 @@ export function generateORLReport(
         { total: 0 } as Record<string, number>
       );
 
-    if (receivables || MathUtility.round(liabilities.total)) {
-      record.receivables = receivables;
-      totals.receivables = totals.receivables + receivables;
+      if (receivables || MathUtility.round(liabilities.total)) {
+          record.receivables = receivables;
+          totals.receivables = totals.receivables + receivables;
 
-      for (let key in liabilities) {
-        const amount = MathUtility.round(liabilities[key]);
+          for (let key in liabilities) {
+              const amount = MathUtility.round(liabilities[key]);
 
-        record.liabilities[key] = amount;
-        totals.liabilities[key] = (totals.liabilities[key] || 0) + amount;
+              record.liabilities[key] = amount;
+              totals.liabilities[key] = (totals.liabilities[key] || 0) + amount;
+          }
+
+          if (record.receivables + record.liabilities.total === 0) continue;
+
+          reportRecords.push(record);
       }
-
-      if (record.type == "Guest") {
-        guestRecords.push(record);
-      } else {
-        externalRecords.push(record);
-      }
-    }
   }
 
   const usedVatTypes = Object.keys(totals.liabilities); // we can ignore 'total' property here
@@ -145,15 +143,17 @@ export function generateORLReport(
       key: vat.key,
     }));
 
-  const rows = [...guestRecords, ...externalRecords].map((r) => [
-    createHyperLinkForRecord(property, r),
-    r.arrival,
-    r.departure,
-    r.status,
-    r.receivables,
-    r.liabilities.total,
-    ...liabilitiesColumns.map((c) => r.liabilities[c.key] || 0),
-  ]);
+  let rows = reportRecords
+      .map((r) =>
+      [
+          createHyperLinkForRecord(property, r),
+          r.arrival,
+          r.departure,
+          r.status,
+          r.receivables,
+          r.liabilities.total,
+          ...liabilitiesColumns.map((c) => r.liabilities[c.key] || 0),
+      ]);
 
 
     // Take receivables and liabilities from previous datasheet into account
@@ -167,8 +167,13 @@ export function generateORLReport(
                 return String(row[0]).includes("/" + oldRow[0] + "/");
             });
             if (existingRow) {
-                existingRow[4] = Number(existingRow[4]) + Number(oldRow[4]);
-                existingRow[5] = Number(existingRow[5]) + Number(oldRow[5]);
+                for (let i = 4; i < existingRow.length; i++) {
+                    const value = existingRow.at(i);
+                    if (!value) continue;
+                    const oldValue = oldRow.at(i);
+                    if (!oldValue) continue;
+                    existingRow[i] = Number(value) + Number(oldValue);
+                }
             } else {
                 const arr = new Array(rowLength - 6).fill(undefined);
                 rows.push([
@@ -177,7 +182,7 @@ export function generateORLReport(
                         receivables: 0,
                         transactions: [],
                         id: oldRow[0],
-                        type: oldRow[3] === "External" ? "External" : "Guest"
+                        type: oldRow[3]
                     }),
                     oldRow[1],
                     oldRow[2],
@@ -192,6 +197,8 @@ export function generateORLReport(
         }
     }
 
+    // remote empty rows
+    rows = rows.filter(r=>Number(r.at(4)) + Number(r.at(5)) !== 0);
 
   const totalRow = [
     "", // id
@@ -263,20 +270,19 @@ export function generateORLReport(
   datasheet.appendRow([" "]);
   datasheet.appendRow([
     `${transactions.length} Transactions processed. Number of records with the open balance: ` +
-      `total - ${rows.length}, reservations - ${guestRecords.length}, external folios - ${externalRecords.length}`,
+      `total - ${rows.length}, 
+      reservations - ${reportRecords.filter(r=>r.type==="Guest").length},
+      booking folios - ${reportRecords.filter(r=>r.type==="Booking").length},
+      external folios - ${reportRecords.filter(r=>r.type==="External").length}`,
   ]);
 }
 
-function getVatTypeKey(
-  vatOrTaxInfo: ReportsModels["TaxAmountModel"] | undefined
-) {
-  if (vatOrTaxInfo && vatOrTaxInfo.type !== "Without") {
-    const { type, percent } = vatOrTaxInfo;
-
-    return `${type}-${percent}`;
-  }
-
-  return "Without";
+function getVatTypeKey(taxOrUndefined: ReportsModels["TaxAmountModel"] | undefined): string {
+    if (taxOrUndefined && taxOrUndefined.type !== 'Without') {
+        const { type, percent } = taxOrUndefined;
+        return `${type}-${percent}`;
+    }
+    return 'Without';
 }
 
 function getRecordId(
@@ -291,7 +297,15 @@ function createRecordForTransaction(
   transaction: ReportsModels["TransactionsGrossExportListItemModel"]
 ): LRReportRowItemModel {
   switch (transaction.referenceType) {
-    case "Guest":
+      case "Booking":
+          return {
+              id: transaction.reference,
+              type: "Booking",
+              transactions: [transaction],
+              receivables: 0,
+              liabilities: { total: 0 },
+          };
+      case "Guest":
       const { id, arrival, departure, status } = transaction.reservation!;
 
       return {
@@ -323,6 +337,8 @@ function createHyperLinkForRecord(propertyId: string, r: LRReportRowItemModel) {
   switch (r.type) {
     case "Guest":
       return `=HYPERLINK("https://app.apaleo.com/${propertyId}/reservations/${r.id}/folio"; "${r.id}")`;
+      case "Booking":
+          return `=HYPERLINK("https://app.apaleo.com/${propertyId}/bookings/${r.id}/folio"; "${r.id}")`;
     case "External":
       return `=HYPERLINK("https://app.apaleo.com/${propertyId}/finance/folios/${r.id}/general"; "${r.id}")`;
     default:
