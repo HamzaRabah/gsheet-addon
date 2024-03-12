@@ -136,7 +136,7 @@ export interface paths {
   };
   "/finance/v1/folio-actions/{folioId}/move-payments": {
     /**
-     * Move payments from one folio of a reservation to another - moving between different reservations is not supported,
+     * Move payments from one guest/booking folio to another - moving between different bookings is not supported,
      * and will lead to an error. If one of the folios is closed, this action cannot be performed.<br />
      * The PSP reference, if present, will be removed when moving and only be persisted on the original payment.<br>You must have at least one of these scopes: 'charges.move, folios.manage'.
      */
@@ -177,7 +177,7 @@ export interface paths {
   "/finance/v1/folios/{folioId}/payments/by-authorization": {
     /**
      * Captures a specific amount from a pre-authorization and posts it to the folio. For the pre-authorization please ensure to set the respective metadata in the original payment
-     * transaction. The flow type has to be set to <i>CaptureOnly</i>. For more information please refer to the documentation of <a href="https://apaleo.dev/guides/business-cases/ibe/getting-the-money" target="_blank">how to do a pre-authorization on a booking engine</a>.
+     * transaction. The flow type has to be set to <i>CaptureOnly</i>. For more information please refer to the documentation of <a href="https://apaleo.dev/guides/business-cases/ibe/get-the-money" target="_blank">how to do a pre-authorization on a booking engine</a>.
      * The payment will be processed asynchronously. Use the location header to poll for the status of the payment. As long as a payment is pending it reduces the amount of allowed
      * payments for the folio. The payment times out after 60 minutes automatically<br>You must have this scope: 'folios.manage'.
      */
@@ -345,6 +345,7 @@ export interface paths {
      * - Austria (AT)<br />
      * - Azerbaijan (AZ)<br />
      * - Belgium (BE)<br />
+     * - Bulgaria (BG)<br />
      * - Cape Verde (CV)<br />
      * - Croatia (HR)<br />
      * - Czech Republic (CZ)<br />
@@ -353,23 +354,27 @@ export interface paths {
      * - France (FR) - without the super-reduced 2.1% VAT<br />
      * - French Polynesia (PF)<br />
      * - Germany (DE)<br />
+     * - Greece (GR)<br />
      * - Hungary (HU)<br />
      * - Indonesia (ID)<br />
      * - Ireland (IE)<br />
      * - Italy (IT)<br />
      * - Iceland (IS)<br />
      * - Japan (JP)<br />
+     * - Malaysia (MY)<br />
      * - Mexico (MX)<br />
      * - Netherlands (NL)<br />
      * - New Zealand (NZ)<br />
      * - Norway (NO) - without the VAT for raw fish supplies<br />
      * - Portugal (PT)<br />
+     * - Reunion (RE)<br />
      * - Saudi Arabia (SA)<br />
      * - Slovenia (SI)<br />
      * - South Africa (ZA)<br />
      * - Spain (ES)<br />
      * - Sweden (SE)<br />
      * - Switzerland (CH)<br />
+     * - Taiwan (TW)<br />
      * - United Kingdom (GB)
      */
     get: operations["FinanceTypesVatGet"];
@@ -377,18 +382,60 @@ export interface paths {
 }
 
 export interface definitions {
+  /**
+   * @example {
+   *   "transactions": [
+   *     {
+   *       "timestamp": "2024-03-12T09:20:23.1455803Z",
+   *       "date": "2024-03-12",
+   *       "debitedAccount": {
+   *         "name": "Receivables for Reservation KFEMSDED-1",
+   *         "number": "KFEMSDED-1_Receivables",
+   *         "parentNumber": "1200",
+   *         "type": "Receivables"
+   *       },
+   *       "creditedAccount": {
+   *         "name": "Revenue Accommodation Other",
+   *         "number": "RevenueAccommodation_Other:19",
+   *         "parentNumber": "5000",
+   *         "type": "Revenues"
+   *       },
+   *       "command": "PostCharge",
+   *       "amount": {
+   *         "amount": 1234.56,
+   *         "currency": "EUR"
+   *       },
+   *       "receipt": {
+   *         "type": "Custom",
+   *         "number": "custom receipt"
+   *       },
+   *       "entryNumber": "00000321",
+   *       "reference": "IDDQD-EXT-1",
+   *       "referenceType": "House",
+   *       "entryGroupNumber": "0000321"
+   *     }
+   *   ]
+   * }
+   */
   AccountingTransactionListModel: {
-    /** The list of transactions */
+    /** @description The list of transactions */
     transactions: definitions["AccountingTransactionModel"][];
   };
   AccountingTransactionModel: {
-    /** Timestamp with time zone information, when the booking was done<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Timestamp with time zone information, when the booking was done<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     timestamp: string;
-    /** The business date when the booking was done */
+    /**
+     * Format: date
+     * @description The business date when the booking was done
+     * @example 2020-10-10
+     */
     date: string;
     debitedAccount: definitions["ExportAccountModel"];
     creditedAccount: definitions["ExportAccountModel"];
-    /** The type of business transaction which triggered the booking */
+    /** @description The type of business transaction which triggered the booking */
     command:
       | "PostCharge"
       | "PostPayment"
@@ -400,17 +447,39 @@ export interface definitions {
       | "System";
     amount: definitions["PreciseMonetaryValueModel"];
     receipt?: definitions["ReceiptModel"];
-    /** All transactions having the same number form one booking */
+    /** @description All transactions having the same number form one booking */
     entryNumber: string;
-    /** The reference for the transactions, reservation id for guest folios, folio id for external folios, property code for the house folio */
+    /** @description The reference for the transactions, reservation id for guest folios, folio id for external folios, property code for the house folio */
     reference: string;
-    /** Does this transaction belong to a reservation, a house or an external folio */
-    referenceType: "House" | "Guest" | "External";
-    /** All transactions triggered by the same business transaction share one group number */
+    /** @description Does this transaction belong to a reservation, a house or an external folio */
+    referenceType: "House" | "Guest" | "External" | "Booking";
+    /** @description All transactions triggered by the same business transaction share one group number */
     entryGroupNumber: string;
   };
+  /**
+   * @example {
+   *   "accountTransactionPairs": [
+   *     {
+   *       "debitedAccount": {
+   *         "name": "Liabilities",
+   *         "number": "3000",
+   *         "type": "Liabilities"
+   *       },
+   *       "creditedAccount": {
+   *         "name": "Receivables",
+   *         "number": "1200",
+   *         "type": "Receivables"
+   *       },
+   *       "amount": {
+   *         "amount": 100.0,
+   *         "currency": "EUR"
+   *       }
+   *     }
+   *   ]
+   * }
+   */
   AccountingTransactionPairListModel: {
-    /** The list of aggregated transaction pairs */
+    /** @description The list of aggregated transaction pairs */
     accountTransactionPairs: definitions["AccountingTransactionPairModel"][];
   };
   AccountingTransactionPairModel: {
@@ -431,10 +500,18 @@ export interface definitions {
       | "ManualRefundNotAllowedWhenOnlineRefundIsPossible";
     message: string;
   };
+  /**
+   * @example {
+   *   "id": "XT347518-1-1",
+   *   "feeChargeIds": [
+   *     "XT347518-1-SERVICE-1"
+   *   ]
+   * }
+   */
   AddedChargeModel: {
-    /** The id of the added charge */
+    /** @description The id of the added charge */
     id: string;
-    /** The fee charges ids */
+    /** @description The fee charges ids */
     feeChargeIds?: string[];
   };
   AddressModel: {
@@ -451,8 +528,66 @@ export interface definitions {
     debitedAmount: definitions["PreciseMonetaryValueModel"];
     balance: definitions["PreciseMonetaryValueModel"];
   };
+  /**
+   * @example {
+   *   "aggregations": [
+   *     {
+   *       "account": {
+   *         "name": "Payments",
+   *         "number": "1000",
+   *         "type": "Payments"
+   *       },
+   *       "creditedAmount": {
+   *         "amount": 202.0,
+   *         "currency": "EUR"
+   *       },
+   *       "debitedAmount": {
+   *         "amount": 170.0,
+   *         "currency": "EUR"
+   *       },
+   *       "balance": {
+   *         "amount": -32.0,
+   *         "currency": "EUR"
+   *       }
+   *     },
+   *     {
+   *       "account": {
+   *         "name": "Revenues",
+   *         "number": "5000",
+   *         "type": "Revenues"
+   *       },
+   *       "creditedAmount": {
+   *         "amount": 233.0,
+   *         "currency": "EUR"
+   *       },
+   *       "debitedAmount": {
+   *         "amount": 265.0,
+   *         "currency": "EUR"
+   *       },
+   *       "balance": {
+   *         "amount": 32.0,
+   *         "currency": "EUR"
+   *       }
+   *     }
+   *   ],
+   *   "total": {
+   *     "creditedAmount": {
+   *       "amount": 435.0,
+   *       "currency": "EUR"
+   *     },
+   *     "debitedAmount": {
+   *       "amount": 435.0,
+   *       "currency": "EUR"
+   *     },
+   *     "balance": {
+   *       "amount": 0.0,
+   *       "currency": "EUR"
+   *     }
+   *   }
+   * }
+   */
   AggregateTransactionListModel: {
-    /** Aggregated data for the main accounts. */
+    /** @description Aggregated data for the main accounts. */
     aggregations: definitions["AggregateTransactionItemModel"][];
     total: definitions["AggregatesTotalModel"];
   };
@@ -462,10 +597,10 @@ export interface definitions {
     balance: definitions["PreciseMonetaryValueModel"];
   };
   AllowanceModel: {
-    /** ID for allowances. This is unique within one folio. */
+    /** @description ID for allowances. This is unique within one folio. */
     id: string;
     amount: definitions["AmountModel"];
-    /** Reason why this allowance was posted */
+    /** @description Reason why this allowance was posted */
     reason: string;
     serviceType:
       | "Other"
@@ -473,21 +608,40 @@ export interface definitions {
       | "FoodAndBeverages"
       | "CancellationFees"
       | "NoShow"
-      | "CityTax";
+      | "CityTax"
+      | "SecondCityTax";
+    /**
+     * Format: date
+     * @example 2020-10-10
+     */
     serviceDate: string;
-    /** Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     created: string;
     movedFrom?: definitions["EmbeddedFolioModel"];
     movedTo?: definitions["EmbeddedFolioModel"];
-    /** A reason why move operation was performed */
+    /** @description A reason why move operation was performed */
     movedReason?: string;
-    /** ID of a charge allowance posted for. `Null` if posted for folio */
+    /** @description ID of a charge allowance posted for. `Null` if posted for folio */
     sourceChargeId?: string;
-    /** ID of the custom sub-account the allowance has been posted to */
+    /** @description ID of the custom sub-account the allowance has been posted to */
     subAccountId?: string;
   };
+  /**
+   * @example {
+   *   "grossAmount": 107.0,
+   *   "netAmount": 100.0,
+   *   "vatType": "Reduced",
+   *   "vatPercent": 7.0,
+   *   "currency": "USD"
+   * }
+   */
   AmountModel: {
+    /** Format: double */
     grossAmount: number;
+    /** Format: double */
     netAmount: number;
     vatType:
       | "Null"
@@ -498,6 +652,7 @@ export interface definitions {
       | "Special"
       | "ReducedCovid19"
       | "NormalCovid19";
+    /** Format: double */
     vatPercent: number;
     currency: string;
   };
@@ -507,69 +662,117 @@ export interface definitions {
     bank?: string;
   };
   BulkAllowanceCreatedItemModel: {
-    /** The id of the created allowance */
+    /** @description The id of the created allowance */
     id: string;
-    /** The id of the charge the allowance has been added to */
+    /** @description The id of the charge the allowance has been added to */
     sourceChargeId: string;
   };
+  /**
+   * @example {
+   *   "items": [
+   *     {
+   *       "id": "IDFKA-1-1-A-1",
+   *       "sourceChargeId": "IDKFA-1-1-TS-1"
+   *     },
+   *     {
+   *       "id": "IDFKA-1-1-A-2",
+   *       "sourceChargeId": "IDKFA-1-1-ES-2"
+   *     }
+   *   ]
+   * }
+   */
   BulkAllowanceCreatedModel: {
-    /** Allowances that have been created */
+    /** @description Allowances that have been created */
     items: definitions["BulkAllowanceCreatedItemModel"][];
   };
   BulkMoveItemRequest: {
-    /** ID of the source folio */
+    /** @description ID of the source folio */
     sourceFolioId: string;
-    /** ID of the target folio */
+    /** @description ID of the target folio */
     targetFolioId: string;
-    /** The IDs of the charges that should be moved */
+    /** @description The IDs of the charges that should be moved */
     chargeIds?: string[];
   };
+  /**
+   * @example {
+   *   "items": [
+   *     {
+   *       "sourceFolioId": "SPRJDQNU-1",
+   *       "targetFolioId": "KFCSQUID-1",
+   *       "chargeIds": [
+   *         "SPRJDQNU-1-C-1",
+   *         "SPRJDQNU-1-C-5"
+   *       ]
+   *     },
+   *     {
+   *       "sourceFolioId": "TTDKOWNC-1",
+   *       "targetFolioId": "YXPZMQAS-1",
+   *       "chargeIds": [
+   *         "TTDKOWNC-1-C-2",
+   *         "TTDKOWNC-1-C-3"
+   *       ]
+   *     }
+   *   ],
+   *   "reason": "Test"
+   * }
+   */
   BulkMoveRequest: {
-    /** The list of actions to perform */
+    /** @description The list of actions to perform */
     items: definitions["BulkMoveItemRequest"][];
-    /** Description of why the move is performed */
+    /** @description Description of why the move is performed */
     reason: string;
   };
   ChargeModel: {
-    /** ID for charges. This is unique within one folio. */
+    /** @description ID for charges. This is unique within one folio. */
     id: string;
-    /** The type of the service or good */
+    /** @description The type of the service or good */
     serviceType:
       | "Other"
       | "Accommodation"
       | "FoodAndBeverages"
       | "CancellationFees"
       | "NoShow"
-      | "CityTax";
-    /** The name, article number, or other description of this charge */
+      | "CityTax"
+      | "SecondCityTax";
+    /** @description The name, article number, or other description of this charge */
     name: string;
     /**
-     * The name, article number, or other description of this charge
+     * @description The name, article number, or other description of this charge
      * translated in different languages
      */
     translatedNames?: { [key: string]: string };
-    /** Status: is this already posted? */
+    /** @description Status: is this already posted? */
     isPosted: boolean;
-    /** The day when the line item is (or was) due to be charged. */
+    /**
+     * Format: date
+     * @description The day when the line item is (or was) due to be charged.
+     * @example 2020-10-10
+     */
     serviceDate: string;
-    /** Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     created: string;
     movedFrom?: definitions["EmbeddedFolioModel"];
     movedTo?: definitions["EmbeddedFolioModel"];
-    /** A reason why move operation was performed */
+    /** @description A reason why move operation was performed */
     movedReason?: string;
     routedFrom?: definitions["EmbeddedFolioModel"];
     routedTo?: definitions["EmbeddedFolioModel"];
     amount: definitions["AmountModel"];
-    /** Receipt for this transaction */
+    /** @description Receipt for this transaction */
     receipt?: string;
-    /** Identifier used for grouping related charges together */
+    /** @description Identifier used for grouping related charges together */
     groupId?: string;
-    /** ID of the custom sub-account the charge has been posted to */
+    /** @description ID of the custom sub-account the charge has been posted to */
     subAccountId?: string;
-    /** The count of services provided */
+    /**
+     * Format: int32
+     * @description The count of services provided
+     */
     quantity: number;
-    /** The type of the charge */
+    /** @description The type of the charge */
     type:
       | "Direct"
       | "TimeSlice"
@@ -579,15 +782,79 @@ export interface definitions {
       | "NoShowFee"
       | "CancellationFee"
       | "ServiceFee"
-      | "Tax";
+      | "Tax"
+      | "SecondCityTax";
   };
+  /**
+   * @example {
+   *   "globalAccounts": [
+   *     {
+   *       "accountNumber": "9000",
+   *       "name": "House",
+   *       "type": "House",
+   *       "hasChildren": false,
+   *       "isArchived": true
+   *     },
+   *     {
+   *       "accountNumber": "1000",
+   *       "name": "Payments",
+   *       "type": "Payments",
+   *       "hasChildren": true,
+   *       "isArchived": false
+   *     },
+   *     {
+   *       "accountNumber": "5000",
+   *       "name": "Revenues",
+   *       "type": "Revenues",
+   *       "hasChildren": true,
+   *       "isArchived": false
+   *     }
+   *   ],
+   *   "guestAccounts": [
+   *     {
+   *       "accountNumber": "3000",
+   *       "name": "Guest Liabilities",
+   *       "type": "Liabilities",
+   *       "hasChildren": true,
+   *       "isArchived": false
+   *     },
+   *     {
+   *       "accountNumber": "1200",
+   *       "name": "Guest Receivables",
+   *       "type": "Receivables",
+   *       "hasChildren": true,
+   *       "isArchived": false
+   *     }
+   *   ],
+   *   "externalAccounts": [
+   *     {
+   *       "accountNumber": "1200",
+   *       "name": "External Receivables",
+   *       "type": "Receivables",
+   *       "hasChildren": true,
+   *       "isArchived": false
+   *     }
+   *   ],
+   *   "bookingAccounts": [
+   *     {
+   *       "accountNumber": "1200",
+   *       "name": "Liabilities",
+   *       "type": "Liabilities",
+   *       "hasChildren": true,
+   *       "isArchived": false
+   *     }
+   *   ]
+   * }
+   */
   ChartOfAccountsModel: {
-    /** The predefined list of global accounts of a property's subledger */
+    /** @description The predefined list of global accounts of a property's subledger */
     globalAccounts: definitions["SlimFinanceAccountModel"][];
-    /** The predefined list of guest specific accounts of a property's subledger. */
+    /** @description The predefined list of guest specific accounts of a property's subledger. */
     guestAccounts: definitions["SlimFinanceAccountModel"][];
-    /** The predefined list of external accounts of a property's subledger. */
+    /** @description The predefined list of external accounts of a property's subledger. */
     externalAccounts: definitions["SlimFinanceAccountModel"][];
+    /** @description The predefined list of booking accounts of a property's subledger. */
+    bookingAccounts: definitions["SlimFinanceAccountModel"][];
   };
   CommercialInfoModel: {
     registerEntry: string;
@@ -595,64 +862,154 @@ export interface definitions {
     managingDirectors?: string;
   };
   CompanyInfoModel: {
-    /** Name of the company */
+    /** @description Name of the company */
     name: string;
-    /** Tax or Vat ID of the company */
+    /** @description Tax or Vat ID of the company */
     taxId?: string;
+    /** @description The additional tax ID of the company (e.g. SIRET in France, Codice Destinatario in Italy) */
+    additionalTaxId?: string;
   };
+  /**
+   * @example {
+   *   "reason": "Minibar is not paid by the company",
+   *   "chargeIds": [
+   *     "IDDQD-1-C-1",
+   *     "IDDQD-1-C-5"
+   *   ],
+   *   "allowanceIds": [
+   *     "IDDQD-1-A-1",
+   *     "IDDQD-1-A-5"
+   *   ],
+   *   "transitoryChargeIds": [
+   *     "IDDQD-1-TC-1",
+   *     "IDDQD-1-TC-5"
+   *   ]
+   * }
+   */
   CorrectFolioRequest: {
-    /** Description of why the correction is performed */
+    /** @description Description of why the correction is performed */
     reason: string;
-    /** The IDs of the charges that should be moved */
+    /** @description The IDs of the charges that should be moved */
     chargeIds?: string[];
     /**
-     * The IDs of the allowances that should be moved
+     * @description The IDs of the allowances that should be moved
      * Only moving global allowances is supported
      */
     allowanceIds?: string[];
-    /** The IDs of the transitory charges that should be moved */
+    /** @description The IDs of the transitory charges that should be moved */
     transitoryChargeIds?: string[];
   };
+  /**
+   * @example {
+   *   "count": 50
+   * }
+   */
   CountModel: {
+    /** Format: int64 */
     count: number;
   };
+  /**
+   * @example {
+   *   "amount": {
+   *     "amount": 230.0,
+   *     "currency": "EUR"
+   *   },
+   *   "paidCharges": [
+   *     {
+   *       "chargeId": "BLIPKWXP-1-1-1",
+   *       "amount": 200.0
+   *     }
+   *   ]
+   * }
+   */
   CreateAccountPaymentRequest: {
-    /** Account owner of the payment account, default is `Guest` */
+    /** @description Account owner of the payment account, default is `Guest` */
     accountOwner?: "Guest" | "Booker";
     amount: definitions["MonetaryValueModel"];
-    /** List of charges and amount being covered by this payment. */
+    /** @description List of charges and amount being covered by this payment. */
     paidCharges?: definitions["PaymentPaidChargesRequest"][];
   };
   CreateAllowanceBulkItemModel: {
-    /** The ID of the charge */
+    /** @description The ID of the charge */
     chargeId: string;
     amount: definitions["MonetaryValueModel"];
   };
+  /**
+   * @example {
+   *   "items": [
+   *     {
+   *       "chargeId": "IDDQD-1-1-TS-1",
+   *       "amount": {
+   *         "amount": 13.0,
+   *         "currency": "EUR"
+   *       }
+   *     },
+   *     {
+   *       "chargeId": "IDDQD-1-1-ES-2",
+   *       "amount": {
+   *         "amount": 37.0,
+   *         "currency": "EUR"
+   *       }
+   *     }
+   *   ],
+   *   "reason": "discount"
+   * }
+   */
   CreateAllowanceBulkModel: {
-    /** The list of actions to perform */
+    /** @description The list of actions to perform */
     items: definitions["CreateAllowanceBulkItemModel"][];
-    /** Description of why allowances are added */
+    /** @description Description of why allowances are added */
     reason: string;
     /**
-     * The business date of the allowance. Defaults to the current date.
+     * Format: date
+     * @description The business date of the allowance. Defaults to the current date.
      * In some cases you might want to post the allowances to the previous business date, this is only possible until 6 AM of the current day.
+     * @example 2020-10-10
      */
     businessDate?: string;
   };
+  /**
+   * @example {
+   *   "reason": "Reason",
+   *   "amount": {
+   *     "amount": 1.0,
+   *     "currency": "EUR"
+   *   }
+   * }
+   */
   CreateAllowanceForChargeModel: {
-    /** Reason why this allowance is posted */
+    /** @description Reason why this allowance is posted */
     reason: string;
     amount: definitions["MonetaryValueModel"];
     /**
-     * The business date of the allowance. Defaults to the current date.
+     * Format: date
+     * @description The business date of the allowance. Defaults to the current date.
      * In some cases you might want to post the allowances to the previous business date, this is only possible until 6 AM of the current day.
+     * @example 2020-10-10
      */
     businessDate?: string;
   };
+  /**
+   * @example {
+   *   "serviceType": "Other",
+   *   "vatType": "Normal",
+   *   "subAccountId": "MUC-REST",
+   *   "reason": "Good guy discount",
+   *   "amount": {
+   *     "amount": 22.0,
+   *     "currency": "EUR"
+   *   }
+   * }
+   */
   CreateAllowanceForFolioModel: {
-    /** The service type, used by accounting to determine the correct revenue account */
-    serviceType: "Other" | "Accommodation" | "FoodAndBeverages" | "CityTax";
-    /** The VAT type, used by accounting to determine the correct vat amount and account */
+    /** @description The service type, used by accounting to determine the correct revenue account */
+    serviceType:
+      | "Other"
+      | "Accommodation"
+      | "FoodAndBeverages"
+      | "CityTax"
+      | "SecondCityTax";
+    /** @description The VAT type, used by accounting to determine the correct vat amount and account */
     vatType:
       | "Null"
       | "VeryReduced"
@@ -662,28 +1019,63 @@ export interface definitions {
       | "Special"
       | "ReducedCovid19"
       | "NormalCovid19";
-    /** ID of the custom sub-account to post the allowance to, used by accounting to determine the correct revenue account */
+    /** @description ID of the custom sub-account to post the allowance to, used by accounting to determine the correct revenue account */
     subAccountId?: string;
-    /** Reason why this allowance is posted */
+    /** @description Reason why this allowance is posted */
     reason: string;
     amount: definitions["MonetaryValueModel"];
     /**
-     * The business date of the allowance. Defaults to the current date.
+     * Format: date
+     * @description The business date of the allowance. Defaults to the current date.
      * In some cases you might want to post the allowances to the previous business date, this is only possible until 6 AM of the current day.
+     * @example 2020-10-10
      */
     businessDate?: string;
   };
+  /**
+   * @example {
+   *   "transactionReference": "564578124534890J",
+   *   "amount": {
+   *     "amount": 330.0,
+   *     "currency": "EUR"
+   *   },
+   *   "paidCharges": [
+   *     {
+   *       "chargeId": "BLIPKWXP-1-1-1",
+   *       "amount": 230.0
+   *     }
+   *   ]
+   * }
+   */
   CreateAuthorizationPaymentRequest: {
-    /** Reference to the original authorization transaction */
+    /** @description Reference to the original authorization transaction */
     transactionReference: string;
     amount: definitions["MonetaryValueModel"];
-    /** List of charges and amount being covered by this payment. */
+    /** @description List of charges and amount being covered by this payment. */
     paidCharges?: definitions["PaymentPaidChargesRequest"][];
   };
+  /**
+   * @example {
+   *   "serviceType": "FoodAndBeverages",
+   *   "vatType": "Normal",
+   *   "subAccountId": "MUC-BEER",
+   *   "name": "Restaurant",
+   *   "amount": {
+   *     "amount": 23.0,
+   *     "currency": "EUR"
+   *   },
+   *   "receipt": "R23412"
+   * }
+   */
   CreateChargeModel: {
-    /** The service type, used by accounting to determine the correct revenue account */
-    serviceType: "Other" | "Accommodation" | "FoodAndBeverages" | "CityTax";
-    /** The VAT type, used by accounting to determine the correct vat amount and account */
+    /** @description The service type, used by accounting to determine the correct revenue account */
+    serviceType:
+      | "Other"
+      | "Accommodation"
+      | "FoodAndBeverages"
+      | "CityTax"
+      | "SecondCityTax";
+    /** @description The VAT type, used by accounting to determine the correct vat amount and account */
     vatType:
       | "Null"
       | "VeryReduced"
@@ -693,27 +1085,46 @@ export interface definitions {
       | "Special"
       | "ReducedCovid19"
       | "NormalCovid19";
-    /** ID of the custom sub-account to post the charge to, used by accounting to determine the correct revenue account */
+    /** @description ID of the custom sub-account to post the charge to, used by accounting to determine the correct revenue account */
     subAccountId?: string;
-    /** The name, article number, or other description of this charge */
+    /** @description The name, article number, or other description of this charge */
     name: string;
     amount: definitions["MonetaryValueModel"];
-    /** Receipt for this transaction */
+    /** @description Receipt for this transaction */
     receipt?: string;
     /**
-     * The count of services provided. Defaults to 1.
+     * Format: int32
+     * @description The count of services provided. Defaults to 1.
      * NOTE: this field will become required 07.05.2020.
      */
     quantity?: number;
     /**
-     * The business date of the charge. Defaults to the current date.
+     * Format: date
+     * @description The business date of the charge. Defaults to the current date.
      * In some cases you might want to post the charges to the previous business date, this is only possible until 6 AM of the current day.
+     * @example 2020-10-10
      */
     businessDate?: string;
   };
+  /**
+   * @example {
+   *   "method": "Cash",
+   *   "receipt": "BLIPKWXP-1",
+   *   "amount": {
+   *     "amount": 230.0,
+   *     "currency": "EUR"
+   *   },
+   *   "paidCharges": [
+   *     {
+   *       "chargeId": "BLIPKWXP-1-1-1",
+   *       "amount": 230.0
+   *     }
+   *   ]
+   * }
+   */
   CreateCustomPaymentRequest: {
     /**
-     * The payment method. Use 'CreditCard', if none of the specific credit cards types matches. 'Booking.com' only makes sense, if
+     * @description The payment method. Use 'CreditCard', if none of the specific credit cards types matches. 'Booking.com' only makes sense, if
      * the property (hotel) configured Booking.com > Finance to be 'Payments by Booking.com'
      */
     method:
@@ -744,41 +1155,77 @@ export interface definitions {
       | "Airbnb"
       | "HolidayCheck";
     /**
-     * The optional receipt you want to store for the payment. It defaults to the reservation or external folio id.
+     * @description The optional receipt you want to store for the payment. It defaults to the reservation or external folio id.
      * This field is required if you are adding payment to the house account
      */
     receipt?: string;
     /**
-     * The business date of the payment. Defaults to the current date.
+     * Format: date
+     * @description The business date of the payment. Defaults to the current date.
      * In some cases you might want to post the payments to the previous business date, this is only possible until 6 AM of the current day.
+     * @example 2020-10-10
      */
     businessDate?: string;
     amount: definitions["MonetaryValueModel"];
-    /** List of charges and amount being covered by this payment. */
+    /** @description List of charges and amount being covered by this payment. */
     paidCharges?: definitions["PaymentPaidChargesRequest"][];
   };
+  /**
+   * @example {
+   *   "reservationId": "TS23XF",
+   *   "debitor": {
+   *     "title": "Dr",
+   *     "firstName": "Jon",
+   *     "name": "Doe",
+   *     "address": {
+   *       "addressLine1": "My Street 1",
+   *       "postalCode": "12453",
+   *       "city": "MyCity",
+   *       "countryCode": "GB"
+   *     },
+   *     "company": {
+   *       "name": "Horns & Hooves Inc",
+   *       "taxId": "TAX-12345",
+   *       "additionalTaxId": "TAX2-12345"
+   *     },
+   *     "personalTaxId": "123456789",
+   *     "reference": "SRC-1232"
+   *   },
+   *   "type": "Guest"
+   * }
+   */
   CreateFolioModel: {
-    /** The ID of the reservation for which a guest folio should be created */
+    /** @description The ID of the reservation for which a guest folio should be created */
     reservationId?: string;
-    /** The ID of the company for which a folio should be created */
+    /** @description The ID of the company for which a folio should be created */
     companyId?: string;
     debitor: definitions["FolioDebitorModel"];
     /**
-     * The type of the folio to create. Default is the guest folio.
+     * @description The type of the folio to create. Default is the guest folio.
      * This field will become required 01.11.2019.
      */
     type?: "Guest" | "External";
-    /** The ID of the property for which an external folio should be created. */
+    /** @description The ID of the property for which an external folio should be created. */
     propertyId?: string;
     /**
-     * Optional code for external folios.
+     * @description Optional code for external folios.
      * If present, the id of the folio will be propertyId-code (MUC-SOMETHING);
      * If no code is provided, the id of the folio will be propertyId-ext-number (MUC-EXT-282).
      */
     code?: string;
   };
+  /**
+   * @example {
+   *   "method": "Cash",
+   *   "amount": {
+   *     "amount": 10.0,
+   *     "currency": "EUR"
+   *   },
+   *   "receipt": "CSH-201824120003"
+   * }
+   */
   CreateFolioRefundRequest: {
-    /** The payment method the refund will be accounted to */
+    /** @description The payment method the refund will be accounted to */
     method:
       | "Cash"
       | "BankTransfer"
@@ -807,17 +1254,19 @@ export interface definitions {
       | "Airbnb"
       | "HolidayCheck";
     amount: definitions["MonetaryValueModel"];
-    /** The receipt for the refund */
+    /** @description The receipt for the refund */
     receipt?: string;
     /**
-     * The business date of the refund. Defaults to the current date.
+     * Format: date
+     * @description The business date of the refund. Defaults to the current date.
      * In some cases you might want to post the refunds to the previous business date, this is only possible until 6 AM of the current day.
+     * @example 2020-10-10
      */
     businessDate?: string;
   };
-  /** A warning about what would fail if you would try to create an invoice with the current folio. */
+  /** @description A warning about what would fail if you would try to create an invoice with the current folio. */
   CreateInvoiceWarningModel: {
-    /** The general classification of the warning, why an invoice would not be created if you would try to create it for the current folio. */
+    /** @description The general classification of the warning, why an invoice would not be created if you would try to create it for the current folio. */
     type:
       | "InvoiceAlreadyExists"
       | "NotAllChargesPosted"
@@ -829,113 +1278,193 @@ export interface definitions {
       | "CannotCreateCompanyInvoiceForExternal"
       | "CheckOutOnArIsNotAllowed"
       | "IsEmptyFolio";
-    /** Optionally, additional information about the warning */
+    /** @description Optionally, additional information about the warning */
     message?: string;
   };
+  /**
+   * @example {
+   *   "expiresAt": "2024-03-14T09:20:22.5984968Z",
+   *   "countryCode": "de",
+   *   "description": "Prepayment for the group booking apaleo Summer party",
+   *   "payerEmail": "0chai@hemenal5.space",
+   *   "amount": {
+   *     "amount": 150.0,
+   *     "currency": "EUR"
+   *   },
+   *   "paidCharges": [
+   *     {
+   *       "chargeId": "BLIPKWXP-1-1-1",
+   *       "amount": 230.0
+   *     }
+   *   ]
+   * }
+   */
   CreatePaymentLinkRequest: {
-    /** The date that the link expires<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description The date that the link expires<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     expiresAt: string;
-    /** The payer's country code. Used to provide suitable for the payer payment methods and use default country language */
+    /** @description The payer's country code. Used to provide suitable for the payer payment methods and use default country language */
     countryCode: string;
-    /** Payment description. It will be shown on the payment form of the link */
+    /** @description Payment description. It will be shown on the payment form of the link */
     description?: string;
     /**
-     * The email address of the payer or cardholder. It can be used to verify the identity of the payer and
+     * @description The email address of the payer or cardholder. It can be used to verify the identity of the payer and
      * allow to catch a fraudulent usage of the payment account if the email address does not match the one
      * on file at the bank
      */
     payerEmail?: string;
     amount: definitions["MonetaryValueModel"];
-    /** List of charges and amount being covered by this payment. */
+    /** @description List of charges and amount being covered by this payment. */
     paidCharges?: definitions["PaymentPaidChargesRequest"][];
   };
+  /**
+   * @example {
+   *   "amount": {
+   *     "amount": 10.0,
+   *     "currency": "EUR"
+   *   }
+   * }
+   */
   CreatePaymentRefundRequest: {
     amount: definitions["MonetaryValueModel"];
     /**
-     * The business date of the refund. Defaults to the current date.
+     * Format: date
+     * @description The business date of the refund. Defaults to the current date.
      * In some cases you might want to post the refunds to the previous business date, this is only possible until 6 AM of the current day.
+     * @example 2020-10-10
      */
     businessDate?: string;
   };
+  /**
+   * @example {
+   *   "terminalId": "V400m-324689704",
+   *   "amount": {
+   *     "amount": 230.0,
+   *     "currency": "EUR"
+   *   },
+   *   "paidCharges": [
+   *     {
+   *       "chargeId": "BLIPKWXP-1-1-1",
+   *       "amount": 230.0
+   *     }
+   *   ]
+   * }
+   */
   CreateTerminalPaymentRequest: {
-    /** Terminal to be used for the payment */
+    /** @description Terminal to be used for the payment */
     terminalId: string;
     amount: definitions["MonetaryValueModel"];
-    /** List of charges and amount being covered by this payment. */
+    /** @description List of charges and amount being covered by this payment. */
     paidCharges?: definitions["PaymentPaidChargesRequest"][];
   };
+  /**
+   * @example {
+   *   "name": "Restaurant",
+   *   "amount": {
+   *     "amount": 23.0,
+   *     "currency": "EUR"
+   *   },
+   *   "receipt": "R23412"
+   * }
+   */
   CreateTransitoryChargeModel: {
-    /** The name, article number, or other description of this item */
+    /** @description The name, article number, or other description of this item */
     name: string;
     amount: definitions["MonetaryValueModel"];
-    /** Receipt for this transaction */
+    /** @description Receipt for this transaction */
     receipt?: string;
-    /** Identifier used for grouping related charges together */
+    /** @description Identifier used for grouping related charges together */
     groupId?: string;
-    /** The service type. This is not used by accounting, but can be entered and stored on the charge. */
-    serviceType?: "Other" | "Accommodation" | "FoodAndBeverages" | "CityTax";
+    /** @description The service type. This is not used by accounting, but can be entered and stored on the charge. */
+    serviceType?:
+      | "Other"
+      | "Accommodation"
+      | "FoodAndBeverages"
+      | "CityTax"
+      | "SecondCityTax";
     /**
-     * The count of services provided. Defaults to 1.
+     * Format: int32
+     * @description The count of services provided. Defaults to 1.
      * NOTE: this field will become required 07.05.2020.
      */
     quantity?: number;
     /**
-     * The business date of the charge. Defaults to the current date.
+     * Format: date
+     * @description The business date of the charge. Defaults to the current date.
      * In some cases you might want to post the charges to the previous business date, this is only possible until 6 AM of the current day.
+     * @example 2020-10-10
      */
     businessDate?: string;
   };
+  /**
+   * @example {
+   *   "id": "XT347518-1-1"
+   * }
+   */
   CreatedSubResourceIdModel: {
     id: string;
   };
+  /**
+   * @example {
+   *   "isoCurrencies": [
+   *     "AED",
+   *     "AUD",
+   *     "EUR",
+   *     "USD",
+   *     "XCD"
+   *   ]
+   * }
+   */
   CurrencyListModel: {
-    /** List of ISO currencies. */
+    /** @description List of ISO currencies. */
     isoCurrencies: string[];
   };
   EmbeddedCompanyModel: {
-    /** The company ID */
+    /** @description The company ID */
     id: string;
-    /** The code of the company */
+    /** @description The code of the company */
     code?: string;
-    /** The name of the company */
+    /** @description The name of the company */
     name?: string;
-    /** Whether or not the company can check out on AR */
+    /** @description Whether or not the company can check out on AR */
     canCheckOutOnAr?: boolean;
   };
   EmbeddedFolioModel: {
-    /** Folio ID */
+    /** @description Folio ID */
     id: string;
-    /** Name of the debitor - the one who will pay the bill */
+    /** @description Name of the debitor - the one who will pay the bill */
     debitor?: string;
   };
   EmbeddedInvoiceModel: {
-    /** Invoice id */
+    /** @description Invoice id */
     id: string;
   };
   EmbeddedPropertyModel: {
-    /** The property id */
+    /** @description The property id */
     id: string;
-    /** The code for the property that can be shown in reports and table views */
+    /** @description The code for the property that can be shown in reports and table views */
     code?: string;
-    /** The name for the property */
+    /** @description The name for the property */
     name?: string;
-    /** The description for the property */
+    /** @description The description for the property */
     description?: string;
   };
   EmbeddedReservationModel: {
-    /** Reservation id */
+    /** @description Reservation id */
     id: string;
-    /** Booking id */
+    /** @description Booking id */
     bookingId: string;
   };
   ExportAccountModel: {
-    /** The account name */
+    /** @description The account name */
     name: string;
-    /** The account number */
+    /** @description The account number */
     number: string;
-    /** The number of the parent account */
+    /** @description The number of the parent account */
     parentNumber?: string;
-    /** The account type */
+    /** @description The account type */
     type:
       | "Revenues"
       | "Payments"
@@ -947,16 +1476,24 @@ export interface definitions {
       | "CityTaxes"
       | "TransitoryItems"
       | "VatOnLiabilities"
-      | "LossOfAccountsReceivable";
+      | "LossOfAccountsReceivable"
+      | "SecondCityTax";
   };
   ExportGrossTransactionItemModel: {
-    /** Timestamp with time zone information, when the booking was done<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Timestamp with time zone information, when the booking was done<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     timestamp: string;
-    /** The business date when the booking was done */
+    /**
+     * Format: date
+     * @description The business date when the booking was done
+     * @example 2020-10-10
+     */
     date: string;
     debitedAccount: definitions["ExportAccountModel"];
     creditedAccount: definitions["ExportAccountModel"];
-    /** The type of business transaction which triggered the booking */
+    /** @description The type of business transaction which triggered the booking */
     command:
       | "PostCharge"
       | "PostPayment"
@@ -966,44 +1503,196 @@ export interface definitions {
       | "PostPrepaymentVat"
       | "PostToLossOfAccountsReceivables"
       | "System";
-    /** The currency of the transaction */
+    /** @description The currency of the transaction */
     currency: string;
-    /** The gross amount being booked */
+    /**
+     * Format: double
+     * @description The gross amount being booked
+     */
     grossAmount: number;
-    /** The net amount being booked */
+    /**
+     * Format: double
+     * @description The net amount being booked
+     */
     netAmount: number;
-    /** The taxes which make up the difference between net and gross amount */
+    /** @description The taxes which make up the difference between net and gross amount */
     taxes?: definitions["TaxAmountModel"][];
     receipt: definitions["ReceiptModel"];
-    /** The original raw transaction entry number which got converted to these one or 2 lines. */
+    /** @description The original raw transaction entry number which got converted to these one or 2 lines. */
     sourceEntryNumber: string;
-    /** The reference for the transactions, reservation id for guest folios, folio id for external folios, property code for the house folio */
+    /** @description The reference for the transactions, reservation id for guest folios, booking id for booking folio, folio id for external folios, property code for the house folio */
     reference: string;
-    /** Does this transaction belong to a reservation, a house or an external folio */
-    referenceType: "House" | "Guest" | "External";
+    /** @description Does this transaction belong to a reservation, a house or an external folio */
+    referenceType: "House" | "Guest" | "External" | "Booking";
   };
+  /**
+   * @example {
+   *   "transactions": [
+   *     {
+   *       "timestamp": "2024-03-12T09:20:23.1880627Z",
+   *       "date": "2024-03-06",
+   *       "debitedAccount": {
+   *         "name": "Cash Payment",
+   *         "number": "1600",
+   *         "type": "Payments"
+   *       },
+   *       "creditedAccount": {
+   *         "name": "Receivables for Reservation QPMZZTUK-1",
+   *         "number": "QPMZZTUK-1_Receivables",
+   *         "type": "Receivables"
+   *       },
+   *       "command": "PostCharge",
+   *       "currency": "EUR",
+   *       "grossAmount": 100.0,
+   *       "netAmount": 100.0,
+   *       "taxes": [],
+   *       "receipt": {
+   *         "type": "Reservation",
+   *         "number": "QPMZZTUK-1-V3"
+   *       },
+   *       "sourceEntryNumber": "IHQNWLZL",
+   *       "reference": "SRC-123",
+   *       "referenceType": "Guest"
+   *     },
+   *     {
+   *       "timestamp": "2024-03-12T09:20:23.1880696Z",
+   *       "date": "2024-03-06",
+   *       "debitedAccount": {
+   *         "name": "Revenues Accommodation",
+   *         "number": "5001",
+   *         "type": "Payments"
+   *       },
+   *       "creditedAccount": {
+   *         "name": "House Account",
+   *         "number": "HOUSE_HCF",
+   *         "type": "Receivables"
+   *       },
+   *       "command": "PostCharge",
+   *       "currency": "EUR",
+   *       "grossAmount": 214.0,
+   *       "netAmount": 200.0,
+   *       "taxes": [
+   *         {
+   *           "type": "Reduced",
+   *           "percent": 7.0,
+   *           "amount": 14.0
+   *         }
+   *       ],
+   *       "receipt": {
+   *         "type": "Reservation",
+   *         "number": "QPMZZTUK-1-V3"
+   *       },
+   *       "sourceEntryNumber": "IHQNWLZL",
+   *       "reference": "SRC-123",
+   *       "referenceType": "Guest"
+   *     }
+   *   ]
+   * }
+   */
   ExportGrossTransactionListModel: {
-    /** List of transactions with all details. */
+    /** @description List of transactions with all details. */
     transactions: definitions["ExportGrossTransactionItemModel"][];
   };
   ExternalReference: {
-    /** The merchant reference ('order number') */
+    /** @description The merchant reference ('order number') */
     merchantReference: string;
-    /** The globally unique identifier of this payment in the reports of the payment service */
+    /** @description The globally unique identifier of this payment in the reports of the payment service */
     pspReference: string;
   };
+  /**
+   * @example {
+   *   "accounts": [
+   *     {
+   *       "accountNumber": "1100",
+   *       "name": "Credit Card Payment",
+   *       "type": "Payments",
+   *       "hasChildren": true,
+   *       "isArchived": false
+   *     },
+   *     {
+   *       "accountNumber": "1100",
+   *       "name": "Bank Transfer",
+   *       "type": "Payments",
+   *       "hasChildren": false,
+   *       "isArchived": true
+   *     }
+   *   ],
+   *   "count": 0
+   * }
+   */
   FinanceAccountListModel: {
-    /** List of accounts in a property, having one specific parent. */
+    /** @description List of accounts in a property, having one specific parent. */
     accounts: definitions["SlimFinanceAccountModel"][];
-    /** Total count of items */
+    /**
+     * Format: int64
+     * @description Total count of items
+     */
     count: number;
   };
+  /**
+   * @example {
+   *   "accountNumber": "1000",
+   *   "name": "Other Revenues",
+   *   "type": "Revenues",
+   *   "hasChildren": false,
+   *   "parentNumber": "5000",
+   *   "isArchived": false,
+   *   "transactions": [
+   *     {
+   *       "timestamp": "2024-03-06T13:25:04.3329251+01:00",
+   *       "date": "2024-03-06",
+   *       "debitedAccount": {
+   *         "name": "Cash Payment",
+   *         "number": "1600",
+   *         "type": "Payments"
+   *       },
+   *       "creditedAccount": {
+   *         "name": "Revenues Accommodation",
+   *         "number": "5001",
+   *         "type": "Receivables"
+   *       },
+   *       "command": "PostCharge",
+   *       "amount": {
+   *         "amount": 180.0,
+   *         "currency": "EUR"
+   *       },
+   *       "entryNumber": "2017122500000001",
+   *       "reference": "SRC-123",
+   *       "referenceType": "Guest",
+   *       "entryGroupNumber": "2017122500000001"
+   *     },
+   *     {
+   *       "timestamp": "2024-03-06T14:25:04.3329251+01:00",
+   *       "date": "2024-03-06",
+   *       "debitedAccount": {
+   *         "name": "Cash Payment",
+   *         "number": "1600",
+   *         "type": "Payments"
+   *       },
+   *       "creditedAccount": {
+   *         "name": "Revenues Accommodation",
+   *         "number": "5001",
+   *         "type": "Receivables"
+   *       },
+   *       "command": "PostCharge",
+   *       "amount": {
+   *         "amount": 210.0,
+   *         "currency": "EUR"
+   *       },
+   *       "entryNumber": "2017122500000002",
+   *       "reference": "SRC-123",
+   *       "referenceType": "Guest",
+   *       "entryGroupNumber": "2017122500000002"
+   *     }
+   *   ]
+   * }
+   */
   FinanceAccountModel: {
-    /** The account number. Unique identifier within one property. */
+    /** @description The account number. Unique identifier within one property. */
     accountNumber: string;
-    /** The name of the account. */
+    /** @description The name of the account. */
     name: string;
-    /** The type of account. */
+    /** @description The type of account. */
     type:
       | "Revenues"
       | "Payments"
@@ -1015,26 +1704,32 @@ export interface definitions {
       | "CityTaxes"
       | "TransitoryItems"
       | "VatOnLiabilities"
-      | "LossOfAccountsReceivable";
+      | "LossOfAccountsReceivable"
+      | "SecondCityTax";
     /**
-     * Indicates whether this account has children / sub accounts or not. The children can be retrieved via GET /accounts and querying
+     * @description Indicates whether this account has children / sub accounts or not. The children can be retrieved via GET /accounts and querying
      * by parent.
      */
     hasChildren: boolean;
-    /** Parent account number. Null for top-level accounts. */
+    /** @description Parent account number. Null for top-level accounts. */
     parentNumber?: string;
-    /** Indicates whether this account is archived ot not. */
+    /** @description Indicates whether this account is archived ot not. */
     isArchived: boolean;
-    /** All transactions / bookings involving this account. */
+    /** @description All transactions / bookings involving this account. */
     transactions?: definitions["AccountingTransactionModel"][];
   };
+  /**
+   * @example {
+   *   "id": "XKCD-17"
+   * }
+   */
   FolioCreatedModel: {
-    /** The folio id */
+    /** @description The folio id */
     id: string;
   };
   FolioDebitorModel: {
     /**
-     * Whether the debitor is the booker, the primary guest, an additional guest, or the company.
+     * @description Whether the debitor is the booker, the primary guest, an additional guest, or the company.
      * When the folio has a company, the only possible value is 'Company'. 'Property' is a reserved type for the house folio.
      */
     type?:
@@ -1043,47 +1738,61 @@ export interface definitions {
       | "Company"
       | "AdditionalGuest"
       | "Property";
-    /** Title */
+    /** @description Title */
     title?: "Mr" | "Ms" | "Dr" | "Prof" | "Mrs" | "Other";
-    /** First name */
+    /** @description First name */
     firstName?: string;
-    /** Last name */
+    /** @description Last name */
     name?: string;
     address?: definitions["NonStrictAddressModel"];
     company?: definitions["CompanyInfoModel"];
-    /** Any additional information about the debitor that should be present on the invoice */
+    /** @description Debitor's Tax Id if debitor is a person */
+    personalTaxId?: string;
+    /** @description Any additional information about the debitor that should be present on the invoice */
     reference?: string;
-    /** Debitor's email */
+    /** @description Debitor's email */
     email?: string;
   };
   FolioItemModel: {
-    /** The id of the folio */
+    /** @description The id of the folio */
     id: string;
-    /** Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     created: string;
-    /** Date of update<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of update<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     updated: string;
-    /** The folio type */
-    type?: "House" | "Guest" | "External";
+    /** @description The folio type */
+    type?: "House" | "Guest" | "External" | "Booking";
     debitor?: definitions["FolioDebitorModel"];
-    /** The date when the folio has been closed */
+    /**
+     * Format: date
+     * @description The date when the folio has been closed
+     * @example 2020-10-10
+     */
     closingDate?: string;
-    /** Set to `true` if this is the main folio for the reservation */
+    /** @description Set to `true` if this is the main folio for the reservation */
     isMainFolio?: boolean;
-    /** Set to `true` if the folio has no unmoved [transitory] charges, unmoved payments, and allowances. */
+    /** @description Set to `true` if the folio has no unmoved [transitory] charges, unmoved payments, and allowances. */
     isEmpty?: boolean;
     reservation?: definitions["EmbeddedReservationModel"];
+    /** @description The id of the booking linked to this folio */
+    bookingId?: string;
     company?: definitions["EmbeddedCompanyModel"];
     balance: definitions["MonetaryValueModel"];
-    /** Set to true, if the folio has been checked out on accounts receivable */
+    /** @description Set to true, if the folio has been checked out on accounts receivable */
     checkedOutOnAccountsReceivable?: boolean;
     /**
-     * Depending on the state of the folio, certain warnings are shown.
+     * @description Depending on the state of the folio, certain warnings are shown.
      * This list includes all folio warnings.
      */
     folioWarnings?: "IncompleteBillingAddress"[];
     /**
-     * Depending on the state of the folio, certain actions are allowed or not.
+     * @description Depending on the state of the folio, certain actions are allowed or not.
      * This list includes all actions you can perform on this folio.
      */
     allowedActions?: (
@@ -1109,74 +1818,378 @@ export interface definitions {
       | "CreateProFormaInvoice"
       | "CreateDepositReceipt"
     )[];
-    /** All invoices that have been created for this folio. This is only set on folios of type 'guest' */
+    /** @description All invoices that have been created for this folio. This is only set on folios of type 'guest' */
     relatedInvoices?: definitions["EmbeddedInvoiceModel"][];
-    /** Status of the folio */
+    /** @description Status of the folio */
     status: "Open" | "Closed" | "ClosedWithInvoice";
-    /** The list of charges */
+    /** @description The list of charges */
     charges?: definitions["ChargeModel"][];
-    /** The list of allowances */
+    /** @description The list of allowances */
     allowances?: definitions["AllowanceModel"][];
-    /** The list of transitory charges */
+    /** @description The list of transitory charges */
     transitoryCharges?: definitions["TransitoryChargeModel"][];
-    /** The list of payments */
+    /** @description The list of payments */
     payments?: definitions["PaymentModel"][];
   };
+  /**
+   * @example {
+   *   "folios": [
+   *     {
+   *       "id": "XKCD-17",
+   *       "created": "0001-01-01T00:00:00Z",
+   *       "updated": "0001-01-01T00:00:00Z",
+   *       "type": "Guest",
+   *       "debitor": {
+   *         "title": "Mr",
+   *         "name": "Fisher",
+   *         "personalTaxId": "123456789"
+   *       },
+   *       "isMainFolio": true,
+   *       "isEmpty": false,
+   *       "reservation": {
+   *         "id": "XKCD-17",
+   *         "bookingId": "XKCD-17"
+   *       },
+   *       "balance": {
+   *         "amount": 223.59,
+   *         "currency": "EUR"
+   *       },
+   *       "checkedOutOnAccountsReceivable": false,
+   *       "allowedActions": [
+   *         "AddCharge",
+   *         "AddPayment",
+   *         "Close"
+   *       ],
+   *       "relatedInvoices": [
+   *         {
+   *           "id": "00010675"
+   *         }
+   *       ],
+   *       "status": "Open"
+   *     },
+   *     {
+   *       "id": "BRC-231",
+   *       "created": "0001-01-01T00:00:00Z",
+   *       "updated": "0001-01-01T00:00:00Z",
+   *       "type": "House",
+   *       "debitor": {
+   *         "title": "Mr",
+   *         "name": "Lee",
+   *         "personalTaxId": "123456789"
+   *       },
+   *       "isMainFolio": true,
+   *       "isEmpty": false,
+   *       "reservation": {
+   *         "id": "BRC-231",
+   *         "bookingId": "BRC-231"
+   *       },
+   *       "balance": {
+   *         "amount": 364.83,
+   *         "currency": "EUR"
+   *       },
+   *       "checkedOutOnAccountsReceivable": false,
+   *       "allowedActions": [
+   *         "AddCharge",
+   *         "AddPayment",
+   *         "Close"
+   *       ],
+   *       "relatedInvoices": [
+   *         {
+   *           "id": "00010672"
+   *         }
+   *       ],
+   *       "status": "Open"
+   *     },
+   *     {
+   *       "id": "XKCD-5-1",
+   *       "created": "0001-01-01T00:00:00Z",
+   *       "updated": "0001-01-01T00:00:00Z",
+   *       "type": "Guest",
+   *       "debitor": {
+   *         "title": "Ms",
+   *         "name": "Ms Jackson"
+   *       },
+   *       "closingDate": "2024-02-05",
+   *       "isMainFolio": false,
+   *       "isEmpty": false,
+   *       "reservation": {
+   *         "id": "XKCD-5",
+   *         "bookingId": "XKCD"
+   *       },
+   *       "balance": {
+   *         "amount": 0.0,
+   *         "currency": "EUR"
+   *       },
+   *       "checkedOutOnAccountsReceivable": true,
+   *       "allowedActions": [
+   *         "AddCharge",
+   *         "AddPayment",
+   *         "Close"
+   *       ],
+   *       "relatedInvoices": [
+   *         {
+   *           "id": "00010687"
+   *         }
+   *       ],
+   *       "status": "Open"
+   *     }
+   *   ],
+   *   "count": 3
+   * }
+   */
   FolioListModel: {
-    /** List of folios. */
+    /** @description List of folios. */
     folios: definitions["FolioItemModel"][];
-    /** Total count of items */
+    /**
+     * Format: int64
+     * @description Total count of items
+     */
     count: number;
   };
+  /**
+   * @example {
+   *   "id": "XKCD17-1",
+   *   "created": "0001-01-01T00:00:00Z",
+   *   "updated": "0001-01-01T00:00:00Z",
+   *   "type": "Guest",
+   *   "debitor": {
+   *     "title": "Dr",
+   *     "firstName": "Jon",
+   *     "name": "Doe",
+   *     "address": {
+   *       "addressLine1": "My Street 1",
+   *       "postalCode": "12453",
+   *       "city": "MyCity",
+   *       "countryCode": "GB"
+   *     },
+   *     "company": {
+   *       "name": "Horns & Hooves Inc",
+   *       "taxId": "TAX-12345",
+   *       "additionalTaxId": "TAX2-12345"
+   *     },
+   *     "personalTaxId": "123456789",
+   *     "reference": "SRC-1232"
+   *   },
+   *   "reservation": {
+   *     "id": "XKCD17",
+   *     "bookingId": "XKCD"
+   *   },
+   *   "property": {
+   *     "id": "MUC"
+   *   },
+   *   "charges": [
+   *     {
+   *       "id": "RND123",
+   *       "serviceType": "Accommodation",
+   *       "name": "Charge",
+   *       "isPosted": true,
+   *       "serviceDate": "2018-05-08",
+   *       "created": "0001-01-01T00:00:00Z",
+   *       "movedFrom": {
+   *         "id": "XKCD23-2"
+   *       },
+   *       "movedTo": {
+   *         "id": "XKCD23-3"
+   *       },
+   *       "amount": {
+   *         "grossAmount": 107.0,
+   *         "netAmount": 100.0,
+   *         "vatType": "Reduced",
+   *         "vatPercent": 7.0,
+   *         "currency": "EUR"
+   *       },
+   *       "quantity": 0,
+   *       "type": "TimeSlice"
+   *     },
+   *     {
+   *       "id": "RND125",
+   *       "serviceType": "Other",
+   *       "name": "The Daily Planet, Newspaper",
+   *       "isPosted": true,
+   *       "serviceDate": "2018-05-07",
+   *       "created": "0001-01-01T00:00:00Z",
+   *       "amount": {
+   *         "grossAmount": 2.14,
+   *         "netAmount": 2.0,
+   *         "vatType": "Reduced",
+   *         "vatPercent": 7.0,
+   *         "currency": "EUR"
+   *       },
+   *       "quantity": 0,
+   *       "type": "Direct"
+   *     },
+   *     {
+   *       "id": "REST2018243",
+   *       "serviceType": "Other",
+   *       "name": "Restaurant",
+   *       "isPosted": true,
+   *       "serviceDate": "2018-05-07",
+   *       "created": "0001-01-01T00:00:00Z",
+   *       "amount": {
+   *         "grossAmount": 59.0,
+   *         "netAmount": 59.0,
+   *         "vatType": "Without",
+   *         "vatPercent": 0.0,
+   *         "currency": "EUR"
+   *       },
+   *       "subAccountId": "MUC-REST",
+   *       "quantity": 0,
+   *       "type": "Direct"
+   *     }
+   *   ],
+   *   "transitoryCharges": [
+   *     {
+   *       "id": "RND3221-1",
+   *       "name": "Transitory charge",
+   *       "amount": {
+   *         "amount": 20.0,
+   *         "currency": "EUR"
+   *       },
+   *       "serviceDate": "0001-01-01",
+   *       "created": "0001-01-01T00:00:00Z",
+   *       "quantity": 0
+   *     }
+   *   ],
+   *   "payments": [
+   *     {
+   *       "id": "PAY-1",
+   *       "method": "BankTransfer",
+   *       "amount": {
+   *         "amount": 50.0,
+   *         "currency": "EUR"
+   *       },
+   *       "receipt": "CA-147-339",
+   *       "paymentDate": "0001-01-01T00:00:00Z",
+   *       "businessDate": "0001-01-01"
+   *     },
+   *     {
+   *       "id": "PAY-2",
+   *       "method": "Cash",
+   *       "amount": {
+   *         "amount": 2.14,
+   *         "currency": "EUR"
+   *       },
+   *       "paymentDate": "0001-01-01T00:00:00Z",
+   *       "businessDate": "0001-01-01"
+   *     }
+   *   ],
+   *   "pendingPayments": [
+   *     {
+   *       "id": "IDDQD-1",
+   *       "amount": {
+   *         "amount": 50.0,
+   *         "currency": "EUR"
+   *       }
+   *     },
+   *     {
+   *       "id": "IDKFA-2",
+   *       "amount": {
+   *         "amount": 2.14,
+   *         "currency": "EUR"
+   *       }
+   *     }
+   *   ],
+   *   "allowances": [
+   *     {
+   *       "id": "RND3221-1",
+   *       "amount": {
+   *         "grossAmount": 11.9,
+   *         "netAmount": 10.0,
+   *         "vatType": "Normal",
+   *         "vatPercent": 19.0,
+   *         "currency": "EUR"
+   *       },
+   *       "reason": "example",
+   *       "serviceType": "Other",
+   *       "serviceDate": "2018-05-10",
+   *       "created": "0001-01-01T00:00:00Z",
+   *       "movedFrom": {
+   *         "id": "XKCD23-2"
+   *       },
+   *       "movedTo": {
+   *         "id": "XKCD23-3"
+   *       },
+   *       "sourceChargeId": "REST2018243"
+   *     }
+   *   ],
+   *   "balance": {
+   *     "amount": 57.0,
+   *     "currency": "EUR"
+   *   },
+   *   "checkedOutOnAccountsReceivable": false,
+   *   "isMainFolio": true,
+   *   "isEmpty": false,
+   *   "allowedActions": [
+   *     "AddCharge",
+   *     "AddPayment",
+   *     "Close"
+   *   ],
+   *   "allowedPayment": 45.1,
+   *   "maximumAllowance": 20.0,
+   *   "status": "Open"
+   * }
+   */
   FolioModel: {
-    /** The id of the folio */
+    /** @description The id of the folio */
     id: string;
-    /** Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     created: string;
-    /** Date of update<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of update<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     updated: string;
-    /** The folio type */
-    type?: "House" | "Guest" | "External";
+    /** @description The folio type */
+    type?: "House" | "Guest" | "External" | "Booking";
     debitor?: definitions["FolioDebitorModel"];
-    /** The date when the folio has been closed */
+    /**
+     * Format: date
+     * @description The date when the folio has been closed
+     * @example 2020-10-10
+     */
     closingDate?: string;
     reservation?: definitions["EmbeddedReservationModel"];
+    /** @description The id of the booking linked to this folio */
+    bookingId?: string;
     company?: definitions["EmbeddedCompanyModel"];
     property: definitions["EmbeddedPropertyModel"];
-    /** The list of charges */
+    /** @description The list of charges */
     charges?: definitions["ChargeModel"][];
-    /** The list of charges */
+    /** @description The list of charges */
     transitoryCharges?: definitions["TransitoryChargeModel"][];
-    /** The list of payments - <b>DEPRECATED: This field will be removed on July 3rd 2020. Use GET /finance/v1/folios/{folioId}/payments or GET /finance/v1/folios/{folioId}/refunds instead.</b> */
+    /** @description The list of payments - <b>DEPRECATED: This field will be removed on July 3rd 2020. Use GET /finance/v1/folios/{folioId}/payments or GET /finance/v1/folios/{folioId}/refunds instead.</b> */
     payments?: definitions["PaymentModel"][];
-    /** The list of pending payments - <b>DEPRECATED: This field will be removed on July 3rd 2020. Use GET /finance/v1/folios/{folioId}/payments instead.</b> */
+    /** @description The list of pending payments - <b>DEPRECATED: This field will be removed on July 3rd 2020. Use GET /finance/v1/folios/{folioId}/payments instead.</b> */
     pendingPayments?: definitions["PendingPaymentModel"][];
-    /** The list of allowances */
+    /** @description The list of allowances */
     allowances?: definitions["AllowanceModel"][];
     balance: definitions["MonetaryValueModel"];
     /**
-     * Set to `true`, if the folio has been checked out on accounts receivable.
+     * @description Set to `true`, if the folio has been checked out on accounts receivable.
      * If you create an invoice from this folio, it will display the outstanding payments
      */
     checkedOutOnAccountsReceivable?: boolean;
-    /** Set to `true` if this is a main folio for the reservation */
+    /** @description Set to `true` if this is a main folio for the reservation */
     isMainFolio?: boolean;
-    /** Set to `true` if the folio has no unmoved [transitory] charges, unmoved payments, and allowances. */
+    /** @description Set to `true` if the folio has no unmoved [transitory] charges, unmoved payments, and allowances. */
     isEmpty?: boolean;
     /**
-     * All folios that are related to this folio. Either because they belong to the same reservation, or because charges where moved
-     * between them. This is only set on folios of type 'guest'
+     * @description All folios that are related to this folio. Either because they belong to the same reservation/booking or
+     * charges were moved/routed between them. It is only set on folios of type 'guest', 'booking', and 'external'.
      */
     relatedFolios?: definitions["EmbeddedFolioModel"][];
-    /** All invoices that have been created for this folio. This is only set on folios of type 'guest' */
+    /** @description All invoices that have been created for this folio. This is only set on folios of type 'guest' */
     relatedInvoices?: definitions["EmbeddedInvoiceModel"][];
     /**
-     * Depending on the state of the folio, certain warnings are shown.
+     * @description Depending on the state of the folio, certain warnings are shown.
      * This list includes all folio warnings.
      */
     folioWarnings?: "IncompleteBillingAddress"[];
     /**
-     * Depending on the state of the folio, certain actions are allowed or not.
+     * @description Depending on the state of the folio, certain actions are allowed or not.
      * This list includes all actions you can perform on this folio.
      */
     allowedActions?: (
@@ -1202,17 +2215,41 @@ export interface definitions {
       | "CreateProFormaInvoice"
       | "CreateDepositReceipt"
     )[];
-    /** The maximum payment that can be posted on this folio */
+    /**
+     * Format: double
+     * @description The maximum payment that can be posted on this folio
+     */
     allowedPayment?: number;
-    /** The maximum allowance (gross) that can be posted on this folio */
+    /**
+     * Format: double
+     * @description The maximum allowance (gross) that can be posted on this folio
+     */
     maximumAllowance?: number;
-    /** Status of the folio */
+    /** @description Status of the folio */
     status: "Open" | "Closed" | "ClosedWithInvoice";
   };
+  /**
+   * @example {
+   *   "id": "C3Q890XZ",
+   *   "method": "Cash",
+   *   "amount": {
+   *     "amount": 230.0,
+   *     "currency": "EUR"
+   *   },
+   *   "externalReference": {
+   *     "merchantReference": "BLIPKWXP-1",
+   *     "pspReference": "8535063621298633"
+   *   },
+   *   "paymentDate": "0001-01-01T00:00:00Z",
+   *   "status": "Success",
+   *   "type": "Custom",
+   *   "businessDate": "1845-01-12"
+   * }
+   */
   FolioPaymentModel: {
-    /** Id of the payment. This is unique within one folio */
+    /** @description Id of the payment. This is unique within one folio */
     id: string;
-    /** The payment method */
+    /** @description The payment method */
     method?:
       | "Cash"
       | "BankTransfer"
@@ -1248,45 +2285,55 @@ export interface definitions {
       | "PspWallet";
     amount: definitions["MonetaryValueModel"];
     externalReference?: definitions["ExternalReference"];
-    /** Receipt for the payment */
+    /** @description Receipt for the payment */
     receipt?: string;
-    /** The date and time when the payment was created<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description The date and time when the payment was created<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     paymentDate: string;
     movedFrom?: definitions["EmbeddedFolioModel"];
     movedTo?: definitions["EmbeddedFolioModel"];
-    /** A reason why the move operation was performed */
+    /** @description A reason why the move operation was performed */
     movedReason?: string;
-    /** A link to the original payment in case of splitting payments */
+    /** @description A link to the original payment in case of splitting payments */
     sourcePaymentId?: string;
-    /** Status of the payment */
+    /** @description Status of the payment */
     status: "Pending" | "Success" | "Failure" | "Canceled";
-    /** Human readable failure reason */
+    /** @description Human readable failure reason */
     failureReason?: string;
-    /** Machine-readable failure code */
+    /** @description Machine-readable failure code */
     failureCode?: "Failed" | "TimedOut";
-    /** Type of the payment */
+    /** @description Type of the payment */
     type:
       | "Custom"
       | "Terminal"
       | "PaymentAccount"
       | "Authorization"
       | "PaymentLink";
-    /** The date and time a payment link expires<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description The date and time a payment link expires<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     expiresAt?: string;
-    /** Payment link description */
+    /** @description Payment link description */
     description?: string;
-    /** Payment link url */
+    /** @description Payment link url */
     url?: string;
-    /** The list of actions for this payment */
+    /** @description The list of actions for this payment */
     actions?: definitions["ActionModel[PaymentAction,NotAllowedPaymentActionReason]"][];
-    /** The business date of the payment */
+    /**
+     * Format: date
+     * @description The business date of the payment
+     * @example 2020-10-10
+     */
     businessDate: string;
   };
   IncludedLineItemModel: {
-    /** The description of the item or service */
+    /** @description The description of the item or service */
     description?: string;
     price: definitions["MonetaryValueModel"];
-    /** The applied VAT type. */
+    /** @description The applied VAT type. */
     vatType?:
       | "Null"
       | "VeryReduced"
@@ -1296,19 +2343,27 @@ export interface definitions {
       | "Special"
       | "ReducedCovid19"
       | "NormalCovid19";
-    /** The applied VAT percent */
+    /**
+     * Format: double
+     * @description The applied VAT percent
+     */
     vatPercent?: number;
   };
+  /**
+   * @example {
+   *   "id": "MUC_201705070000012"
+   * }
+   */
   InvoiceCreatedModel: {
-    /** The invoice id */
+    /** @description The invoice id */
     id: string;
   };
   InvoiceItemModel: {
-    /** Invoice identifier */
+    /** @description Invoice identifier */
     id: string;
-    /** Invoice number */
+    /** @description Invoice number */
     number: string;
-    /** Invoice type */
+    /** @description Invoice type */
     type:
       | "Initial"
       | "Cancellation"
@@ -1317,36 +2372,41 @@ export interface definitions {
       | "AdvanceCancellation"
       | "AdvanceCorrection"
       | "Proforma";
-    /** Language which was used to create the invoice */
+    /** @description Language which was used to create the invoice */
     languageCode: string;
-    /** The folio for this invoice */
+    /** @description The folio for this invoice */
     folioId: string;
-    /** The reservation for this invoice */
+    /** @description The reservation for this invoice */
     reservationId?: string;
-    /** The ID of the property */
+    /** @description The booking for this invoice */
+    bookingId?: string;
+    /** @description The ID of the property */
     propertyId: string;
     /**
-     * If the invoice is related to another invoice, this field contains related invoice number
+     * @description If the invoice is related to another invoice, this field contains related invoice number
      * For example, if the invoice has Cancellation type,
      * this field contains the number of invoice which is being cancelled
      */
     relatedInvoiceNumber?: string;
-    /** If the invoice was written-off, this field contains the reason why it was written-off */
+    /** @description If the invoice was written-off, this field contains the reason why it was written-off */
     writeOffReason?: string;
     subTotal: definitions["MonetaryValueModel"];
     outstandingPayment?: definitions["MonetaryValueModel"];
-    /** True, if this invoice had no outstanding payments or was settled. */
+    /** @description True, if this invoice had no outstanding payments or was settled. */
     paymentSettled: boolean;
-    /** Status of the invoice */
+    /** @description Status of the invoice */
     status: "FullyPaid" | "Unpaid" | "WrittenOff";
-    /** Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     created: string;
-    /** Name of the guest */
+    /** @description Name of the guest */
     guestName?: string;
-    /** Company the guest specified */
+    /** @description Company the guest specified */
     guestCompany?: string;
     /**
-     * Depending on the state of the invoice, certain actions are allowed or not.
+     * @description Depending on the state of the invoice, certain actions are allowed or not.
      * This list includes all actions you can perform on this invoice.
      */
     allowedActions?: (
@@ -1359,12 +2419,16 @@ export interface definitions {
     company?: definitions["EmbeddedCompanyModel"];
   };
   InvoiceLineItemModel: {
-    /** The date on which this item or service is delivered */
+    /**
+     * Format: date
+     * @description The date on which this item or service is delivered
+     * @example 2020-10-10
+     */
     date: string;
-    /** The description of the item or service */
+    /** @description The description of the item or service */
     description: string;
     price: definitions["MonetaryValueModel"];
-    /** The applied VAT type. */
+    /** @description The applied VAT type. */
     vatType?:
       | "Null"
       | "VeryReduced"
@@ -1374,33 +2438,320 @@ export interface definitions {
       | "Special"
       | "ReducedCovid19"
       | "NormalCovid19";
-    /** The applied VAT percent */
+    /**
+     * Format: double
+     * @description The applied VAT percent
+     */
     vatPercent?: number;
-    /** Whether this line item represents a no-show fee */
+    /** @description Whether this line item represents a no-show fee */
     isNoShowFee: boolean;
-    /** Items which are included in the package, if there are any */
+    /** @description Items which are included in the package, if there are any */
     includedLineItems?: definitions["IncludedLineItemModel"][];
-    /** Guest who the service has been provided to. Is defined only when the invoice has charges from multiple folios with different guests. */
+    /** @description Guest who the service has been provided to. Is defined only when the invoice has charges from multiple folios with different guests. */
     guest?: string;
-    /** The count of services provided */
+    /**
+     * Format: int32
+     * @description The count of services provided
+     */
     quantity?: number;
   };
   InvoiceLineItemsModel: {
     lineItems?: definitions["InvoiceLineItemModel"][];
     subTotal: definitions["MonetaryValueModel"];
   };
+  /**
+   * @example {
+   *   "invoices": [
+   *     {
+   *       "id": "MUC-20171200000002",
+   *       "number": "20171200000002",
+   *       "type": "Initial",
+   *       "languageCode": "de",
+   *       "folioId": "DHNSHFK-1-1",
+   *       "reservationId": "DHNSHFK-1",
+   *       "bookingId": "DHNSHFK",
+   *       "propertyId": "MUC",
+   *       "subTotal": {
+   *         "amount": 100.0,
+   *         "currency": "EUR"
+   *       },
+   *       "paymentSettled": true,
+   *       "status": "FullyPaid",
+   *       "created": "2024-03-05T15:25:04.3329251+01:00",
+   *       "guestName": "Alan Turing",
+   *       "guestCompany": "GCHQ",
+   *       "company": {
+   *         "id": "MUC-ACME",
+   *         "code": "ACME",
+   *         "name": "ACME Inc."
+   *       }
+   *     },
+   *     {
+   *       "id": "MUC-20181200000002",
+   *       "number": "20181200000002",
+   *       "type": "Initial",
+   *       "languageCode": "de",
+   *       "folioId": "HGZGDNAK-1-1",
+   *       "reservationId": "HGZGDNAK-1",
+   *       "bookingId": "HGZGDNAK",
+   *       "propertyId": "MUC",
+   *       "subTotal": {
+   *         "amount": 100.0,
+   *         "currency": "EUR"
+   *       },
+   *       "outstandingPayment": {
+   *         "amount": 95.0,
+   *         "currency": "EUR"
+   *       },
+   *       "paymentSettled": false,
+   *       "status": "Unpaid",
+   *       "created": "2024-03-05T15:25:04.3329251+01:00",
+   *       "guestName": "Bertrand Russell",
+   *       "allowedActions": [
+   *         "CorrectAddress",
+   *         "CorrectCharges"
+   *       ]
+   *     },
+   *     {
+   *       "id": "MUC-20171200000018",
+   *       "number": "20171200000018",
+   *       "type": "Cancellation",
+   *       "languageCode": "de",
+   *       "folioId": "DHNSHFK-1-2",
+   *       "reservationId": "DHNSHFK-1",
+   *       "bookingId": "DHNSHFK",
+   *       "propertyId": "MUC",
+   *       "relatedInvoiceNumber": "20171200000002",
+   *       "subTotal": {
+   *         "amount": 100.0,
+   *         "currency": "EUR"
+   *       },
+   *       "paymentSettled": true,
+   *       "status": "FullyPaid",
+   *       "created": "2024-03-06T13:25:04.3329251+01:00",
+   *       "guestName": "Ludwig Wittgenstein"
+   *     },
+   *     {
+   *       "id": "MUC-20171200000022",
+   *       "number": "20171200000022",
+   *       "type": "Correction",
+   *       "languageCode": "de",
+   *       "folioId": "DHNSHFK-1-3",
+   *       "reservationId": "DHNSHFK-1",
+   *       "bookingId": "DHNSHFK",
+   *       "propertyId": "MUC",
+   *       "subTotal": {
+   *         "amount": 100.0,
+   *         "currency": "EUR"
+   *       },
+   *       "paymentSettled": true,
+   *       "status": "FullyPaid",
+   *       "created": "2024-03-06T13:25:04.3329251+01:00",
+   *       "guestName": "Rudolf Carnap",
+   *       "allowedActions": [
+   *         "CorrectAddress",
+   *         "CorrectCharges"
+   *       ]
+   *     },
+   *     {
+   *       "id": "MUC-20171200000023",
+   *       "number": "20171200000023",
+   *       "type": "Initial",
+   *       "languageCode": "de",
+   *       "folioId": "DHNSHFL-1-5",
+   *       "reservationId": "DHNSHFL-1",
+   *       "bookingId": "DHNSHFL",
+   *       "propertyId": "MUC",
+   *       "writeOffReason": "Some weighty reason",
+   *       "subTotal": {
+   *         "amount": 100.0,
+   *         "currency": "EUR"
+   *       },
+   *       "paymentSettled": false,
+   *       "status": "WrittenOff",
+   *       "created": "2024-03-06T12:25:04.3329251+01:00",
+   *       "guestName": "Yury Vlasov"
+   *     }
+   *   ],
+   *   "count": 5
+   * }
+   */
   InvoiceListModel: {
-    /** List of invoices. */
+    /** @description List of invoices. */
     invoices: definitions["InvoiceItemModel"][];
-    /** Total count of items */
+    /**
+     * Format: int64
+     * @description Total count of items
+     */
     count: number;
   };
+  /**
+   * @example {
+   *   "id": "INVOICE-SGZLTBJC-1",
+   *   "number": "MUC_20190328000000228",
+   *   "type": "Initial",
+   *   "to": {
+   *     "name": "John D. Doe",
+   *     "address": {
+   *       "addressLine1": "Baker Street 7",
+   *       "postalCode": "10005",
+   *       "city": "London",
+   *       "countryCode": "GB"
+   *     },
+   *     "companyName": "Investigators Inc.",
+   *     "companyTaxId": "GB-3358791",
+   *     "reference": "REF-111",
+   *     "personalTaxId": "123-321"
+   *   },
+   *   "paymentSettled": true,
+   *   "status": "FullyPaid",
+   *   "created": "0001-01-01T00:00:00Z",
+   *   "writeOffReason": "Weighty reason",
+   *   "allowedActions": [
+   *     "CorrectAddress",
+   *     "CorrectCharges"
+   *   ],
+   *   "invoiceDate": "2024-03-06",
+   *   "folioId": "SGZLTBJC-1",
+   *   "from": {
+   *     "name": "The Bay Hotel",
+   *     "address": {
+   *       "addressLine1": "Ocean Drive 44",
+   *       "postalCode": "55511",
+   *       "city": "Santa Cruz",
+   *       "countryCode": "US"
+   *     }
+   *   },
+   *   "commercialInformation": {
+   *     "registerEntry": "200417510087, California",
+   *     "taxId": "775-43-2106"
+   *   },
+   *   "bankAccount": {
+   *     "iban": "DE44 5001 0517 5407 3249 31",
+   *     "bic": "SSKMDEMMXXX",
+   *     "bank": "Stadtsparkasse München"
+   *   },
+   *   "paymentTerms": "Pay within 7 days",
+   *   "lineItems": {
+   *     "lineItems": [
+   *       {
+   *         "date": "2024-03-06",
+   *         "description": "Double Room",
+   *         "price": {
+   *           "amount": 130.0,
+   *           "currency": "EUR"
+   *         },
+   *         "vatType": "Reduced",
+   *         "vatPercent": 7.0,
+   *         "isNoShowFee": false,
+   *         "guest": "John Doe"
+   *       },
+   *       {
+   *         "date": "2024-03-06",
+   *         "description": "Service Package",
+   *         "price": {
+   *           "amount": 20.0,
+   *           "currency": "EUR"
+   *         },
+   *         "vatType": "Normal",
+   *         "vatPercent": 19.0,
+   *         "isNoShowFee": false,
+   *         "guest": "Jane Air"
+   *       },
+   *       {
+   *         "date": "2024-03-06",
+   *         "description": "Business Lounge Access",
+   *         "price": {
+   *           "amount": 40.0,
+   *           "currency": "EUR"
+   *         },
+   *         "vatType": "Normal",
+   *         "vatPercent": 19.0,
+   *         "isNoShowFee": false,
+   *         "guest": "John Doe"
+   *       }
+   *     ],
+   *     "subTotal": {
+   *       "amount": 190.0,
+   *       "currency": "EUR"
+   *     }
+   *   },
+   *   "payments": [
+   *     {
+   *       "id": "PAY-1",
+   *       "method": "BankTransfer",
+   *       "methodName": "Banküberweisung",
+   *       "amount": {
+   *         "amount": 130.0,
+   *         "currency": "EUR"
+   *       },
+   *       "paymentDate": "2024-03-06T15:25:04.3329251+01:00",
+   *       "businessDate": "0001-01-01"
+   *     },
+   *     {
+   *       "id": "PAY-2",
+   *       "method": "Cash",
+   *       "methodName": "Bar",
+   *       "amount": {
+   *         "amount": 30.0,
+   *         "currency": "EUR"
+   *       },
+   *       "paymentDate": "2024-03-06T15:25:04.3329251+01:00",
+   *       "businessDate": "0001-01-01"
+   *     }
+   *   ],
+   *   "taxDetails": [
+   *     {
+   *       "vatType": "Reduced",
+   *       "vatPercent": 7.0,
+   *       "net": {
+   *         "amount": 120.0,
+   *         "currency": "EUR"
+   *       },
+   *       "tax": {
+   *         "amount": 10.0,
+   *         "currency": "EUR"
+   *       }
+   *     },
+   *     {
+   *       "vatType": "Normal",
+   *       "vatPercent": 19.0,
+   *       "net": {
+   *         "amount": 49.0,
+   *         "currency": "EUR"
+   *       },
+   *       "tax": {
+   *         "amount": 11.0,
+   *         "currency": "EUR"
+   *       }
+   *     }
+   *   ],
+   *   "total": {
+   *     "amount": -30.0,
+   *     "currency": "EUR"
+   *   },
+   *   "stayInfo": {
+   *     "guestName": "John Doe",
+   *     "arrivalDate": "2024-03-09",
+   *     "departureDate": "2024-03-12",
+   *     "reservationId": "ASTUBXVZ-1"
+   *   },
+   *   "propertyId": "MUC",
+   *   "propertyCountryCode": "DE",
+   *   "languageCode": "EN",
+   *   "company": {
+   *     "id": "MUC-ACME",
+   *     "code": "ACME",
+   *     "name": "ACME Inc."
+   *   }
+   * }
+   */
   InvoiceModel: {
-    /** Invoice identifier */
+    /** @description Invoice identifier */
     id: string;
-    /** Invoice number */
+    /** @description Invoice number */
     number: string;
-    /** Invoice type */
+    /** @description Invoice type */
     type:
       | "Initial"
       | "Cancellation"
@@ -1410,22 +2761,25 @@ export interface definitions {
       | "AdvanceCorrection"
       | "Proforma";
     to: definitions["InvoiceRecipientModel"];
-    /** True, if this invoice had no outstanding payments or was settled. */
+    /** @description True, if this invoice had no outstanding payments or was settled. */
     paymentSettled: boolean;
-    /** Status of the invoice */
+    /** @description Status of the invoice */
     status: "FullyPaid" | "Unpaid" | "WrittenOff";
-    /** Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     created: string;
     /**
-     * If the invoice is related to another invoice, this field contains related invoice number
+     * @description If the invoice is related to another invoice, this field contains related invoice number
      * For example, if the invoice has Cancellation type,
      * this field contains the number of invoice which is being cancelled
      */
     relatedInvoiceNumber?: string;
-    /** If the invoice was written-off, this field contains the reason why it was written-off */
+    /** @description If the invoice was written-off, this field contains the reason why it was written-off */
     writeOffReason?: string;
     /**
-     * Depending on the state of the invoice, certain actions are allowed or not.
+     * @description Depending on the state of the invoice, certain actions are allowed or not.
      * This list includes all actions you can perform on this invoice.
      */
     allowedActions?: (
@@ -1435,35 +2789,52 @@ export interface definitions {
       | "Cancel"
       | "WriteOff"
     )[];
-    /** Date the invoice has been created */
+    /**
+     * Format: date
+     * @description Date the invoice has been created
+     * @example 2020-10-10
+     */
     invoiceDate: string;
-    /** The folio this invoice was requested for */
+    /** @description The folio this invoice was requested for */
     folioId: string;
     from: definitions["InvoiceSenderModel"];
     commercialInformation: definitions["CommercialInfoModel"];
     bankAccount?: definitions["BankAccountModel"];
-    /** Specification of the payment terms, as defined in the property */
+    /** @description Specification of the payment terms, as defined in the property */
     paymentTerms?: string;
     lineItems: definitions["InvoiceLineItemsModel"];
-    /** A list of all payments */
+    /** @description A list of all payments */
     payments?: definitions["InvoicePaymentModel"][];
     outstandingPayment?: definitions["MonetaryValueModel"];
-    /** The subtotal, displaying net and tax amount for each VAT type */
+    /** @description The subtotal, displaying net and tax amount for each VAT type */
     taxDetails?: definitions["TaxDetailModel"][];
     total: definitions["MonetaryValueModel"];
     stayInfo?: definitions["StayInfoModel"];
-    /** The ID of the property */
+    /** @description The ID of the property */
     propertyId: string;
-    /** The country code of the property */
+    /** @description The country code of the property */
     propertyCountryCode: string;
-    /** Language which was used to create the invoice */
+    /** @description Language which was used to create the invoice */
     languageCode: string;
     company?: definitions["EmbeddedCompanyModel"];
   };
+  /**
+   * @example {
+   *   "id": "C3Q890XZ",
+   *   "method": "BankTransfer",
+   *   "methodName": "Banküberweisung",
+   *   "amount": {
+   *     "amount": 230.0,
+   *     "currency": "EUR"
+   *   },
+   *   "paymentDate": "2024-03-06T14:25:04.3329251+01:00",
+   *   "businessDate": "1984-06-07"
+   * }
+   */
   InvoicePaymentModel: {
-    /** Id of the payment. This is unique within one folio. */
+    /** @description Id of the payment. This is unique within one folio. */
     id: string;
-    /** The Payment Method type. */
+    /** @description The Payment Method type. */
     method:
       | "Cash"
       | "BankTransfer"
@@ -1497,18 +2868,31 @@ export interface definitions {
       | "PspBanking"
       | "PspOpenInvoice"
       | "PspWallet";
-    /** The Payment Method name translated in the requested language of the invoice */
+    /** @description The Payment Method name translated in the requested language of the invoice */
     methodName: string;
     amount: definitions["MonetaryValueModel"];
-    /** The date when the payment was done<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description The date when the payment was done<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     paymentDate?: string;
-    /** The business date of the payment, can be different from the payment date for some payments posted after midnight and before 6AM. */
+    /**
+     * Format: date
+     * @description The business date of the payment, can be different from the payment date for some payments posted after midnight and before 6AM.
+     * @example 2020-10-10
+     */
     businessDate?: string;
   };
+  /**
+   * @example {
+   *   "languageCode": "en",
+   *   "folioId": "HBCXQZ-1"
+   * }
+   */
   InvoicePreviewPdfRequest: {
-    /** The language in which the invoice should be produced. */
+    /** @description The language in which the invoice should be produced. */
     languageCode: string;
-    /** The ID of the folio for which the invoice should be created. */
+    /** @description The ID of the folio for which the invoice should be created. */
     folioId: string;
   };
   InvoiceRecipientModel: {
@@ -1517,6 +2901,7 @@ export interface definitions {
     companyName?: string;
     companyTaxId?: string;
     reference?: string;
+    personalTaxId?: string;
   };
   InvoiceSenderModel: {
     name: string;
@@ -1526,36 +2911,71 @@ export interface definitions {
     messages?: string[];
   };
   MonetaryValueModel: {
+    /** Format: double */
     amount: number;
     currency: string;
   };
+  /**
+   * @example {
+   *   "targetFolioId": "KFCSQUID-1",
+   *   "reason": "Test"
+   * }
+   */
   MoveAllChargesRequest: {
-    /** ID of the target folio */
+    /** @description ID of the target folio */
     targetFolioId: string;
-    /** Description of why the move is performed */
+    /** @description Description of why the move is performed */
     reason: string;
   };
+  /**
+   * @example {
+   *   "targetFolioId": "KFCSQUID-1",
+   *   "reason": "Test",
+   *   "chargeIds": [
+   *     "KFCSQUID-1-C-1",
+   *     "KFCSQUID-1-C-5"
+   *   ],
+   *   "allowanceIds": [
+   *     "KFCSQUID-1-A-1",
+   *     "KFCSQUID-1-A-2"
+   *   ],
+   *   "transitoryChargeIds": [
+   *     "KFCSQUID-1-TC-1",
+   *     "KFCSQUID-1-TC-2"
+   *   ]
+   * }
+   */
   MoveChargesRequest: {
-    /** ID of the target folio */
+    /** @description ID of the target folio */
     targetFolioId: string;
-    /** Description of why the move is performed */
+    /** @description Description of why the move is performed */
     reason: string;
-    /** The IDs of the charges that should be moved */
+    /** @description The IDs of the charges that should be moved */
     chargeIds?: string[];
     /**
-     * The IDs of the allowances that should be moved.
+     * @description The IDs of the allowances that should be moved.
      * Only moving global allowances is supported
      */
     allowanceIds?: string[];
-    /** The IDs of the transitory charges that should be moved */
+    /** @description The IDs of the transitory charges that should be moved */
     transitoryChargeIds?: string[];
   };
+  /**
+   * @example {
+   *   "targetFolioId": "KFCSQUID-1",
+   *   "reason": "Test",
+   *   "paymentIds": [
+   *     "KFCSQUID-1-C-1",
+   *     "KFCSQUID-1-C-5"
+   *   ]
+   * }
+   */
   MovePaymentsRequest: {
-    /** ID of the target folio */
+    /** @description ID of the target folio */
     targetFolioId: string;
-    /** Description of why the move is performed */
+    /** @description Description of why the move is performed */
     reason: string;
-    /** The IDs of the payments that should be moved */
+    /** @description The IDs of the payments that should be moved */
     paymentIds: string[];
   };
   NonStrictAddressModel: {
@@ -1567,13 +2987,19 @@ export interface definitions {
     countryCode?: string;
   };
   Operation: {
-    value?: { [key: string]: unknown };
+    value?: unknown;
     path?: string;
     op?: string;
     from?: string;
   };
+  /**
+   * @example {
+   *   "paymentMethod": "BankTransfer",
+   *   "receipt": "BANK-123456"
+   * }
+   */
   PayInvoiceRequest: {
-    /** The payment method used for paying the invoice. Used for accounting. */
+    /** @description The payment method used for paying the invoice. Used for accounting. */
     paymentMethod:
       | "Cash"
       | "BankTransfer"
@@ -1601,20 +3027,87 @@ export interface definitions {
       | "Cheque"
       | "Airbnb"
       | "HolidayCheck";
-    /** The receipt for the payment. Each transaction in accounting has a receipt set. */
+    /** @description The receipt for the payment. Each transaction in accounting has a receipt set. */
     receipt: string;
   };
   PaymentCreatedModel: {
     id: string;
   };
+  /**
+   * @example {
+   *   "payments": [
+   *     {
+   *       "id": "PAY-1",
+   *       "method": "BankTransfer",
+   *       "amount": {
+   *         "amount": 50.0,
+   *         "currency": "EUR"
+   *       },
+   *       "receipt": "CA-147-339",
+   *       "paymentDate": "0001-01-01T00:00:00Z",
+   *       "status": "Success",
+   *       "type": "Custom",
+   *       "businessDate": "0001-01-01"
+   *     },
+   *     {
+   *       "id": "PAY-2",
+   *       "amount": {
+   *         "amount": 2.14,
+   *         "currency": "EUR"
+   *       },
+   *       "receipt": "HSKJCNDR-1",
+   *       "paymentDate": "0001-01-01T00:00:00Z",
+   *       "status": "Pending",
+   *       "type": "Custom",
+   *       "businessDate": "0001-01-01"
+   *     }
+   *   ],
+   *   "count": 2
+   * }
+   */
   PaymentListModel: {
-    /** List of payments */
+    /** @description List of payments */
     payments: definitions["FolioPaymentModel"][];
-    /** Total count of items */
+    /**
+     * Format: int64
+     * @description Total count of items
+     */
     count: number;
   };
+  /**
+   * @example {
+   *   "paymentMethods": [
+   *     "Cash",
+   *     "BankTransfer",
+   *     "CreditCard",
+   *     "Amex",
+   *     "VisaCredit",
+   *     "VisaDebit",
+   *     "MasterCard",
+   *     "MasterCardDebit",
+   *     "Maestro",
+   *     "GiroCard",
+   *     "DiscoverCard",
+   *     "Diners",
+   *     "Jcb",
+   *     "BookingCom",
+   *     "VPay",
+   *     "PayPal",
+   *     "Postcard",
+   *     "Reka",
+   *     "Twint",
+   *     "Lunchcheck",
+   *     "Voucher",
+   *     "ChinaUnionPay",
+   *     "Other",
+   *     "Cheque",
+   *     "Airbnb",
+   *     "HolidayCheck"
+   *   ]
+   * }
+   */
   PaymentMethodListModel: {
-    /** List of supported payment methods. */
+    /** @description List of supported payment methods. */
     paymentMethods: (
       | "Cash"
       | "BankTransfer"
@@ -1644,10 +3137,26 @@ export interface definitions {
       | "HolidayCheck"
     )[];
   };
+  /**
+   * @example {
+   *   "id": "C3Q890XZ",
+   *   "method": "Cash",
+   *   "amount": {
+   *     "amount": 230.0,
+   *     "currency": "EUR"
+   *   },
+   *   "externalReference": {
+   *     "merchantReference": "BLIPKWXP-1",
+   *     "pspReference": "8535063621298633"
+   *   },
+   *   "paymentDate": "0001-01-01T00:00:00Z",
+   *   "businessDate": "2021-05-22"
+   * }
+   */
   PaymentModel: {
-    /** Id of the payment. This is unique within one folio. */
+    /** @description Id of the payment. This is unique within one folio. */
     id: string;
-    /** The Payment Method. */
+    /** @description The Payment Method. */
     method:
       | "Cash"
       | "BankTransfer"
@@ -1683,90 +3192,311 @@ export interface definitions {
       | "PspWallet";
     amount: definitions["MonetaryValueModel"];
     externalReference?: definitions["ExternalReference"];
-    /** Receipt for the payment. For payments done by the payment service provider integration, this is the same as the pspReference. */
+    /** @description Receipt for the payment. For payments done by the payment service provider integration, this is the same as the pspReference. */
     receipt?: string;
-    /** The date when the payment was done<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description The date when the payment was done<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     paymentDate?: string;
     movedFrom?: definitions["EmbeddedFolioModel"];
     movedTo?: definitions["EmbeddedFolioModel"];
-    /** A reason why move operation was performed */
+    /** @description A reason why move operation was performed */
     movedReason?: string;
-    /** A link to the original payment in case of splitting payments */
+    /** @description A link to the original payment in case of splitting payments */
     sourcePaymentId?: string;
-    /** The business date of the payment */
+    /**
+     * Format: date
+     * @description The business date of the payment
+     * @example 2020-10-10
+     */
     businessDate: string;
   };
   PaymentPaidChargesRequest: {
-    /** The ID of the charge being paid */
+    /** @description The ID of the charge being paid */
     chargeId: string;
-    /** The amount being covered with the payment. If not provided it is assumed that the payment is covering the full amount of the charge */
+    /**
+     * Format: double
+     * @description The amount being covered with the payment. If not provided it is assumed that the payment is covering the full amount of the charge
+     */
     amount: number;
   };
+  /**
+   * @example {
+   *   "id": "HESOYAM",
+   *   "amount": {
+   *     "amount": 228.0,
+   *     "currency": "EUR"
+   *   },
+   *   "terminalId": "T400"
+   * }
+   */
   PendingPaymentModel: {
-    /** Id of the payment task. */
+    /** @description Id of the payment task. */
     id: string;
     amount: definitions["MonetaryValueModel"];
-    /** The terminal used for the payment. */
+    /** @description The terminal used for the payment. */
     terminalId?: string;
   };
-  /** Use this model in all accounting reports */
+  /** @description Use this model in all accounting reports */
   PreciseMonetaryValueModel: {
+    /** Format: double */
     amount: number;
     currency: string;
   };
+  /**
+   * @example {
+   *   "to": {
+   *     "name": "John D. Doe",
+   *     "address": {
+   *       "addressLine1": "Baker Street 7",
+   *       "postalCode": "10005",
+   *       "city": "London",
+   *       "countryCode": "GB"
+   *     },
+   *     "companyName": "Investigators Inc.",
+   *     "companyTaxId": "GB-3358791",
+   *     "reference": "REF-11",
+   *     "personalTaxId": "123-321"
+   *   },
+   *   "createInvoiceAction": "CreatesInvoice",
+   *   "invoiceDate": "2024-03-06",
+   *   "folioId": "SGZLTBJC-1",
+   *   "from": {
+   *     "name": "The Bay Hotel",
+   *     "address": {
+   *       "addressLine1": "Ocean Drive 44",
+   *       "postalCode": "55511",
+   *       "city": "Santa Cruz",
+   *       "countryCode": "US"
+   *     }
+   *   },
+   *   "commercialInformation": {
+   *     "registerEntry": "200417510087, California",
+   *     "taxId": "775-43-2106"
+   *   },
+   *   "bankAccount": {
+   *     "iban": "DE44 5001 0517 5407 3249 31",
+   *     "bic": "SSKMDEMMXXX",
+   *     "bank": "Stadtsparkasse München"
+   *   },
+   *   "paymentTerms": "Pay within 7 days",
+   *   "lineItems": {
+   *     "lineItems": [
+   *       {
+   *         "date": "2024-03-06",
+   *         "description": "Double Room",
+   *         "price": {
+   *           "amount": 130.0,
+   *           "currency": "EUR"
+   *         },
+   *         "vatType": "Reduced",
+   *         "vatPercent": 7.0,
+   *         "isNoShowFee": false
+   *       },
+   *       {
+   *         "date": "2024-03-06",
+   *         "description": "Service Package",
+   *         "price": {
+   *           "amount": 20.0,
+   *           "currency": "EUR"
+   *         },
+   *         "vatType": "Normal",
+   *         "vatPercent": 19.0,
+   *         "isNoShowFee": false
+   *       },
+   *       {
+   *         "date": "2024-03-06",
+   *         "description": "Business Lounge Access",
+   *         "price": {
+   *           "amount": 40.0,
+   *           "currency": "EUR"
+   *         },
+   *         "vatType": "Normal",
+   *         "vatPercent": 19.0,
+   *         "isNoShowFee": false
+   *       }
+   *     ],
+   *     "subTotal": {
+   *       "amount": 190.0,
+   *       "currency": "EUR"
+   *     }
+   *   },
+   *   "payments": [
+   *     {
+   *       "id": "PAY-1",
+   *       "method": "BankTransfer",
+   *       "methodName": "Banküberweisung",
+   *       "amount": {
+   *         "amount": 130.0,
+   *         "currency": "EUR"
+   *       },
+   *       "paymentDate": "2024-03-06T15:25:04.3329251+01:00",
+   *       "businessDate": "0001-01-01"
+   *     },
+   *     {
+   *       "id": "PAY-2",
+   *       "method": "Cash",
+   *       "methodName": "Bar",
+   *       "amount": {
+   *         "amount": 30.0,
+   *         "currency": "EUR"
+   *       },
+   *       "paymentDate": "2024-03-06T15:25:04.3329251+01:00",
+   *       "businessDate": "0001-01-01"
+   *     }
+   *   ],
+   *   "taxDetails": [
+   *     {
+   *       "vatType": "Reduced",
+   *       "vatPercent": 7.0,
+   *       "net": {
+   *         "amount": 120.0,
+   *         "currency": "EUR"
+   *       },
+   *       "tax": {
+   *         "amount": 10.0,
+   *         "currency": "EUR"
+   *       }
+   *     },
+   *     {
+   *       "vatType": "Normal",
+   *       "vatPercent": 19.0,
+   *       "net": {
+   *         "amount": 49.0,
+   *         "currency": "EUR"
+   *       },
+   *       "tax": {
+   *         "amount": 11.0,
+   *         "currency": "EUR"
+   *       }
+   *     }
+   *   ],
+   *   "total": {
+   *     "amount": -30.0,
+   *     "currency": "EUR"
+   *   },
+   *   "stayInfo": {
+   *     "guestName": "John Doe",
+   *     "arrivalDate": "2024-03-09",
+   *     "departureDate": "2024-03-12",
+   *     "reservationId": "ASTUBXVZ-1"
+   *   },
+   *   "propertyId": "ID",
+   *   "propertyCountryCode": "BY",
+   *   "languageCode": "en"
+   * }
+   */
   PreviewInvoiceModel: {
     to?: definitions["InvoiceRecipientModel"];
-    /** Describes what will happen, when you try to create an invoice with the folio in the state it is in now. */
+    /** @description Describes what will happen, when you try to create an invoice with the folio in the state it is in now. */
     createInvoiceAction:
       | "CannotCreateInvoice"
       | "CreatesInvoice"
       | "CreatesInvoiceAndClosesFolio"
       | "CreatesArInvoiceAndClosesFolio";
     createInvoiceWarning?: definitions["CreateInvoiceWarningModel"];
-    /** Date the invoice has been created */
+    /**
+     * Format: date
+     * @description Date the invoice has been created
+     * @example 2020-10-10
+     */
     invoiceDate: string;
-    /** The folio this invoice was requested for */
+    /** @description The folio this invoice was requested for */
     folioId: string;
     from: definitions["InvoiceSenderModel"];
     commercialInformation: definitions["CommercialInfoModel"];
     bankAccount?: definitions["BankAccountModel"];
-    /** Specification of the payment terms, as defined in the property */
+    /** @description Specification of the payment terms, as defined in the property */
     paymentTerms?: string;
     lineItems: definitions["InvoiceLineItemsModel"];
-    /** A list of all payments */
+    /** @description A list of all payments */
     payments?: definitions["InvoicePaymentModel"][];
     outstandingPayment?: definitions["MonetaryValueModel"];
-    /** The subtotal, displaying net and tax amount for each VAT type */
+    /** @description The subtotal, displaying net and tax amount for each VAT type */
     taxDetails?: definitions["TaxDetailModel"][];
     total: definitions["MonetaryValueModel"];
     stayInfo?: definitions["StayInfoModel"];
-    /** The ID of the property */
+    /** @description The ID of the property */
     propertyId: string;
-    /** The country code of the property */
+    /** @description The country code of the property */
     propertyCountryCode: string;
-    /** Language which was used to create the invoice */
+    /** @description Language which was used to create the invoice */
     languageCode: string;
     company?: definitions["EmbeddedCompanyModel"];
   };
   ReceiptModel: {
-    /** The type of receipt. */
+    /** @description The type of receipt. */
     type?: "Custom" | "Reservation" | "Invoice" | "PspReference";
-    /** The receipt number. */
+    /** @description The receipt number. */
     number: string;
   };
   RefundCreatedModel: {
     id: string;
   };
+  /**
+   * @example {
+   *   "refunds": [
+   *     {
+   *       "id": "MUC-12454",
+   *       "method": "Cash",
+   *       "amount": {
+   *         "amount": 100.0,
+   *         "currency": "EUR"
+   *       },
+   *       "refundDate": "2024-03-06T15:25:04.3329251+01:00",
+   *       "sourcePaymentId": "MUC-KSJHDF",
+   *       "status": "Failure",
+   *       "failureReason": "Can't refund more than original payment.",
+   *       "failureCode": "Failed",
+   *       "businessDate": "2024-03-06"
+   *     },
+   *     {
+   *       "id": "BER-12454",
+   *       "method": "CreditCard",
+   *       "amount": {
+   *         "amount": 220.0,
+   *         "currency": "EUR"
+   *       },
+   *       "refundDate": "2024-03-06T15:25:04.3329251+01:00",
+   *       "sourcePaymentId": "BER-UWNWFD",
+   *       "status": "Pending",
+   *       "businessDate": "2024-03-06"
+   *     }
+   *   ],
+   *   "count": 2
+   * }
+   */
   RefundListModel: {
-    /** List of refunds */
+    /** @description List of refunds */
     refunds: definitions["RefundModel"][];
-    /** Total count of items */
+    /**
+     * Format: int64
+     * @description Total count of items
+     */
     count: number;
   };
+  /**
+   * @example {
+   *   "id": "KDSF86SF",
+   *   "method": "CreditCard",
+   *   "amount": {
+   *     "amount": 150.0,
+   *     "currency": "EUR"
+   *   },
+   *   "externalReference": {
+   *     "merchantReference": "JDKLKDS-1",
+   *     "pspReference": "091283918312"
+   *   },
+   *   "refundDate": "2024-03-06T15:25:04.3329251+01:00",
+   *   "status": "Pending",
+   *   "businessDate": "2024-03-06"
+   * }
+   */
   RefundModel: {
-    /** Id of the refund */
+    /** @description Id of the refund */
     id: string;
-    /** The payment method */
+    /** @description The payment method */
     method:
       | "Cash"
       | "BankTransfer"
@@ -1802,25 +3532,45 @@ export interface definitions {
       | "PspWallet";
     amount: definitions["MonetaryValueModel"];
     externalReference?: definitions["ExternalReference"];
-    /** Receipt for the payment. For payments run through the apaleo payment services it is set to the pspReference */
+    /** @description Receipt for the payment. For payments run through the apaleo payment services it is set to the pspReference */
     receipt?: string;
-    /** The date when the refund was done<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description The date when the refund was done<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     refundDate: string;
-    /** A link to the payment that the refund was done for */
+    /** @description A link to the payment that the refund was done for */
     sourcePaymentId?: string;
-    /** Status of the refund */
+    /** @description Status of the refund */
     status: "Pending" | "Success" | "Failure" | "Canceled";
     failureReason?: string;
     failureCode?: "Failed" | "TimedOut";
     movedFrom?: definitions["EmbeddedFolioModel"];
     movedTo?: definitions["EmbeddedFolioModel"];
-    /** A reason why the move operation was performed */
+    /** @description A reason why the move operation was performed */
     movedReason?: string;
-    /** The business date of the refund */
+    /**
+     * Format: date
+     * @description The business date of the refund
+     * @example 2020-10-10
+     */
     businessDate: string;
   };
+  /**
+   * @example {
+   *   "serviceTypes": [
+   *     "Other",
+   *     "Accommodation",
+   *     "FoodAndBeverages",
+   *     "CancellationFees",
+   *     "NoShow",
+   *     "CityTax",
+   *     "SecondCityTax"
+   *   ]
+   * }
+   */
   ServiceTypeListModel: {
-    /** List of supported payment methods. */
+    /** @description List of supported payment methods. */
     serviceTypes: (
       | "Other"
       | "Accommodation"
@@ -1828,14 +3578,35 @@ export interface definitions {
       | "CancellationFees"
       | "NoShow"
       | "CityTax"
+      | "SecondCityTax"
     )[];
   };
+  /**
+   * @example {
+   *   "accountNumber": "1000",
+   *   "name": "Other Revenues",
+   *   "type": "Revenues",
+   *   "parentNumber": "5000",
+   *   "hasChildren": true,
+   *   "isArchived": false,
+   *   "subAccounts": [
+   *     {
+   *       "accountNumber": "1000",
+   *       "name": "Other Revenues (7%)",
+   *       "type": "Revenues",
+   *       "parentNumber": "RevenueOther",
+   *       "hasChildren": false,
+   *       "isArchived": true
+   *     }
+   *   ]
+   * }
+   */
   SlimFinanceAccountModel: {
-    /** The account number. Unique identifier within one property. */
+    /** @description The account number. Unique identifier within one property. */
     accountNumber: string;
-    /** The name of the account. */
+    /** @description The name of the account. */
     name: string;
-    /** The type of account. */
+    /** @description The type of account. */
     type:
       | "Revenues"
       | "Payments"
@@ -1847,55 +3618,96 @@ export interface definitions {
       | "CityTaxes"
       | "TransitoryItems"
       | "VatOnLiabilities"
-      | "LossOfAccountsReceivable";
-    /** Parent account number. Null for top-level accounts. */
+      | "LossOfAccountsReceivable"
+      | "SecondCityTax";
+    /** @description Parent account number. Null for top-level accounts. */
     parentNumber?: string;
-    /** Indicates whether this account has children / sub accounts or not. */
+    /** @description Indicates whether this account has children / sub accounts or not. */
     hasChildren: boolean;
-    /** Indicates whether this account is archived ot not. */
+    /** @description Indicates whether this account is archived ot not. */
     isArchived: boolean;
     vat?: definitions["VatItemModel"];
-    /** Sub accounts for this accounts. */
+    /** @description Sub accounts for this accounts. */
     subAccounts?: definitions["SlimFinanceAccountModel"][];
   };
+  /**
+   * @example {
+   *   "percent": 51.0,
+   *   "type": "ByPercent"
+   * }
+   */
   SplitChargeRequest: {
-    /** The percent to split charge (between 0 and 100) */
+    /**
+     * Format: double
+     * @description The percent to split charge (between 0 and 100)
+     */
     percent?: number;
     amount?: definitions["MonetaryValueModel"];
-    /** How to split the charge: by percent value, or by absolute amount */
+    /** @description How to split the charge: by percent value, or by absolute amount */
     type: "ByPercent" | "ByAmount";
   };
+  /**
+   * @example {
+   *   "allowanceId": "ABCDEF-1-1",
+   *   "firstChargeId": "ABCDEF-1-2",
+   *   "secondChargeId": "ABCDEF-1-2"
+   * }
+   */
   SplitChargeResult: {
     allowanceId?: string;
     firstChargeId?: string;
     secondChargeId?: string;
   };
+  /**
+   * @example {
+   *   "percent": 51.0,
+   *   "type": "ByPercent"
+   * }
+   */
   SplitPaymentRequest: {
-    /** The percent to split payment (between 0 and 100) */
+    /**
+     * Format: double
+     * @description The percent to split payment (between 0 and 100)
+     */
     percent?: number;
     amount?: definitions["MonetaryValueModel"];
-    /** How to split the payment: by percent value, or by absolute amount */
+    /** @description How to split the payment: by percent value, or by absolute amount */
     type: "ByPercent" | "ByAmount";
   };
+  /**
+   * @example {
+   *   "refundId": "ABCDEF-1-1",
+   *   "firstPaymentId": "ABCDEF-1-2",
+   *   "secondPaymentId": "ABCDEF-1-3"
+   * }
+   */
   SplitPaymentResult: {
     refundId?: string;
     firstPaymentId?: string;
     secondPaymentId?: string;
   };
   StayInfoModel: {
-    /** Name of the primary guest */
+    /** @description Name of the primary guest */
     guestName: string;
-    /** The arrival date */
+    /**
+     * Format: date
+     * @description The arrival date
+     * @example 2020-10-10
+     */
     arrivalDate: string;
-    /** The departure date */
+    /**
+     * Format: date
+     * @description The departure date
+     * @example 2020-10-10
+     */
     departureDate: string;
-    /** ID of the reservation this invoice is for, if any. */
+    /** @description ID of the reservation this invoice is for, if any. */
     reservationId: string;
-    /** The last room number */
+    /** @description The last room number */
     roomNumber?: string;
   };
   TaxAmountModel: {
-    /** The VAT type */
+    /** @description The VAT type */
     type:
       | "Null"
       | "VeryReduced"
@@ -1905,9 +3717,15 @@ export interface definitions {
       | "Special"
       | "ReducedCovid19"
       | "NormalCovid19";
-    /** The currently valid percent to calculate the VAT */
+    /**
+     * Format: double
+     * @description The currently valid percent to calculate the VAT
+     */
     percent: number;
-    /** The tax amount */
+    /**
+     * Format: double
+     * @description The tax amount
+     */
     amount: number;
   };
   TaxDetailModel: {
@@ -1920,39 +3738,51 @@ export interface definitions {
       | "Special"
       | "ReducedCovid19"
       | "NormalCovid19";
+    /** Format: double */
     vatPercent: number;
     net: definitions["MonetaryValueModel"];
     tax: definitions["MonetaryValueModel"];
   };
   TransitoryChargeModel: {
-    /** ID for transitory charge. This is unique within one folio. */
+    /** @description ID for transitory charge. This is unique within one folio. */
     id: string;
-    /** The name, article number, or other description of this item */
+    /** @description The name, article number, or other description of this item */
     name: string;
     amount: definitions["MonetaryValueModel"];
-    /** The service type of this transitory charge. As revenue and VAT of transitory charges are not recorded for the hotel, this is just FYI. */
+    /** @description The service type of this transitory charge. As revenue and VAT of transitory charges are not recorded for the hotel, this is just FYI. */
     serviceType?:
       | "Other"
       | "Accommodation"
       | "FoodAndBeverages"
       | "CancellationFees"
       | "NoShow"
-      | "CityTax";
-    /** The date when this charge was added. */
+      | "CityTax"
+      | "SecondCityTax";
+    /**
+     * Format: date
+     * @description The date when this charge was added.
+     * @example 2020-10-10
+     */
     serviceDate: string;
-    /** Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     created: string;
-    /** Receipt for this transaction */
+    /** @description Receipt for this transaction */
     receipt?: string;
     movedFrom?: definitions["EmbeddedFolioModel"];
     movedTo?: definitions["EmbeddedFolioModel"];
-    /** A reason why move operation was performed */
+    /** @description A reason why move operation was performed */
     movedReason?: string;
-    /** The count of services provided */
+    /**
+     * Format: int32
+     * @description The count of services provided
+     */
     quantity: number;
   };
   VatItemModel: {
-    /** The VAT type */
+    /** @description The VAT type */
     type:
       | "Null"
       | "VeryReduced"
@@ -1962,9 +3792,30 @@ export interface definitions {
       | "Special"
       | "ReducedCovid19"
       | "NormalCovid19";
-    /** The currently valid percent to calculate the VAT */
+    /**
+     * Format: double
+     * @description The currently valid percent to calculate the VAT
+     */
     percent: number;
   };
+  /**
+   * @example {
+   *   "vatTypes": [
+   *     {
+   *       "type": "Null",
+   *       "percent": 0.0
+   *     },
+   *     {
+   *       "type": "Reduced",
+   *       "percent": 7.0
+   *     },
+   *     {
+   *       "type": "Normal",
+   *       "percent": 19.0
+   *     }
+   *   ]
+   * }
+   */
   VatListModel: {
     vatTypes?: definitions["VatItemModel"][];
   };
@@ -2008,7 +3859,7 @@ export interface operations {
         /** If set to `true`, only main folios are returned, otherwise all. */
         onlyMain?: boolean;
         /** The type of the folio */
-        type?: "House" | "Guest" | "External";
+        type?: "House" | "Guest" | "External" | "Booking";
         /**
          * Allows filtering external folios by code.
          * Useful when you use external folios with custom codes.
@@ -2020,6 +3871,8 @@ export interface operations {
          * folio id. The search is case insensitive.
          */
         textSearch?: string;
+        /** This will filter reservations based on their balance.<br />You can provide an array of string expressions which all need to apply.<br />Each expression has the form of 'OPERATION_VALUE' where VALUE needs to be of the valid format of the property type and OPERATION can be:<br />'eq' for equals<br />'neq' for not equals<br />'lt' for less than<br />'gt' for greater than<br />'lte' for less than or equals<br />'gte' for greater than or equals<br />For instance<br />'eq_5' would mean the value should equal 5<br />'lte_7' would mean the value should be less than or equal to 7 */
+        balanceFilter?: string[];
         /** Page number, 1-based. Default value is 1 (if this is not set or not positive). Results in 204 if there are no items on that page. */
         pageNumber?: number;
         /** Page size. If this is not set or not positive, the pageNumber is ignored and all items are returned. */
@@ -2140,7 +3993,7 @@ export interface operations {
         /** If set to `true`, only main folios are returned, otherwise all. */
         onlyMain?: boolean;
         /** The type of the folio */
-        type?: "House" | "Guest" | "External";
+        type?: "House" | "Guest" | "External" | "Booking";
         /**
          * Allows filtering external folios by code.
          * Useful when you use external folios with custom codes.
@@ -2152,6 +4005,8 @@ export interface operations {
          * folio id. The search is case insensitive.
          */
         textSearch?: string;
+        /** This will filter reservations based on their balance.<br />You can provide an array of string expressions which all need to apply.<br />Each expression has the form of 'OPERATION_VALUE' where VALUE needs to be of the valid format of the property type and OPERATION can be:<br />'eq' for equals<br />'neq' for not equals<br />'lt' for less than<br />'gt' for greater than<br />'lte' for less than or equals<br />'gte' for greater than or equals<br />For instance<br />'eq_5' would mean the value should equal 5<br />'lte_7' would mean the value should be less than or equal to 7 */
+        balanceFilter?: string[];
       };
     };
     responses: {
@@ -2867,7 +4722,7 @@ export interface operations {
     };
   };
   /**
-   * Move payments from one folio of a reservation to another - moving between different reservations is not supported,
+   * Move payments from one guest/booking folio to another - moving between different bookings is not supported,
    * and will lead to an error. If one of the folios is closed, this action cannot be performed.<br />
    * The PSP reference, if present, will be removed when moving and only be persisted on the original payment.<br>You must have at least one of these scopes: 'charges.move, folios.manage'.
    */
@@ -3213,7 +5068,7 @@ export interface operations {
   };
   /**
    * Captures a specific amount from a pre-authorization and posts it to the folio. For the pre-authorization please ensure to set the respective metadata in the original payment
-   * transaction. The flow type has to be set to <i>CaptureOnly</i>. For more information please refer to the documentation of <a href="https://apaleo.dev/guides/business-cases/ibe/getting-the-money" target="_blank">how to do a pre-authorization on a booking engine</a>.
+   * transaction. The flow type has to be set to <i>CaptureOnly</i>. For more information please refer to the documentation of <a href="https://apaleo.dev/guides/business-cases/ibe/get-the-money" target="_blank">how to do a pre-authorization on a booking engine</a>.
    * The payment will be processed asynchronously. Use the location header to poll for the status of the payment. As long as a payment is pending it reduces the amount of allowed
    * payments for the folio. The payment times out after 60 minutes automatically<br>You must have this scope: 'folios.manage'.
    */
@@ -3575,7 +5430,7 @@ export interface operations {
     responses: {
       /** Success. */
       200: {
-        schema: { [key: string]: unknown };
+        schema: unknown;
       };
       /** Bad request. */
       400: unknown;
@@ -3649,6 +5504,8 @@ export interface operations {
         propertyIds?: string[];
         /** Filter by reservation IDs */
         reservationIds?: string[];
+        /** Filter by booking IDs */
+        bookingIds?: string[];
         /** Filter by folio IDs */
         folioIds?: string[];
         /** Find invoices for a recipient name or company. Provide at least three characters. */
@@ -3751,7 +5608,7 @@ export interface operations {
     responses: {
       /** Success. */
       200: {
-        schema: { [key: string]: unknown };
+        schema: unknown;
       };
       /** Bad request. */
       400: unknown;
@@ -3899,7 +5756,8 @@ export interface operations {
           | "CityTaxes"
           | "TransitoryItems"
           | "VatOnLiabilities"
-          | "LossOfAccountsReceivable";
+          | "LossOfAccountsReceivable"
+          | "SecondCityTax";
         /** Allows to override the default accounting schema. Only specify this, when you know what you are doing. */
         accountingSchema?: "Simple" | "Extended";
         /** The language for the the report (2-letter ISO code) */
@@ -3968,7 +5826,8 @@ export interface operations {
           | "CityTaxes"
           | "TransitoryItems"
           | "VatOnLiabilities"
-          | "LossOfAccountsReceivable";
+          | "LossOfAccountsReceivable"
+          | "SecondCityTax";
         /** Allows to override the default accounting schema. Only specify this, when you know what you are doing. */
         accountingSchema?: "Simple" | "Extended";
         /** The language for the the report (2-letter ISO code) */
@@ -4041,7 +5900,8 @@ export interface operations {
           | "CityTaxes"
           | "TransitoryItems"
           | "VatOnLiabilities"
-          | "LossOfAccountsReceivable";
+          | "LossOfAccountsReceivable"
+          | "SecondCityTax";
         /** Allows to override the default accounting schema. Only specify this, when you know what you are doing. */
         accountingSchema?: "Simple" | "Extended";
         /** The language for the the report */
@@ -4114,7 +5974,8 @@ export interface operations {
           | "CityTaxes"
           | "TransitoryItems"
           | "VatOnLiabilities"
-          | "LossOfAccountsReceivable";
+          | "LossOfAccountsReceivable"
+          | "SecondCityTax";
         /** Allows to override the default accounting schema. Only specify this, when you know what you are doing. */
         accountingSchema?: "Simple" | "Extended";
         /** The language for the the report */
@@ -4183,7 +6044,8 @@ export interface operations {
           | "CityTaxes"
           | "TransitoryItems"
           | "VatOnLiabilities"
-          | "LossOfAccountsReceivable";
+          | "LossOfAccountsReceivable"
+          | "SecondCityTax";
         /** Allows to override the default accounting schema. Only specify this, when you know what you are doing. */
         accountingSchema?: "Simple" | "Extended";
         /** The language for the the report (2-letter ISO code) */
@@ -4614,6 +6476,7 @@ export interface operations {
    * - Austria (AT)<br />
    * - Azerbaijan (AZ)<br />
    * - Belgium (BE)<br />
+   * - Bulgaria (BG)<br />
    * - Cape Verde (CV)<br />
    * - Croatia (HR)<br />
    * - Czech Republic (CZ)<br />
@@ -4622,23 +6485,27 @@ export interface operations {
    * - France (FR) - without the super-reduced 2.1% VAT<br />
    * - French Polynesia (PF)<br />
    * - Germany (DE)<br />
+   * - Greece (GR)<br />
    * - Hungary (HU)<br />
    * - Indonesia (ID)<br />
    * - Ireland (IE)<br />
    * - Italy (IT)<br />
    * - Iceland (IS)<br />
    * - Japan (JP)<br />
+   * - Malaysia (MY)<br />
    * - Mexico (MX)<br />
    * - Netherlands (NL)<br />
    * - New Zealand (NZ)<br />
    * - Norway (NO) - without the VAT for raw fish supplies<br />
    * - Portugal (PT)<br />
+   * - Reunion (RE)<br />
    * - Saudi Arabia (SA)<br />
    * - Slovenia (SI)<br />
    * - South Africa (ZA)<br />
    * - Spain (ES)<br />
    * - Sweden (SE)<br />
    * - Switzerland (CH)<br />
+   * - Taiwan (TW)<br />
    * - United Kingdom (GB)
    */
   FinanceTypesVatGet: {
@@ -4647,8 +6514,8 @@ export interface operations {
         /** The 2-letter ISO country code */
         isoCountryCode: string;
         /**
-         * If specified, returns only the VAT types that are in place for this specific date.
-         * If nothing specified, returns all VAT types that existed and will exist for the country.
+         * If specified, returns the VAT types that are effective for this specific date.
+         * If nothing specified, returns the VAT types that are effective for the current date in UTC timezone.
          */
         atDate?: string;
       };

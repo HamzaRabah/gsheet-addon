@@ -77,50 +77,102 @@ export interface definitions {
     company: definitions["CompanyModel"];
     invoice: definitions["InvoiceModel"];
   };
+  /**
+   * @example {
+   *   "companyInvoices": [
+   *     {
+   *       "company": {
+   *         "id": "MUC-APALEO",
+   *         "code": "APALEO",
+   *         "name": "APALEO Company",
+   *         "taxId": "DE311046461",
+   *         "address": {
+   *           "addressLine1": "Dachauerstr. 15 A",
+   *           "postalCode": "80335",
+   *           "city": "Munich",
+   *           "countryCode": "DE"
+   *         }
+   *       },
+   *       "invoice": {
+   *         "number": "2019050000009",
+   *         "date": "2024-03-12",
+   *         "subTotal": {
+   *           "amount": 114.0,
+   *           "currency": "EUR"
+   *         },
+   *         "outstandingPayment": {
+   *           "amount": 50.0,
+   *           "currency": "EUR"
+   *         },
+   *         "taxDetails": [
+   *           {
+   *             "vatType": "Reduced",
+   *             "vatPercent": 14.0,
+   *             "net": {
+   *               "amount": 100.0,
+   *               "currency": "EUR"
+   *             },
+   *             "tax": {
+   *               "amount": 14.0,
+   *               "currency": "EUR"
+   *             }
+   *           }
+   *         ]
+   *       }
+   *     }
+   *   ],
+   *   "count": 1
+   * }
+   */
   CompaniesVatReportListModel: {
-    /** List of company invoices */
+    /** @description List of company invoices */
     companyInvoices: definitions["CompaniesVatReportItemModel"][];
-    /** Total count of items */
+    /**
+     * Format: int64
+     * @description Total count of items
+     */
     count: number;
   };
   CompanyModel: {
-    /** The ID of the company */
+    /** @description The ID of the company */
     id: string;
-    /** The code for the company */
+    /** @description The code for the company */
     code: string;
-    /** The name of the company */
+    /** @description The name of the company */
     name: string;
-    /** The tax ID of the company */
+    /** @description The tax ID of the company */
     taxId?: string;
     address: definitions["AddressModel"];
   };
   CountryEntry: {
-    /** 2 letter ISO country code */
-    countryCode: string;
+    /** @description 2 letter ISO country code */
+    countryCode?: string;
+    /** Format: int32 */
     number: number;
+    /** Format: double */
     percent: number;
     reservationIds?: string[];
   };
   EmbeddedUnitGroupModel: {
-    /** The unit group id */
+    /** @description The unit group id */
     id: string;
-    /** The code for the unit group that can be shown in reports and table views */
+    /** @description The code for the unit group that can be shown in reports and table views */
     code?: string;
-    /** The name for the unit group */
+    /** @description The name for the unit group */
     name?: string;
-    /** The description for the unit group */
+    /** @description The description for the unit group */
     description?: string;
-    /** The unit group type */
+    /** @description The unit group type */
     type?: "BedRoom" | "MeetingRoom" | "EventSpace" | "ParkingLot" | "Other";
   };
   ExportAccountModel: {
-    /** The account name */
+    /** @description The account name */
     name: string;
-    /** The account number */
+    /** @description The account number */
     number: string;
-    /** The number of the parent account */
+    /** @description The number of the parent account */
     parentNumber?: string;
-    /** The account type */
+    /** @description The account type */
     type:
       | "Revenues"
       | "Payments"
@@ -132,124 +184,322 @@ export interface definitions {
       | "CityTaxes"
       | "TransitoryItems"
       | "VatOnLiabilities"
-      | "LossOfAccountsReceivable";
+      | "LossOfAccountsReceivable"
+      | "SecondCityTax";
   };
+  /**
+   * @example {
+   *   "total": 279,
+   *   "travelPurposeBreakdown": [
+   *     {
+   *       "purpose": "Leisure",
+   *       "number": 274,
+   *       "percent": 98.20,
+   *       "reservationIds": [
+   *         "AHSJFHSH-1",
+   *         "HFNDHSKA-2"
+   *       ]
+   *     },
+   *     {
+   *       "purpose": "Business",
+   *       "number": 2,
+   *       "percent": 0.72,
+   *       "reservationIds": [
+   *         "AHSJFHSH-1",
+   *         "HFNDHSKA-2"
+   *       ]
+   *     },
+   *     {
+   *       "number": 2,
+   *       "percent": 0.72,
+   *       "reservationIds": [
+   *         "AHSJFHSH-1",
+   *         "HFNDHSKA-2"
+   *       ]
+   *     }
+   *   ],
+   *   "nationalityBreakdown": [
+   *     {
+   *       "countryCode": "DE",
+   *       "number": 118,
+   *       "percent": 42.29,
+   *       "reservationIds": [
+   *         "AHSJFHSH-1",
+   *         "HFNDHSKA-2"
+   *       ]
+   *     },
+   *     {
+   *       "countryCode": "GB",
+   *       "number": 18,
+   *       "percent": 6.45,
+   *       "reservationIds": [
+   *         "AHSJFHSH-1",
+   *         "HFNDHSKA-2"
+   *       ]
+   *     },
+   *     {
+   *       "number": 143,
+   *       "percent": 51.26,
+   *       "reservationIds": [
+   *         "AHSJFHSH-1",
+   *         "HFNDHSKA-2"
+   *       ]
+   *     }
+   *   ],
+   *   "countryOfResidenceBreakdown": [
+   *     {
+   *       "countryCode": "DE",
+   *       "number": 132,
+   *       "percent": 47.31,
+   *       "reservationIds": [
+   *         "AHSJFHSH-1",
+   *         "HFNDHSKA-2"
+   *       ]
+   *     },
+   *     {
+   *       "countryCode": "GB",
+   *       "number": 9,
+   *       "percent": 3.23,
+   *       "reservationIds": [
+   *         "AHSJFHSH-1",
+   *         "HFNDHSKA-2"
+   *       ]
+   *     },
+   *     {
+   *       "number": 138,
+   *       "percent": 49.46,
+   *       "reservationIds": [
+   *         "AHSJFHSH-1",
+   *         "HFNDHSKA-2"
+   *       ]
+   *     }
+   *   ]
+   * }
+   */
   GuestReportModel: {
-    /** Total number for all guests. */
+    /**
+     * Format: int32
+     * @description Total number for all guests.
+     */
     total: number;
-    /** Breakdown by travel purpose. Data where the travel purpose is unknown is excluded. */
+    /** @description Breakdown by travel purpose. */
     travelPurposeBreakdown?: definitions["TravelPurposeEntry"][];
-    /** Breakdown by nationality. Data where the nationality is unknown is excluded. */
+    /** @description Breakdown by nationality. */
     nationalityBreakdown?: definitions["CountryEntry"][];
-    /** Breakdown by country of residence. Data where the country of residence is unknown is excluded. */
+    /** @description Breakdown by country of residence. */
     countryOfResidenceBreakdown?: definitions["CountryEntry"][];
   };
   InvoiceModel: {
-    /** Invoice number */
+    /** @description Invoice number */
     number?: string;
-    /** Date the invoice has been created */
+    /**
+     * Format: date
+     * @description Date the invoice has been created
+     * @example 2020-10-10
+     */
     date: string;
     subTotal: definitions["MonetaryValueModel"];
     outstandingPayment?: definitions["MonetaryValueModel"];
-    /** The subtotal, displaying net and tax amount for each VAT type */
+    /** @description The subtotal, displaying net and tax amount for each VAT type */
     taxDetails?: definitions["TaxDetailModel"][];
   };
   MessageItemCollection: {
     messages?: string[];
   };
   MonetaryValueModel: {
+    /** Format: double */
     amount: number;
     currency: string;
   };
   OrderedServicesGuestModel: {
-    /** Title of the guest */
+    /** @description Title of the guest */
     title?: "Mr" | "Ms" | "Dr" | "Prof" | "Mrs" | "Other";
-    /** Gender of the guest */
+    /** @description Gender of the guest */
     gender?: "Female" | "Male" | "Other";
-    /** First name of the guest */
+    /** @description First name of the guest */
     firstName?: string;
-    /** Middle initial of the guest */
+    /** @description Middle initial of the guest */
     middleInitial?: string;
-    /** Last name of the guest */
+    /** @description Last name of the guest */
     lastName: string;
   };
   OrderedServicesItemModel: {
-    /** The service id */
+    /** @description The service id */
     id: string;
-    /** The code for the service */
+    /** @description The code for the service */
     code: string;
-    /** The name for the service */
+    /** @description The name for the service */
     name: string;
-    /** The date this service is delivered */
+    /**
+     * Format: date
+     * @description The date this service is delivered
+     * @example 2020-10-10
+     */
     serviceDate: string;
-    /** The count of services ordered */
+    /**
+     * Format: int32
+     * @description The count of services ordered
+     */
     count: number;
     guest?: definitions["OrderedServicesGuestModel"];
     reservation: definitions["OrderedServicesReservationModel"];
     unit?: definitions["OrderedServicesUnitModel"];
     unitGroup: definitions["OrderedServicesUnitGroupModel"];
   };
+  /**
+   * @example {
+   *   "orderedServices": [
+   *     {
+   *       "id": "MUC-BRK",
+   *       "code": "BRK",
+   *       "name": "Breakfast",
+   *       "serviceDate": "2024-03-09",
+   *       "count": 1,
+   *       "guest": {
+   *         "title": "Mr",
+   *         "gender": "Male",
+   *         "firstName": "John",
+   *         "middleInitial": "G.",
+   *         "lastName": "Doe"
+   *       },
+   *       "reservation": {
+   *         "id": "XPGMSXGF-1",
+   *         "arrival": "2024-03-08T17:00:00+01:00",
+   *         "departure": "2024-03-10T17:00:00+01:00",
+   *         "persons": 2
+   *       },
+   *       "unit": {
+   *         "id": "HDHD",
+   *         "name": "A.001"
+   *       },
+   *       "unitGroup": {
+   *         "id": "MUC-SGL",
+   *         "code": "SGL",
+   *         "name": "Single room"
+   *       }
+   *     }
+   *   ],
+   *   "count": 1
+   * }
+   */
   OrderedServicesListModel: {
-    /** List of ordered services */
+    /** @description List of ordered services */
     orderedServices: definitions["OrderedServicesItemModel"][];
-    /** Total count of items */
+    /**
+     * Format: int64
+     * @description Total count of items
+     */
     count: number;
   };
   OrderedServicesReservationModel: {
-    /** Reservation id */
+    /** @description Reservation id */
     id: string;
-    /** Date of arrival<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of arrival<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     arrival: string;
-    /** Date of departure<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of departure<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     departure: string;
-    /** Number of persons */
+    /**
+     * Format: int32
+     * @description Number of persons
+     */
     persons: number;
   };
   OrderedServicesUnitGroupModel: {
-    /** The unit group id */
+    /** @description The unit group id */
     id: string;
-    /** The code for the unit group */
+    /** @description The code for the unit group */
     code: string;
-    /** The name for the unit group */
+    /** @description The name for the unit group */
     name: string;
   };
   OrderedServicesUnitModel: {
-    /** The unit id */
+    /** @description The unit id */
     id: string;
-    /** The name for the unit */
+    /** @description The name for the unit */
     name: string;
   };
   PropertyPerformancePerUnitGroupModel: {
     unitGroup: definitions["EmbeddedUnitGroupModel"];
-    /** The number of units physically existing excluding the ones which are out of inventory */
+    /**
+     * Format: int32
+     * @description The number of units physically existing excluding the ones which are out of inventory
+     */
     houseCount: number;
-    /** The number of items (e.g. beds, seats, etc.) physically existing excluding the ones which are out of inventory */
+    /**
+     * Format: int32
+     * @description The number of items (e.g. beds, seats, etc.) physically existing excluding the ones which are out of inventory
+     */
     houseItemsCount: number;
-    /** The number of sold units plus definitely blocked units from group bookings */
+    /**
+     * Format: int32
+     * @description The number of sold units plus definitely blocked units from group bookings
+     */
     soldCount: number;
-    /** The number of sold items (e.g. beds, seats, etc.) plus definitely blocked items from group bookings */
+    /**
+     * Format: int32
+     * @description The number of sold items (e.g. beds, seats, etc.) plus definitely blocked items from group bookings
+     */
     soldItemsCount: number;
-    /** The number of unsold units: house count minus sold units and out of order units */
+    /**
+     * Format: int32
+     * @description The number of unsold units: house count minus sold units and out of order units
+     */
     unsoldCount: number;
-    /** The number of unsold items (e.g. beds, seats, etc.): house items count minus sold items and out of order items */
+    /**
+     * Format: int32
+     * @description The number of unsold items (e.g. beds, seats, etc.): house items count minus sold items and out of order items
+     */
     unsoldItemsCount: number;
-    /** The number of units which are out of order */
+    /**
+     * Format: int32
+     * @description The number of units which are out of order
+     */
     outOfOrderCount: number;
-    /** The number of items (e.g. beds, seats, etc.) which are out of order */
+    /**
+     * Format: int32
+     * @description The number of items (e.g. beds, seats, etc.) which are out of order
+     */
     outOfOrderItemsCount: number;
-    /** The number of units which are tentatively blocked */
+    /**
+     * Format: int32
+     * @description The number of units which are tentatively blocked
+     */
     tentativelyBlockedCount: number;
-    /** The number of items (beds, seats, etc.) which are tentatively blocked */
+    /**
+     * Format: int32
+     * @description The number of items (beds, seats, etc.) which are tentatively blocked
+     */
     tentativelyBlockedItemsCount: number;
-    /** The number of arrivals units */
+    /**
+     * Format: int32
+     * @description The number of arrivals units
+     */
     arrivalsCount: number;
-    /** The number of departures units */
+    /**
+     * Format: int32
+     * @description The number of departures units
+     */
     departuresCount: number;
-    /** The number of no-show units */
+    /**
+     * Format: int32
+     * @description The number of no-show units
+     */
     noShowsCount: number;
-    /** The number of cancelled units */
+    /**
+     * Format: int32
+     * @description The number of cancelled units
+     */
     cancellationsCount: number;
-    /** The occupancy in percent, which is the ratio of sold units in relation to house count minus out of order units */
+    /**
+     * Format: double
+     * @description The occupancy in percent, which is the ratio of sold units in relation to house count minus out of order units
+     */
     occupancyPercentage: number;
     grossUnitRevenue: definitions["MonetaryValueModel"];
     netUnitRevenue: definitions["MonetaryValueModel"];
@@ -264,37 +514,86 @@ export interface definitions {
     revPar: definitions["MonetaryValueModel"];
   };
   PropertyPerformanceReportItemModel: {
-    /** The business day */
+    /**
+     * Format: date
+     * @description The business day
+     * @example 2020-10-10
+     */
     businessDay: string;
-    /** The number of units physically existing excluding the ones which are out of inventory */
+    /**
+     * Format: int32
+     * @description The number of units physically existing excluding the ones which are out of inventory
+     */
     houseCount: number;
-    /** The number of items (e.g. beds, seats, etc.) physically existing excluding the ones which are out of inventory */
+    /**
+     * Format: int32
+     * @description The number of items (e.g. beds, seats, etc.) physically existing excluding the ones which are out of inventory
+     */
     houseItemsCount: number;
-    /** The number of sold units plus definitely blocked units from group bookings */
+    /**
+     * Format: int32
+     * @description The number of sold units plus definitely blocked units from group bookings
+     */
     soldCount: number;
-    /** The number of sold items (e.g. beds, seats, etc.) plus definitely blocked items from group bookings */
+    /**
+     * Format: int32
+     * @description The number of sold items (e.g. beds, seats, etc.) plus definitely blocked items from group bookings
+     */
     soldItemsCount: number;
-    /** The number of unsold units: house count minus sold units and out of order units */
+    /**
+     * Format: int32
+     * @description The number of unsold units: house count minus sold units and out of order units
+     */
     unsoldCount: number;
-    /** The number of unsold items (e.g. beds, seats, etc.): house items count minus sold items and out of order items */
+    /**
+     * Format: int32
+     * @description The number of unsold items (e.g. beds, seats, etc.): house items count minus sold items and out of order items
+     */
     unsoldItemsCount: number;
-    /** The number of units which are out of order */
+    /**
+     * Format: int32
+     * @description The number of units which are out of order
+     */
     outOfOrderCount: number;
-    /** The number of items (e.g. beds, seats, etc.) which are out of order */
+    /**
+     * Format: int32
+     * @description The number of items (e.g. beds, seats, etc.) which are out of order
+     */
     outOfOrderItemsCount: number;
-    /** The number of units which are tentatively blocked */
+    /**
+     * Format: int32
+     * @description The number of units which are tentatively blocked
+     */
     tentativelyBlockedCount: number;
-    /** The number of items (beds, seats, etc.) which are tentatively blocked */
+    /**
+     * Format: int32
+     * @description The number of items (beds, seats, etc.) which are tentatively blocked
+     */
     tentativelyBlockedItemsCount: number;
-    /** The number of arrivals units */
+    /**
+     * Format: int32
+     * @description The number of arrivals units
+     */
     arrivalsCount: number;
-    /** The number of departures units */
+    /**
+     * Format: int32
+     * @description The number of departures units
+     */
     departuresCount: number;
-    /** The number of no-show units */
+    /**
+     * Format: int32
+     * @description The number of no-show units
+     */
     noShowsCount: number;
-    /** The number of cancelled units */
+    /**
+     * Format: int32
+     * @description The number of cancelled units
+     */
     cancellationsCount: number;
-    /** The occupancy in percent, which is the ratio of sold units in relation to house count minus out of order units */
+    /**
+     * Format: double
+     * @description The occupancy in percent, which is the ratio of sold units in relation to house count minus out of order units
+     */
     occupancyPercentage: number;
     grossUnitRevenue: definitions["MonetaryValueModel"];
     netUnitRevenue: definitions["MonetaryValueModel"];
@@ -307,39 +606,549 @@ export interface definitions {
     grossAdr: definitions["MonetaryValueModel"];
     netAdr: definitions["MonetaryValueModel"];
     revPar: definitions["MonetaryValueModel"];
-    /** The breakdown per unit group */
+    /** @description The breakdown per unit group */
     unitGroups: definitions["PropertyPerformancePerUnitGroupModel"][];
   };
+  /**
+   * @example {
+   *   "houseCount": 10,
+   *   "houseItemsCount": 0,
+   *   "soldCount": 6,
+   *   "soldItemsCount": 0,
+   *   "unsoldCount": 2,
+   *   "unsoldItemsCount": 0,
+   *   "outOfOrderCount": 2,
+   *   "outOfOrderItemsCount": 0,
+   *   "tentativelyBlockedCount": 0,
+   *   "tentativelyBlockedItemsCount": 0,
+   *   "arrivalsCount": 0,
+   *   "departuresCount": 0,
+   *   "noShowsCount": 0,
+   *   "cancellationsCount": 0,
+   *   "occupancyPercentage": 75.00,
+   *   "grossUnitRevenue": {
+   *     "amount": 830.00,
+   *     "currency": "EUR"
+   *   },
+   *   "netUnitRevenue": {
+   *     "amount": 775.70,
+   *     "currency": "EUR"
+   *   },
+   *   "grossAccommodationRevenue": {
+   *     "amount": 26.00,
+   *     "currency": "EUR"
+   *   },
+   *   "netAccommodationRevenue": {
+   *     "amount": 24.00,
+   *     "currency": "EUR"
+   *   },
+   *   "grossFoodAndBeveragesRevenue": {
+   *     "amount": 134.00,
+   *     "currency": "EUR"
+   *   },
+   *   "netFoodAndBeveragesRevenue": {
+   *     "amount": 16.00,
+   *     "currency": "EUR"
+   *   },
+   *   "grossOtherRevenue": {
+   *     "amount": 194.00,
+   *     "currency": "EUR"
+   *   },
+   *   "netOtherRevenue": {
+   *     "amount": 126.00,
+   *     "currency": "EUR"
+   *   },
+   *   "grossAdr": {
+   *     "amount": 138.33,
+   *     "currency": "EUR"
+   *   },
+   *   "netAdr": {
+   *     "amount": 129.28,
+   *     "currency": "EUR"
+   *   },
+   *   "revPar": {
+   *     "amount": 96.96,
+   *     "currency": "EUR"
+   *   },
+   *   "businessDays": [
+   *     {
+   *       "businessDay": "2024-03-06",
+   *       "houseCount": 5,
+   *       "houseItemsCount": 0,
+   *       "soldCount": 3,
+   *       "soldItemsCount": 0,
+   *       "unsoldCount": 1,
+   *       "unsoldItemsCount": 0,
+   *       "outOfOrderCount": 1,
+   *       "outOfOrderItemsCount": 0,
+   *       "tentativelyBlockedCount": 0,
+   *       "tentativelyBlockedItemsCount": 0,
+   *       "arrivalsCount": 0,
+   *       "departuresCount": 0,
+   *       "noShowsCount": 0,
+   *       "cancellationsCount": 0,
+   *       "occupancyPercentage": 75.0,
+   *       "grossUnitRevenue": {
+   *         "amount": 350.00,
+   *         "currency": "EUR"
+   *       },
+   *       "netUnitRevenue": {
+   *         "amount": 327.10,
+   *         "currency": "EUR"
+   *       },
+   *       "grossAccommodationRevenue": {
+   *         "amount": 8.00,
+   *         "currency": "EUR"
+   *       },
+   *       "netAccommodationRevenue": {
+   *         "amount": 7.00,
+   *         "currency": "EUR"
+   *       },
+   *       "grossFoodAndBeveragesRevenue": {
+   *         "amount": 17.00,
+   *         "currency": "EUR"
+   *       },
+   *       "netFoodAndBeveragesRevenue": {
+   *         "amount": 3.00,
+   *         "currency": "EUR"
+   *       },
+   *       "grossOtherRevenue": {
+   *         "amount": 47.00,
+   *         "currency": "EUR"
+   *       },
+   *       "netOtherRevenue": {
+   *         "amount": 13.00,
+   *         "currency": "EUR"
+   *       },
+   *       "grossAdr": {
+   *         "amount": 116.67,
+   *         "currency": "EUR"
+   *       },
+   *       "netAdr": {
+   *         "amount": 109.03,
+   *         "currency": "EUR"
+   *       },
+   *       "revPar": {
+   *         "amount": 81.78,
+   *         "currency": "EUR"
+   *       },
+   *       "unitGroups": [
+   *         {
+   *           "unitGroup": {
+   *             "id": "MUC-DBL",
+   *             "code": "DBL",
+   *             "name": "Double",
+   *             "description": "Double",
+   *             "type": "BedRoom"
+   *           },
+   *           "houseCount": 4,
+   *           "houseItemsCount": 0,
+   *           "soldCount": 2,
+   *           "soldItemsCount": 0,
+   *           "unsoldCount": 1,
+   *           "unsoldItemsCount": 0,
+   *           "outOfOrderCount": 1,
+   *           "outOfOrderItemsCount": 0,
+   *           "tentativelyBlockedCount": 0,
+   *           "tentativelyBlockedItemsCount": 0,
+   *           "arrivalsCount": 0,
+   *           "departuresCount": 0,
+   *           "noShowsCount": 0,
+   *           "cancellationsCount": 0,
+   *           "occupancyPercentage": 66.67,
+   *           "grossUnitRevenue": {
+   *             "amount": 230.00,
+   *             "currency": "EUR"
+   *           },
+   *           "netUnitRevenue": {
+   *             "amount": 214.95,
+   *             "currency": "EUR"
+   *           },
+   *           "grossAccommodationRevenue": {
+   *             "amount": 4.00,
+   *             "currency": "EUR"
+   *           },
+   *           "netAccommodationRevenue": {
+   *             "amount": 3.50,
+   *             "currency": "EUR"
+   *           },
+   *           "grossFoodAndBeveragesRevenue": {
+   *             "amount": 8.50,
+   *             "currency": "EUR"
+   *           },
+   *           "netFoodAndBeveragesRevenue": {
+   *             "amount": 1.50,
+   *             "currency": "EUR"
+   *           },
+   *           "grossOtherRevenue": {
+   *             "amount": 23.50,
+   *             "currency": "EUR"
+   *           },
+   *           "netOtherRevenue": {
+   *             "amount": 6.50,
+   *             "currency": "EUR"
+   *           },
+   *           "grossAdr": {
+   *             "amount": 115.00,
+   *             "currency": "EUR"
+   *           },
+   *           "netAdr": {
+   *             "amount": 107.48,
+   *             "currency": "EUR"
+   *           },
+   *           "revPar": {
+   *             "amount": 71.65,
+   *             "currency": "EUR"
+   *           }
+   *         },
+   *         {
+   *           "unitGroup": {
+   *             "id": "MUC-SGL",
+   *             "code": "SGL",
+   *             "name": "Single",
+   *             "description": "Single",
+   *             "type": "BedRoom"
+   *           },
+   *           "houseCount": 1,
+   *           "houseItemsCount": 0,
+   *           "soldCount": 1,
+   *           "soldItemsCount": 0,
+   *           "unsoldCount": 0,
+   *           "unsoldItemsCount": 0,
+   *           "outOfOrderCount": 0,
+   *           "outOfOrderItemsCount": 0,
+   *           "tentativelyBlockedCount": 0,
+   *           "tentativelyBlockedItemsCount": 0,
+   *           "arrivalsCount": 0,
+   *           "departuresCount": 0,
+   *           "noShowsCount": 0,
+   *           "cancellationsCount": 0,
+   *           "occupancyPercentage": 100.00,
+   *           "grossUnitRevenue": {
+   *             "amount": 120.00,
+   *             "currency": "EUR"
+   *           },
+   *           "netUnitRevenue": {
+   *             "amount": 112.15,
+   *             "currency": "EUR"
+   *           },
+   *           "grossAccommodationRevenue": {
+   *             "amount": 4.00,
+   *             "currency": "EUR"
+   *           },
+   *           "netAccommodationRevenue": {
+   *             "amount": 3.50,
+   *             "currency": "EUR"
+   *           },
+   *           "grossFoodAndBeveragesRevenue": {
+   *             "amount": 8.50,
+   *             "currency": "EUR"
+   *           },
+   *           "netFoodAndBeveragesRevenue": {
+   *             "amount": 1.50,
+   *             "currency": "EUR"
+   *           },
+   *           "grossOtherRevenue": {
+   *             "amount": 23.50,
+   *             "currency": "EUR"
+   *           },
+   *           "netOtherRevenue": {
+   *             "amount": 6.50,
+   *             "currency": "EUR"
+   *           },
+   *           "grossAdr": {
+   *             "amount": 120.00,
+   *             "currency": "EUR"
+   *           },
+   *           "netAdr": {
+   *             "amount": 112.15,
+   *             "currency": "EUR"
+   *           },
+   *           "revPar": {
+   *             "amount": 112.15,
+   *             "currency": "EUR"
+   *           }
+   *         }
+   *       ]
+   *     },
+   *     {
+   *       "businessDay": "2024-03-07",
+   *       "houseCount": 5,
+   *       "houseItemsCount": 0,
+   *       "soldCount": 3,
+   *       "soldItemsCount": 0,
+   *       "unsoldCount": 1,
+   *       "unsoldItemsCount": 0,
+   *       "outOfOrderCount": 1,
+   *       "outOfOrderItemsCount": 0,
+   *       "tentativelyBlockedCount": 0,
+   *       "tentativelyBlockedItemsCount": 0,
+   *       "arrivalsCount": 0,
+   *       "departuresCount": 0,
+   *       "noShowsCount": 0,
+   *       "cancellationsCount": 0,
+   *       "occupancyPercentage": 75.00,
+   *       "grossUnitRevenue": {
+   *         "amount": 480.00,
+   *         "currency": "EUR"
+   *       },
+   *       "netUnitRevenue": {
+   *         "amount": 448.60,
+   *         "currency": "EUR"
+   *       },
+   *       "grossAccommodationRevenue": {
+   *         "amount": 18.00,
+   *         "currency": "EUR"
+   *       },
+   *       "netAccommodationRevenue": {
+   *         "amount": 17.00,
+   *         "currency": "EUR"
+   *       },
+   *       "grossFoodAndBeveragesRevenue": {
+   *         "amount": 117.00,
+   *         "currency": "EUR"
+   *       },
+   *       "netFoodAndBeveragesRevenue": {
+   *         "amount": 13.00,
+   *         "currency": "EUR"
+   *       },
+   *       "grossOtherRevenue": {
+   *         "amount": 147.00,
+   *         "currency": "EUR"
+   *       },
+   *       "netOtherRevenue": {
+   *         "amount": 113.00,
+   *         "currency": "EUR"
+   *       },
+   *       "grossAdr": {
+   *         "amount": 160.00,
+   *         "currency": "EUR"
+   *       },
+   *       "netAdr": {
+   *         "amount": 149.53,
+   *         "currency": "EUR"
+   *       },
+   *       "revPar": {
+   *         "amount": 112.15,
+   *         "currency": "EUR"
+   *       },
+   *       "unitGroups": [
+   *         {
+   *           "unitGroup": {
+   *             "id": "MUC-DBL",
+   *             "code": "DBL",
+   *             "name": "Double",
+   *             "description": "Double",
+   *             "type": "BedRoom"
+   *           },
+   *           "houseCount": 4,
+   *           "houseItemsCount": 0,
+   *           "soldCount": 3,
+   *           "soldItemsCount": 0,
+   *           "unsoldCount": 0,
+   *           "unsoldItemsCount": 0,
+   *           "outOfOrderCount": 1,
+   *           "outOfOrderItemsCount": 0,
+   *           "tentativelyBlockedCount": 0,
+   *           "tentativelyBlockedItemsCount": 0,
+   *           "arrivalsCount": 0,
+   *           "departuresCount": 0,
+   *           "noShowsCount": 0,
+   *           "cancellationsCount": 0,
+   *           "occupancyPercentage": 100.00,
+   *           "grossUnitRevenue": {
+   *             "amount": 370.00,
+   *             "currency": "EUR"
+   *           },
+   *           "netUnitRevenue": {
+   *             "amount": 345.79,
+   *             "currency": "EUR"
+   *           },
+   *           "grossAccommodationRevenue": {
+   *             "amount": 9.00,
+   *             "currency": "EUR"
+   *           },
+   *           "netAccommodationRevenue": {
+   *             "amount": 8.50,
+   *             "currency": "EUR"
+   *           },
+   *           "grossFoodAndBeveragesRevenue": {
+   *             "amount": 56.50,
+   *             "currency": "EUR"
+   *           },
+   *           "netFoodAndBeveragesRevenue": {
+   *             "amount": 7.50,
+   *             "currency": "EUR"
+   *           },
+   *           "grossOtherRevenue": {
+   *             "amount": 73.50,
+   *             "currency": "EUR"
+   *           },
+   *           "netOtherRevenue": {
+   *             "amount": 56.50,
+   *             "currency": "EUR"
+   *           },
+   *           "grossAdr": {
+   *             "amount": 123.33,
+   *             "currency": "EUR"
+   *           },
+   *           "netAdr": {
+   *             "amount": 115.26,
+   *             "currency": "EUR"
+   *           },
+   *           "revPar": {
+   *             "amount": 215.26,
+   *             "currency": "EUR"
+   *           }
+   *         },
+   *         {
+   *           "unitGroup": {
+   *             "id": "MUC-SGL",
+   *             "code": "SGL",
+   *             "name": "Single",
+   *             "description": "Single",
+   *             "type": "BedRoom"
+   *           },
+   *           "houseCount": 1,
+   *           "houseItemsCount": 0,
+   *           "soldCount": 1,
+   *           "soldItemsCount": 0,
+   *           "unsoldCount": 0,
+   *           "unsoldItemsCount": 0,
+   *           "outOfOrderCount": 0,
+   *           "outOfOrderItemsCount": 0,
+   *           "tentativelyBlockedCount": 0,
+   *           "tentativelyBlockedItemsCount": 0,
+   *           "arrivalsCount": 0,
+   *           "departuresCount": 0,
+   *           "noShowsCount": 0,
+   *           "cancellationsCount": 0,
+   *           "occupancyPercentage": 100.00,
+   *           "grossUnitRevenue": {
+   *             "amount": 110.00,
+   *             "currency": "EUR"
+   *           },
+   *           "netUnitRevenue": {
+   *             "amount": 102.80,
+   *             "currency": "EUR"
+   *           },
+   *           "grossAccommodationRevenue": {
+   *             "amount": 9.00,
+   *             "currency": "EUR"
+   *           },
+   *           "netAccommodationRevenue": {
+   *             "amount": 8.50,
+   *             "currency": "EUR"
+   *           },
+   *           "grossFoodAndBeveragesRevenue": {
+   *             "amount": 56.50,
+   *             "currency": "EUR"
+   *           },
+   *           "netFoodAndBeveragesRevenue": {
+   *             "amount": 7.50,
+   *             "currency": "EUR"
+   *           },
+   *           "grossOtherRevenue": {
+   *             "amount": 73.50,
+   *             "currency": "EUR"
+   *           },
+   *           "netOtherRevenue": {
+   *             "amount": 56.50,
+   *             "currency": "EUR"
+   *           },
+   *           "grossAdr": {
+   *             "amount": 110.00,
+   *             "currency": "EUR"
+   *           },
+   *           "netAdr": {
+   *             "amount": 102.80,
+   *             "currency": "EUR"
+   *           },
+   *           "revPar": {
+   *             "amount": 102.80,
+   *             "currency": "EUR"
+   *           }
+   *         }
+   *       ]
+   *     }
+   *   ]
+   * }
+   */
   PropertyPerformanceReportModel: {
-    /** The number of units physically existing excluding the ones which are out of inventory */
+    /**
+     * Format: int32
+     * @description The number of units physically existing excluding the ones which are out of inventory
+     */
     houseCount: number;
-    /** The number of items (e.g. beds, seats, etc.) physically existing excluding the ones which are out of inventory */
+    /**
+     * Format: int32
+     * @description The number of items (e.g. beds, seats, etc.) physically existing excluding the ones which are out of inventory
+     */
     houseItemsCount: number;
-    /** The number of sold units plus definitely blocked units from group bookings */
+    /**
+     * Format: int32
+     * @description The number of sold units plus definitely blocked units from group bookings
+     */
     soldCount: number;
-    /** The number of sold items (e.g. beds, seats, etc.) plus definitely blocked items from group bookings */
+    /**
+     * Format: int32
+     * @description The number of sold items (e.g. beds, seats, etc.) plus definitely blocked items from group bookings
+     */
     soldItemsCount: number;
-    /** The number of unsold units: house count minus sold units and out of order units */
+    /**
+     * Format: int32
+     * @description The number of unsold units: house count minus sold units and out of order units
+     */
     unsoldCount: number;
-    /** The number of unsold items (e.g. beds, seats, etc.): house items count minus sold items and out of order items */
+    /**
+     * Format: int32
+     * @description The number of unsold items (e.g. beds, seats, etc.): house items count minus sold items and out of order items
+     */
     unsoldItemsCount: number;
-    /** The number of units which are out of order */
+    /**
+     * Format: int32
+     * @description The number of units which are out of order
+     */
     outOfOrderCount: number;
-    /** The number of items (e.g. beds, seats, etc.) which are out of order */
+    /**
+     * Format: int32
+     * @description The number of items (e.g. beds, seats, etc.) which are out of order
+     */
     outOfOrderItemsCount: number;
-    /** The number of units which are tentatively blocked */
+    /**
+     * Format: int32
+     * @description The number of units which are tentatively blocked
+     */
     tentativelyBlockedCount: number;
-    /** The number of items (beds, seats, etc.) which are tentatively blocked */
+    /**
+     * Format: int32
+     * @description The number of items (beds, seats, etc.) which are tentatively blocked
+     */
     tentativelyBlockedItemsCount: number;
-    /** The number of arrivals units */
+    /**
+     * Format: int32
+     * @description The number of arrivals units
+     */
     arrivalsCount: number;
-    /** The number of departures units */
+    /**
+     * Format: int32
+     * @description The number of departures units
+     */
     departuresCount: number;
-    /** The number of no-show units */
+    /**
+     * Format: int32
+     * @description The number of no-show units
+     */
     noShowsCount: number;
-    /** The number of cancelled units */
+    /**
+     * Format: int32
+     * @description The number of cancelled units
+     */
     cancellationsCount: number;
-    /** The occupancy in percent, which is the ratio of sold units in relation to house count minus out of order units */
+    /**
+     * Format: double
+     * @description The occupancy in percent, which is the ratio of sold units in relation to house count minus out of order units
+     */
     occupancyPercentage: number;
     grossUnitRevenue: definitions["MonetaryValueModel"];
     netUnitRevenue: definitions["MonetaryValueModel"];
@@ -352,28 +1161,97 @@ export interface definitions {
     grossAdr: definitions["MonetaryValueModel"];
     netAdr: definitions["MonetaryValueModel"];
     revPar: definitions["MonetaryValueModel"];
-    /** The breakdown by business day for the specified filter criteria */
+    /** @description The breakdown by business day for the specified filter criteria */
     businessDays?: definitions["PropertyPerformanceReportItemModel"][];
   };
   ReceiptModel: {
-    /** The type of receipt. */
+    /** @description The type of receipt. */
     type?: "Custom" | "Reservation" | "Invoice" | "PspReference";
-    /** The receipt number. */
+    /** @description The receipt number. */
     number: string;
   };
+  /**
+   * @example {
+   *   "account": {
+   *     "name": "Revenues",
+   *     "number": "5000",
+   *     "type": "Revenues"
+   *   },
+   *   "netAmount": {
+   *     "amount": 8000.0,
+   *     "currency": "EUR"
+   *   },
+   *   "grossAmount": {
+   *     "amount": 10000.0,
+   *     "currency": "EUR"
+   *   },
+   *   "children": [
+   *     {
+   *       "account": {
+   *         "name": "Revenues Accommodation",
+   *         "number": "RevenueAccommodation",
+   *         "type": "Revenues"
+   *       },
+   *       "netAmount": {
+   *         "amount": 5000.0,
+   *         "currency": "EUR"
+   *       },
+   *       "grossAmount": {
+   *         "amount": 6000.0,
+   *         "currency": "EUR"
+   *       },
+   *       "children": [
+   *         {
+   *           "account": {
+   *             "name": "Revenues Accommodation (7%)",
+   *             "number": "RevenuesAccommodation_Reduced",
+   *             "type": "Revenues"
+   *           },
+   *           "netAmount": {
+   *             "amount": 5000.0,
+   *             "currency": "EUR"
+   *           },
+   *           "grossAmount": {
+   *             "amount": 6000.0,
+   *             "currency": "EUR"
+   *           }
+   *         }
+   *       ]
+   *     },
+   *     {
+   *       "account": {
+   *         "name": "Revenues F&B",
+   *         "number": "RevenueFoodAndBeverages",
+   *         "type": "Revenues"
+   *       },
+   *       "netAmount": {
+   *         "amount": 3000.0,
+   *         "currency": "EUR"
+   *       },
+   *       "grossAmount": {
+   *         "amount": 4000.0,
+   *         "currency": "EUR"
+   *       }
+   *     }
+   *   ]
+   * }
+   */
   RevenuesReportItemModel: {
     account: definitions["ExportAccountModel"];
     netAmount: definitions["MonetaryValueModel"];
     grossAmount: definitions["MonetaryValueModel"];
-    /** Child accounts of this account */
+    /** @description Child accounts of this account */
     children?: definitions["RevenuesReportItemModel"][];
   };
   RoomNightsConsumedModel: {
-    /** Room nights consumed. */
+    /**
+     * Format: int64
+     * @description Room nights consumed.
+     */
     roomNightsConsumed: number;
   };
   TaxAmountModel: {
-    /** The VAT type */
+    /** @description The VAT type */
     type:
       | "Null"
       | "VeryReduced"
@@ -383,9 +1261,15 @@ export interface definitions {
       | "Special"
       | "ReducedCovid19"
       | "NormalCovid19";
-    /** The currently valid percent to calculate the VAT */
+    /**
+     * Format: double
+     * @description The currently valid percent to calculate the VAT
+     */
     percent: number;
-    /** The tax amount */
+    /**
+     * Format: double
+     * @description The tax amount
+     */
     amount: number;
   };
   TaxDetailModel: {
@@ -398,19 +1282,27 @@ export interface definitions {
       | "Special"
       | "ReducedCovid19"
       | "NormalCovid19";
+    /** Format: double */
     vatPercent: number;
     net: definitions["MonetaryValueModel"];
     tax: definitions["MonetaryValueModel"];
   };
   TransactionsGrossExportListItemModel: {
     reservation?: definitions["TransactionsGrossExportReservationModel"];
-    /** Timestamp with time zone information, when the booking was done<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Timestamp with time zone information, when the booking was done<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     timestamp: string;
-    /** The business date when the booking was done */
+    /**
+     * Format: date
+     * @description The business date when the booking was done
+     * @example 2020-10-10
+     */
     date: string;
     debitedAccount: definitions["ExportAccountModel"];
     creditedAccount: definitions["ExportAccountModel"];
-    /** The type of business transaction which triggered the booking */
+    /** @description The type of business transaction which triggered the booking */
     command:
       | "PostCharge"
       | "PostPayment"
@@ -420,41 +1312,128 @@ export interface definitions {
       | "PostPrepaymentVat"
       | "PostToLossOfAccountsReceivables"
       | "System";
-    /** The currency of the transaction */
+    /** @description The currency of the transaction */
     currency: string;
-    /** The gross amount being booked */
+    /**
+     * Format: double
+     * @description The gross amount being booked
+     */
     grossAmount: number;
-    /** The net amount being booked */
+    /**
+     * Format: double
+     * @description The net amount being booked
+     */
     netAmount: number;
-    /** The taxes which make up the difference between net and gross amount */
+    /** @description The taxes which make up the difference between net and gross amount */
     taxes?: definitions["TaxAmountModel"][];
     receipt: definitions["ReceiptModel"];
-    /** The original raw transaction entry number which got converted to these one or 2 lines. */
+    /** @description The original raw transaction entry number which got converted to these one or 2 lines. */
     sourceEntryNumber: string;
-    /** The reference for the transactions, reservation id for guest folios, folio id for external folios, property code for the house folio */
+    /** @description The reference for the transactions, reservation id for guest folios, booking id for booking folio, folio id for external folios, property code for the house folio */
     reference: string;
-    /** Does this transaction belong to a reservation, a house or an external folio */
-    referenceType: "House" | "Guest" | "External";
+    /** @description Does this transaction belong to a reservation, a house or an external folio */
+    referenceType: "House" | "Guest" | "External" | "Booking";
   };
+  /**
+   * @example {
+   *   "transactions": [
+   *     {
+   *       "reservation": {
+   *         "id": "QPMZZTUK-1",
+   *         "status": "CheckedOut",
+   *         "arrival": "2020-10-10T11:11:00Z",
+   *         "departure": "2020-10-12T11:11:00Z"
+   *       },
+   *       "timestamp": "2024-03-12T09:20:29.9007222Z",
+   *       "date": "2024-03-06",
+   *       "debitedAccount": {
+   *         "name": "Cash Payment",
+   *         "number": "1600",
+   *         "type": "Revenues"
+   *       },
+   *       "creditedAccount": {
+   *         "name": "Receivables for Reservation QPMZZTUK-1",
+   *         "number": "QPMZZTUK-1_Receivables",
+   *         "type": "Revenues"
+   *       },
+   *       "command": "PostCharge",
+   *       "currency": "EUR",
+   *       "grossAmount": 100.0,
+   *       "netAmount": 100.0,
+   *       "receipt": {
+   *         "type": "Reservation",
+   *         "number": "QPMZZTUK-1-V3"
+   *       },
+   *       "sourceEntryNumber": "SourceEntryNumber",
+   *       "reference": "REFERENCE",
+   *       "referenceType": "Guest"
+   *     },
+   *     {
+   *       "timestamp": "2024-03-12T09:20:29.9007396Z",
+   *       "date": "2024-03-06",
+   *       "debitedAccount": {
+   *         "name": "Revenues Accommodation",
+   *         "number": "5001",
+   *         "type": "Revenues"
+   *       },
+   *       "creditedAccount": {
+   *         "name": "House Account",
+   *         "number": "HOUSE_HCF",
+   *         "type": "Revenues"
+   *       },
+   *       "command": "PostCharge",
+   *       "currency": "EUR",
+   *       "grossAmount": 214.0,
+   *       "netAmount": 200.0,
+   *       "taxes": [
+   *         {
+   *           "type": "Reduced",
+   *           "percent": 7.0,
+   *           "amount": 14.0
+   *         }
+   *       ],
+   *       "receipt": {
+   *         "type": "Reservation",
+   *         "number": "QPMZZTUK-1-V3"
+   *       },
+   *       "sourceEntryNumber": "SourceEntryNumber",
+   *       "reference": "REFERENCE",
+   *       "referenceType": "House"
+   *     }
+   *   ],
+   *   "count": 2
+   * }
+   */
   TransactionsGrossExportListModel: {
-    /** The list of gross transactions with additional metadata */
+    /** @description The list of gross transactions with additional metadata */
     transactions: definitions["TransactionsGrossExportListItemModel"][];
-    /** Total count of items */
+    /**
+     * Format: int64
+     * @description Total count of items
+     */
     count: number;
   };
   TransactionsGrossExportReservationModel: {
-    /** Reservation id */
+    /** @description Reservation id */
     id: string;
-    /** Status of the reservation */
+    /** @description Status of the reservation */
     status: "Confirmed" | "InHouse" | "CheckedOut" | "Canceled" | "NoShow";
-    /** Date of arrival<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of arrival<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     arrival: string;
-    /** Date of departure<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of departure<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     departure: string;
   };
   TravelPurposeEntry: {
-    purpose: "Business" | "Leisure";
+    purpose?: "Business" | "Leisure";
+    /** Format: int32 */
     number: number;
+    /** Format: double */
     percent: number;
     reservationIds?: string[];
   };
@@ -469,7 +1448,7 @@ export interface operations {
         propertyId: string;
         /** Filter by business date<br />You can provide an array of string expressions which all need to apply.<br />Each expression has the form of 'OPERATION_VALUE' where VALUE needs to be of the valid format of the property type and OPERATION can be:<br />'eq' for equals<br />'neq' for not equals<br />'lt' for less than<br />'gt' for greater than<br />'lte' for less than or equals<br />'gte' for greater than or equals<br />For instance<br />'eq_5' would mean the value should equal 5<br />'lte_7' would mean the value should be less than or equal to 7 */
         dateFilter: string[];
-        /** Filter transactions by reference (reservation id/external folio id/property id for house folio). */
+        /** Filter transactions by reference (reservation id/booking id/external folio id/property id for house folio). */
         reference?: string;
       };
       header: {
@@ -733,6 +1712,7 @@ export interface operations {
           | "Homelike"
           | "Hrs"
           | "AltoVita"
+          | "DesVu"
         )[];
         /** The market segment IDs used to filter the retrieved data */
         marketSegmentIds?: string[];

@@ -375,18 +375,130 @@ export interface definitions {
       | "AmendNotAllowedForReservationInFinalStatus";
     message: string;
   };
-  /** With this request you can add reservations to an existing booking */
+  /**
+   * @description With this request you can add reservations to an existing booking
+   * @example {
+   *   "reservations": [
+   *     {
+   *       "arrival": "2024-03-08",
+   *       "departure": "2024-03-10",
+   *       "adults": 1,
+   *       "comment": "I need a wake up service",
+   *       "externalCode": "812864414|381",
+   *       "channelCode": "BookingCom",
+   *       "primaryGuest": {
+   *         "title": "Mr",
+   *         "gender": "Male",
+   *         "firstName": "Jon",
+   *         "middleInitial": "D",
+   *         "lastName": "Doe",
+   *         "email": "john.d@doe.com",
+   *         "phone": "+4989123343",
+   *         "address": {
+   *           "addressLine1": "My Street 1",
+   *           "postalCode": "12453",
+   *           "city": "MyCity",
+   *           "countryCode": "GB"
+   *         }
+   *       },
+   *       "guaranteeType": "Prepayment",
+   *       "timeSlices": [
+   *         {
+   *           "ratePlanId": "MUC-NONREF-DBL"
+   *         },
+   *         {
+   *           "ratePlanId": "MUC-NONREF-DBL"
+   *         }
+   *       ],
+   *       "services": [
+   *         {
+   *           "serviceId": "MUC-BRKF"
+   *         },
+   *         {
+   *           "serviceId": "MUC-YOGA",
+   *           "dates": [
+   *             {
+   *               "serviceDate": "2024-03-09",
+   *               "amount": {
+   *                 "amount": 35.0,
+   *                 "currency": "EUR"
+   *               }
+   *             }
+   *           ]
+   *         }
+   *       ],
+   *       "companyId": "UMBRELLA",
+   *       "corporateCode": "UMBRELLA-MUC_NONREF_DBL"
+   *     },
+   *     {
+   *       "arrival": "2024-03-09",
+   *       "departure": "2024-03-11",
+   *       "adults": 1,
+   *       "childrenAges": [
+   *         6
+   *       ],
+   *       "channelCode": "Direct",
+   *       "primaryGuest": {
+   *         "title": "Mr",
+   *         "gender": "Male",
+   *         "firstName": "Eric",
+   *         "middleInitial": "E",
+   *         "lastName": "Steinmetz",
+   *         "email": "eric.e@steinmetz.com",
+   *         "phone": "+4989123343",
+   *         "address": {
+   *           "addressLine1": "My Street 1",
+   *           "postalCode": "12453",
+   *           "city": "MyCity",
+   *           "countryCode": "GB"
+   *         }
+   *       },
+   *       "guaranteeType": "CreditCard",
+   *       "timeSlices": [
+   *         {
+   *           "ratePlanId": "BER-FLEX-DBL"
+   *         },
+   *         {
+   *           "ratePlanId": "BER-FLEX-DBL"
+   *         }
+   *       ],
+   *       "commission": {
+   *         "commissionAmount": {
+   *           "amount": 20.0,
+   *           "currency": "EUR"
+   *         },
+   *         "beforeCommissionAmount": {
+   *           "amount": 100.0,
+   *           "currency": "EUR"
+   *         }
+   *       }
+   *     }
+   *   ],
+   *   "transactionReference": "RFEUFHEW"
+   * }
+   */
   AddReservationsModel: {
-    /** List of reservations to add to the existing booking */
+    /** @description List of reservations to add to the existing booking */
     reservations: definitions["CreateReservationModel"][];
     /**
-     * The reference of a payment transaction. This should be set when a payment transaction has been initiated and should be used to complete the transaction upon reservation creation.
+     * @description The reference of a payment transaction. This should be set when a payment transaction has been initiated and should be used to complete the transaction upon reservation creation.
      * When set, the payment transaction completion is always triggered regardless of the reservation guarantee type and payment automation settings.
      */
     transactionReference?: string;
   };
+  /**
+   * @example {
+   *   "grossAmount": 107.0,
+   *   "netAmount": 100.0,
+   *   "vatType": "Reduced",
+   *   "vatPercent": 7.0,
+   *   "currency": "USD"
+   * }
+   */
   AmountModel: {
+    /** Format: double */
     grossAmount: number;
+    /** Format: double */
     netAmount: number;
     vatType:
       | "Null"
@@ -397,68 +509,345 @@ export interface definitions {
       | "Special"
       | "ReducedCovid19"
       | "NormalCovid19";
+    /** Format: double */
     vatPercent: number;
     currency: string;
   };
+  /**
+   * @example {
+   *   "unit": {
+   *     "id": "MUC-JQI",
+   *     "name": "A.102",
+   *     "description": "Double room",
+   *     "unitGroupId": "MUC-DBL"
+   *   }
+   * }
+   */
   AssignedUnitModel: {
     unit: definitions["EmbeddedUnitModel"];
   };
   AutoAssignedUnitItemModel: {
     unit: definitions["EmbeddedUnitModel"];
-    /** The start date and time for this time slice<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description The start date and time for this time slice<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     from: string;
-    /** The end date and time for this time slice<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description The end date and time for this time slice<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     to: string;
   };
+  /**
+   * @example {
+   *   "timeSlices": [
+   *     {
+   *       "unit": {
+   *         "id": "MUC-JQI",
+   *         "name": "A.102",
+   *         "description": "Double room",
+   *         "unitGroupId": "MUC-DBL"
+   *       },
+   *       "from": "2024-03-06T17:00:00+01:00",
+   *       "to": "2024-03-07T11:00:00+01:00"
+   *     },
+   *     {
+   *       "unit": {
+   *         "id": "MUC-MTA",
+   *         "name": "A.101",
+   *         "description": "Single room",
+   *         "unitGroupId": "MUC-SGL"
+   *       },
+   *       "from": "2024-03-07T17:00:00+01:00",
+   *       "to": "2024-03-08T11:00:00+01:00"
+   *     }
+   *   ]
+   * }
+   */
   AutoAssignedUnitListModel: {
-    /** The list of time slices with the respective assigned unit */
+    /** @description The list of time slices with the respective assigned unit */
     timeSlices: definitions["AutoAssignedUnitItemModel"][];
   };
+  /**
+   * @example {
+   *   "id": "MUC-HSGTDG"
+   * }
+   */
   BlockCreatedModel: {
-    /** Block id */
+    /** @description Block id */
     id: string;
   };
   BlockItemModel: {
-    /** Block id */
+    /** @description Block id */
     id: string;
     group: definitions["EmbeddedGroupModel"];
-    /** Status of the block */
+    /** @description Status of the block */
     status: "Tentative" | "Definite" | "Canceled";
     property: definitions["EmbeddedPropertyModel"];
     ratePlan: definitions["EmbeddedRatePlanModel"];
     unitGroup: definitions["EmbeddedUnitGroupModel"];
     grossDailyRate: definitions["MonetaryValueModel"];
-    /** Start date and time from which the inventory will be blocked<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Start date and time from which the inventory will be blocked<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     from: string;
-    /** End date and time until which the inventory will be blocked<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description End date and time until which the inventory will be blocked<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     to: string;
-    /** Number of reservations already picked from this block */
+    /**
+     * Format: int32
+     * @description Number of reservations already picked from this block
+     */
     pickedReservations: number;
-    /** The promo code associated with a certain special offer used to create the block */
+    /** @description The promo code associated with a certain special offer used to create the block */
     promoCode?: string;
-    /** The corporate code associated with a certain special offer used to create the block */
+    /** @description The corporate code associated with a certain special offer used to create the block */
     corporateCode?: string;
-    /** Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     created: string;
-    /** Date of last modification<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of last modification<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     modified: string;
-    /** The list of blocked units for each time slice */
+    /** @description The list of blocked units for each time slice */
     timeSlices?: definitions["BlockTimeSliceModel"][];
-    /** The list of actions for this block */
+    /** @description The list of actions for this block */
     actions?: definitions["ActionModel[BlockAction,NotAllowedBlockActionReason]"][];
   };
+  /**
+   * @example {
+   *   "blocks": [
+   *     {
+   *       "id": "MUC-HSGTDG",
+   *       "group": {
+   *         "id": "XPGMSXGF",
+   *         "name": "apaleo Summer Festival 2025"
+   *       },
+   *       "status": "Tentative",
+   *       "property": {
+   *         "id": "MUC",
+   *         "code": "MUC",
+   *         "name": "Demo Hotel Munich",
+   *         "description": "This is the demo hotel Munich"
+   *       },
+   *       "ratePlan": {
+   *         "id": "MUC-NONREF_SGL",
+   *         "code": "NONREF",
+   *         "name": "Non Refundable",
+   *         "description": "Non Refundable",
+   *         "isSubjectToCityTax": false
+   *       },
+   *       "unitGroup": {
+   *         "id": "MUC-SGL",
+   *         "code": "SGL",
+   *         "name": "Single",
+   *         "description": "Single",
+   *         "type": "BedRoom"
+   *       },
+   *       "grossDailyRate": {
+   *         "amount": 160.0,
+   *         "currency": "EUR"
+   *       },
+   *       "from": "2024-03-11T17:00:00+01:00",
+   *       "to": "2024-03-12T11:00:00+01:00",
+   *       "pickedReservations": 0,
+   *       "created": "0001-01-01T00:00:00Z",
+   *       "modified": "0001-01-01T00:00:00Z",
+   *       "timeSlices": [
+   *         {
+   *           "from": "2024-03-11T17:00:00+01:00",
+   *           "to": "2024-03-12T11:00:00+01:00",
+   *           "blockedUnits": 2,
+   *           "pickedUnits": 0,
+   *           "baseAmount": {
+   *             "grossAmount": 115.0,
+   *             "netAmount": 100.0,
+   *             "vatType": "Special",
+   *             "vatPercent": 15.0,
+   *             "currency": "EUR"
+   *           },
+   *           "totalGrossAmount": {
+   *             "amount": 120.0,
+   *             "currency": "EUR"
+   *           }
+   *         }
+   *       ]
+   *     },
+   *     {
+   *       "id": "MUC-JAIULS",
+   *       "group": {
+   *         "id": "XPGMSXGF",
+   *         "name": "apaleo Summer Festival 2025"
+   *       },
+   *       "status": "Definite",
+   *       "property": {
+   *         "id": "MUC",
+   *         "code": "MUC",
+   *         "name": "Demo Hotel Munich",
+   *         "description": "This is the demo hotel Munich"
+   *       },
+   *       "ratePlan": {
+   *         "id": "MUC-NONREF_DBL",
+   *         "code": "NONREF",
+   *         "name": "Non Refundable",
+   *         "description": "Non Refundable",
+   *         "isSubjectToCityTax": false
+   *       },
+   *       "unitGroup": {
+   *         "id": "MUC-DBL",
+   *         "code": "DBL",
+   *         "name": "Double",
+   *         "description": "Double",
+   *         "type": "BedRoom"
+   *       },
+   *       "grossDailyRate": {
+   *         "amount": 190.0,
+   *         "currency": "EUR"
+   *       },
+   *       "from": "2024-03-11T17:00:00+01:00",
+   *       "to": "2024-03-13T11:00:00+01:00",
+   *       "pickedReservations": 1,
+   *       "created": "0001-01-01T00:00:00Z",
+   *       "modified": "0001-01-01T00:00:00Z",
+   *       "timeSlices": [
+   *         {
+   *           "from": "2024-03-11T17:00:00+01:00",
+   *           "to": "2024-03-12T11:00:00+01:00",
+   *           "blockedUnits": 2,
+   *           "pickedUnits": 1,
+   *           "baseAmount": {
+   *             "grossAmount": 115.0,
+   *             "netAmount": 100.0,
+   *             "vatType": "Special",
+   *             "vatPercent": 15.0,
+   *             "currency": "EUR"
+   *           },
+   *           "totalGrossAmount": {
+   *             "amount": 120.0,
+   *             "currency": "EUR"
+   *           }
+   *         },
+   *         {
+   *           "from": "2024-03-12T17:00:00+01:00",
+   *           "to": "2024-03-13T11:00:00+01:00",
+   *           "blockedUnits": 3,
+   *           "pickedUnits": 1,
+   *           "baseAmount": {
+   *             "grossAmount": 115.0,
+   *             "netAmount": 100.0,
+   *             "vatType": "Special",
+   *             "vatPercent": 15.0,
+   *             "currency": "EUR"
+   *           },
+   *           "totalGrossAmount": {
+   *             "amount": 120.0,
+   *             "currency": "EUR"
+   *           }
+   *         }
+   *       ]
+   *     }
+   *   ],
+   *   "count": 2
+   * }
+   */
   BlockListModel: {
-    /** List of blocks */
+    /** @description List of blocks */
     blocks: definitions["BlockItemModel"][];
-    /** Total count of items */
+    /**
+     * Format: int64
+     * @description Total count of items
+     */
     count: number;
   };
+  /**
+   * @example {
+   *   "id": "MUC-HSGTDG",
+   *   "group": {
+   *     "id": "XPGMSXGF",
+   *     "name": "apaleo Summer Festival 2025"
+   *   },
+   *   "status": "Tentative",
+   *   "property": {
+   *     "id": "MUC",
+   *     "code": "MUC",
+   *     "name": "Demo Hotel Munich",
+   *     "description": "This is the demo hotel Munich"
+   *   },
+   *   "ratePlan": {
+   *     "id": "MUC-NONREF_SGL",
+   *     "code": "NONREF",
+   *     "name": "Non Refundable",
+   *     "description": "Non Refundable",
+   *     "isSubjectToCityTax": false
+   *   },
+   *   "unitGroup": {
+   *     "id": "MUC-SGL",
+   *     "code": "SGL",
+   *     "name": "Single",
+   *     "description": "Single",
+   *     "type": "BedRoom"
+   *   },
+   *   "grossDailyRate": {
+   *     "amount": 160.0,
+   *     "currency": "EUR"
+   *   },
+   *   "from": "2024-03-11T17:00:00+01:00",
+   *   "to": "2024-03-13T11:00:00+01:00",
+   *   "pickedReservations": 0,
+   *   "created": "0001-01-01T00:00:00Z",
+   *   "modified": "0001-01-01T00:00:00Z",
+   *   "timeSlices": [
+   *     {
+   *       "from": "2024-03-11T17:00:00+01:00",
+   *       "to": "2024-03-12T11:00:00+01:00",
+   *       "blockedUnits": 2,
+   *       "pickedUnits": 0,
+   *       "baseAmount": {
+   *         "grossAmount": 115.0,
+   *         "netAmount": 100.0,
+   *         "vatType": "Special",
+   *         "vatPercent": 15.0,
+   *         "currency": "EUR"
+   *       },
+   *       "totalGrossAmount": {
+   *         "amount": 120.0,
+   *         "currency": "EUR"
+   *       }
+   *     },
+   *     {
+   *       "from": "2024-03-12T17:00:00+01:00",
+   *       "to": "2024-03-13T11:00:00+01:00",
+   *       "blockedUnits": 3,
+   *       "pickedUnits": 0,
+   *       "baseAmount": {
+   *         "grossAmount": 1071.0,
+   *         "netAmount": 900.0,
+   *         "vatType": "Special",
+   *         "vatPercent": 19.0,
+   *         "currency": "EUR"
+   *       },
+   *       "totalGrossAmount": {
+   *         "amount": 120.0,
+   *         "currency": "EUR"
+   *       }
+   *     }
+   *   ]
+   * }
+   */
   BlockModel: {
-    /** Block id */
+    /** @description Block id */
     id: string;
     group: definitions["EmbeddedGroupModel"];
     /**
-     * Status of the block. Tentative will just mark inventory as requested, but still allows to sell it
+     * @description Status of the block. Tentative will just mark inventory as requested, but still allows to sell it
      * through other channels. Definite will block the inventory for selling through other channels
      */
     status: "Tentative" | "Definite" | "Canceled";
@@ -466,141 +855,429 @@ export interface definitions {
     ratePlan: definitions["EmbeddedRatePlanModel"];
     unitGroup: definitions["EmbeddedUnitGroupModel"];
     grossDailyRate: definitions["MonetaryValueModel"];
-    /** Start date and time from which the inventory will be blocked<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Start date and time from which the inventory will be blocked<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     from: string;
-    /** End date and time until which the inventory will be blocked<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description End date and time until which the inventory will be blocked<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     to: string;
-    /** Number of reservations already picked from this block */
+    /**
+     * Format: int32
+     * @description Number of reservations already picked from this block
+     */
     pickedReservations: number;
-    /** The promo code associated with a certain special offer used to create the block */
+    /** @description The promo code associated with a certain special offer used to create the block */
     promoCode?: string;
-    /** The corporate code associated with a certain special offer used to create the block */
+    /** @description The corporate code associated with a certain special offer used to create the block */
     corporateCode?: string;
-    /** Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     created: string;
-    /** Date of last modification<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of last modification<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     modified: string;
-    /** The list of time slices for this block */
+    /** @description The list of time slices for this block */
     timeSlices?: definitions["BlockTimeSliceModel"][];
-    /** The list of actions for this block */
+    /** @description The list of actions for this block */
     actions?: definitions["ActionModel[BlockAction,NotAllowedBlockActionReason]"][];
   };
   BlockTimeSliceModel: {
-    /** Start date and time from which units will be blocked<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Start date and time from which units will be blocked<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     from: string;
-    /** End date and time until which units will be blocked<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description End date and time until which units will be blocked<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     to: string;
-    /** Number of units blocked for this time slice */
+    /**
+     * Format: int32
+     * @description Number of units blocked for this time slice
+     */
     blockedUnits: number;
-    /** Number of units which have picked reservations for this time slice */
+    /**
+     * Format: int32
+     * @description Number of units which have picked reservations for this time slice
+     */
     pickedUnits: number;
     baseAmount: definitions["AmountModel"];
     totalGrossAmount: definitions["MonetaryValueModel"];
   };
+  /**
+   * @example {
+   *   "serviceId": "MUC-SPA",
+   *   "dates": [
+   *     {
+   *       "serviceDate": "2024-03-06",
+   *       "amount": {
+   *         "amount": 25.0,
+   *         "currency": "EUR"
+   *       }
+   *     },
+   *     {
+   *       "serviceDate": "2024-03-07"
+   *     }
+   *   ]
+   * }
+   */
   BookReservationServiceModel: {
-    /** The id of the service you want to book */
+    /** @description The id of the service you want to book */
     serviceId: string;
-    /** The number of services to book for each service date. It defaults to the service offer count when not specified. */
+    /**
+     * Format: int32
+     * @description The number of services to book for each service date. It defaults to the service offer count when not specified.
+     */
     count?: number;
     amount?: definitions["MonetaryValueModel"];
-    /** The optional dates you want to book the service for; if not specified the default service pattern will be used (e.g. whole stay). */
+    /** @description The optional dates you want to book the service for; if not specified the default service pattern will be used (e.g. whole stay). */
     dates?: definitions["Date"][];
   };
   BookerModel: {
-    /** Title of the booker */
+    /** @description Title of the booker */
     title?: "Mr" | "Ms" | "Dr" | "Prof" | "Mrs" | "Other";
-    /** Gender of the booker */
+    /** @description Gender of the booker */
     gender?: "Female" | "Male" | "Other";
-    /** First name of the booker */
+    /** @description First name of the booker */
     firstName?: string;
-    /** Middle initial of the booker */
+    /** @description Middle initial of the booker */
     middleInitial?: string;
-    /** Last name of the booker */
+    /** @description Last name of the booker */
     lastName: string;
-    /** Email address of the booker */
+    /** @description Email address of the booker */
     email?: string;
-    /** Phone number of the booker */
+    /** @description Phone number of the booker */
     phone?: string;
     address?: definitions["PersonAddressModel"];
-    /** The booker's nationality, in ISO 3166-1 alpha-2 code */
+    /** @description The booker's nationality, in ISO 3166-1 alpha-2 code */
     nationalityCountryCode?: string;
-    /** The booker's identification number for the given identificationType. */
+    /** @description The booker's identification number for the given identificationType. */
     identificationNumber?: string;
-    /** The issue date of the booker's identification document. */
+    /**
+     * Format: date
+     * @description The issue date of the booker's identification document.
+     * @example 2020-10-10
+     */
     identificationIssueDate?: string;
-    /** The type of the identificationNumber */
+    /**
+     * Format: date
+     * @description The expiry date of the booker's identification document.
+     * @example 2020-10-10
+     */
+    identificationExpiryDate?: string;
+    /** @description The type of the identificationNumber */
     identificationType?:
       | "SocialInsuranceNumber"
       | "PassportNumber"
       | "IdNumber"
       | "DriverLicenseNumber";
     company?: definitions["PersonCompanyModel"];
-    /** Preferred contact two-letter language code (ISO Alpha-2) */
+    /** @description Preferred contact two-letter language code (ISO Alpha-2) */
     preferredLanguage?: string;
-    /** Birth date */
+    /**
+     * Format: date
+     * @description Birth date
+     * @example 2020-10-10
+     */
     birthDate?: string;
-    /** The place of birth */
+    /** @description The place of birth */
     birthPlace?: string;
   };
+  /**
+   * @example {
+   *   "id": "XPGMSXGF",
+   *   "reservationIds": [
+   *     {
+   *       "id": "XPGMSXGF-1"
+   *     },
+   *     {
+   *       "id": "XPGMSXGF-2"
+   *     }
+   *   ]
+   * }
+   */
   BookingCreatedModel: {
-    /** Booking id */
+    /** @description Booking id */
     id: string;
-    /** List of ids for newly created reservations */
+    /** @description List of ids for newly created reservations */
     reservationIds: definitions["ReservationCreatedModel"][];
   };
-  /** A booking holds all shared metadata for a set of reservations */
+  /** @description A booking holds all shared metadata for a set of reservations */
   BookingItemModel: {
-    /** Booking id */
+    /** @description Booking id */
     id: string;
-    /** Group id */
+    /** @description Group id */
     groupId?: string;
     booker?: definitions["BookerModel"];
     paymentAccount?: definitions["PaymentAccountModel"];
-    /** Additional information and comments */
+    /** @description Additional information and comments */
     comment?: string;
-    /** Additional information and comment by the booker */
+    /** @description Additional information and comment by the booker */
     bookerComment?: string;
-    /** Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     created: string;
-    /** Date of last modification<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of last modification<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     modified: string;
-    /** Reservations within this booking */
+    /** @description Reservations within this booking */
     reservations?: definitions["BookingReservationModel"][];
   };
+  /**
+   * @example {
+   *   "bookings": [
+   *     {
+   *       "id": "XPGMSXGF",
+   *       "booker": {
+   *         "title": "Mr",
+   *         "gender": "Male",
+   *         "firstName": "Jon",
+   *         "middleInitial": "D",
+   *         "lastName": "Doe",
+   *         "email": "john.d@doe.com",
+   *         "phone": "+4989123343",
+   *         "address": {
+   *           "addressLine1": "My Street 5",
+   *           "postalCode": "12453",
+   *           "city": "MyCity",
+   *           "countryCode": "GB"
+   *         }
+   *       },
+   *       "paymentAccount": {
+   *         "accountNumber": "1111",
+   *         "accountHolder": "John Doe",
+   *         "expiryMonth": "8",
+   *         "expiryYear": "2018",
+   *         "paymentMethod": "visa",
+   *         "payerEmail": "s.hopper@test.com",
+   *         "isVirtual": false,
+   *         "isActive": false
+   *       },
+   *       "comment": "The comment from the front desk or reservation office",
+   *       "bookerComment": "The comment from the booker provided via the booking channel",
+   *       "created": "0001-01-01T00:00:00Z",
+   *       "modified": "0001-01-01T00:00:00Z",
+   *       "reservations": [
+   *         {
+   *           "id": "XPGMSXGF-1",
+   *           "status": "Confirmed",
+   *           "externalCode": "345343345|334",
+   *           "channelCode": "BookingCom",
+   *           "arrival": "2024-03-08T17:00:00+01:00",
+   *           "departure": "2024-03-10T11:00:00+01:00",
+   *           "adults": 1,
+   *           "childrenAges": [
+   *             6
+   *           ],
+   *           "totalGrossAmount": {
+   *             "amount": 130.0,
+   *             "currency": "EUR"
+   *           },
+   *           "property": {
+   *             "id": "MUC",
+   *             "code": "MUC",
+   *             "name": "Demo Hotel Munich",
+   *             "description": "This is the demo hotel Munich"
+   *           },
+   *           "ratePlan": {
+   *             "id": "MUC-NONREF_SGL",
+   *             "code": "NONREF",
+   *             "name": "Non Refundable",
+   *             "description": "Non Refundable",
+   *             "isSubjectToCityTax": false
+   *           },
+   *           "unitGroup": {
+   *             "id": "MUC-SGL",
+   *             "code": "SGL",
+   *             "name": "Single",
+   *             "description": "Single",
+   *             "type": "BedRoom"
+   *           },
+   *           "guestComment": "The comment from the guest provided via the booking channel",
+   *           "cancellationFee": {
+   *             "id": "MUC-FLE",
+   *             "code": "FLE",
+   *             "name": "Flexible",
+   *             "description": "Free cancellation until 36 hours before arrival.",
+   *             "dueDateTime": "2024-03-08T17:00:00+01:00",
+   *             "fee": {
+   *               "amount": 30.0,
+   *               "currency": "EUR"
+   *             }
+   *           },
+   *           "noShowFee": {
+   *             "id": "MUC-NONREF",
+   *             "code": "NONREF",
+   *             "name": "Non Refundable",
+   *             "description": "No free no-show",
+   *             "fee": {
+   *               "amount": 130.0,
+   *               "currency": "EUR"
+   *             }
+   *           }
+   *         }
+   *       ]
+   *     }
+   *   ],
+   *   "count": 1
+   * }
+   */
   BookingListModel: {
     bookings: definitions["BookingItemModel"][];
-    /** Total count of items */
+    /**
+     * Format: int64
+     * @description Total count of items
+     */
     count: number;
   };
-  /** A booking holds all shared metadata for a set of reservations */
+  /**
+   * @description A booking holds all shared metadata for a set of reservations
+   * @example {
+   *   "id": "XPGMSXGF",
+   *   "booker": {
+   *     "title": "Mr",
+   *     "gender": "Male",
+   *     "firstName": "Jon",
+   *     "middleInitial": "D",
+   *     "lastName": "Doe",
+   *     "email": "john.d@doe.com",
+   *     "phone": "+4989123343",
+   *     "address": {
+   *       "addressLine1": "My Street 5",
+   *       "postalCode": "12453",
+   *       "city": "MyCity",
+   *       "countryCode": "GB"
+   *     }
+   *   },
+   *   "paymentAccount": {
+   *     "accountNumber": "1111",
+   *     "accountHolder": "John Doe",
+   *     "expiryMonth": "8",
+   *     "expiryYear": "2018",
+   *     "paymentMethod": "visa",
+   *     "payerEmail": "s.hopper@test.com",
+   *     "isVirtual": false,
+   *     "isActive": false
+   *   },
+   *   "comment": "The comment from the front desk or reservation office",
+   *   "bookerComment": "The comment from the booker provided via the booking channel",
+   *   "created": "0001-01-01T00:00:00Z",
+   *   "modified": "0001-01-01T00:00:00Z",
+   *   "reservations": [
+   *     {
+   *       "id": "XPGMSXGF-1",
+   *       "status": "Confirmed",
+   *       "externalCode": "345343345|334",
+   *       "channelCode": "BookingCom",
+   *       "arrival": "2024-03-08T17:00:00+01:00",
+   *       "departure": "2024-03-10T11:00:00+01:00",
+   *       "adults": 1,
+   *       "childrenAges": [
+   *         6
+   *       ],
+   *       "totalGrossAmount": {
+   *         "amount": 130.0,
+   *         "currency": "EUR"
+   *       },
+   *       "property": {
+   *         "id": "MUC",
+   *         "code": "MUC",
+   *         "name": "Demo Hotel Munich",
+   *         "description": "This is the demo hotel Munich"
+   *       },
+   *       "ratePlan": {
+   *         "id": "MUC-NONREF_DBL",
+   *         "code": "NONREF",
+   *         "name": "Non Refundable",
+   *         "description": "Non Refundable",
+   *         "isSubjectToCityTax": false
+   *       },
+   *       "unitGroup": {
+   *         "id": "MUC-DBL",
+   *         "code": "DBL",
+   *         "name": "Double",
+   *         "description": "Double",
+   *         "type": "BedRoom"
+   *       },
+   *       "guestComment": "The comment from the guest provided via the booking channel",
+   *       "cancellationFee": {
+   *         "id": "MUC-FLE",
+   *         "code": "FLE",
+   *         "name": "Flexible",
+   *         "description": "Free cancellation until 36 hours before arrival.",
+   *         "dueDateTime": "2024-03-08T17:00:00+01:00",
+   *         "fee": {
+   *           "amount": 30.0,
+   *           "currency": "EUR"
+   *         }
+   *       },
+   *       "noShowFee": {
+   *         "id": "MUC-NONREF",
+   *         "code": "NONREF",
+   *         "name": "Non Refundable",
+   *         "description": "No free no-show",
+   *         "fee": {
+   *           "amount": 130.0,
+   *           "currency": "EUR"
+   *         }
+   *       },
+   *       "company": {
+   *         "id": "MUC-UMBRELLA",
+   *         "code": "UMBRELLA",
+   *         "name": "Umbrella Corp.",
+   *         "canCheckOutOnAr": true
+   *       }
+   *     }
+   *   ]
+   * }
+   */
   BookingModel: {
-    /** Booking id */
+    /** @description Booking id */
     id: string;
-    /** Group id */
+    /** @description Group id */
     groupId?: string;
     booker?: definitions["BookerModel"];
     paymentAccount?: definitions["PaymentAccountModel"];
-    /** Additional information and comments */
+    /** @description Additional information and comments */
     comment?: string;
-    /** Additional information and comment by the booker */
+    /** @description Additional information and comment by the booker */
     bookerComment?: string;
-    /** Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     created: string;
-    /** Date of last modification<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of last modification<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     modified: string;
-    /** Property specific values like total amount and balance */
+    /** @description Property specific values like total amount and balance */
     propertyValues?: definitions["PropertyValueModel"][];
-    /** Reservations within this booking */
+    /** @description Reservations within this booking */
     reservations?: definitions["BookingReservationModel"][];
   };
   BookingReservationModel: {
-    /** Reservation id */
+    /** @description Reservation id */
     id: string;
-    /** Status of the reservation */
+    /** @description Status of the reservation */
     status: "Confirmed" | "InHouse" | "CheckedOut" | "Canceled" | "NoShow";
-    /** Code in external system */
+    /** @description Code in external system */
     externalCode?: string;
-    /** Channel code */
+    /** @description Channel code */
     channelCode:
       | "Direct"
       | "BookingCom"
@@ -609,25 +1286,35 @@ export interface definitions {
       | "Expedia"
       | "Homelike"
       | "Hrs"
-      | "AltoVita";
-    /** Source of the reservation (e.g Hotels.com, Orbitz, etc.) */
+      | "AltoVita"
+      | "DesVu";
+    /** @description Source of the reservation (e.g Hotels.com, Orbitz, etc.) */
     source?: string;
     paymentAccount?: definitions["PaymentAccountModel"];
-    /** Date of arrival<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of arrival<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     arrival: string;
-    /** Date of departure<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of departure<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     departure: string;
-    /** Number of adults */
+    /**
+     * Format: int32
+     * @description Number of adults
+     */
     adults: number;
-    /** The ages of the children */
+    /** @description The ages of the children */
     childrenAges?: number[];
     totalGrossAmount: definitions["MonetaryValueModel"];
     property: definitions["EmbeddedPropertyModel"];
     ratePlan: definitions["EmbeddedRatePlanModel"];
     unitGroup: definitions["EmbeddedUnitGroupModel"];
-    /** The list of additional services (extras, add-ons) reserved for the stay */
+    /** @description The list of additional services (extras, add-ons) reserved for the stay */
     services?: definitions["ReservationServiceItemModel"][];
-    /** Additional information and comment by the guest */
+    /** @description Additional information and comment by the guest */
     guestComment?: string;
     cancellationFee: definitions["ReservationCancellationFeeModel"];
     noShowFee: definitions["ReservationNoShowFeeModel"];
@@ -637,98 +1324,309 @@ export interface definitions {
     commissionAmount: definitions["MonetaryValueModel"];
     beforeCommissionAmount?: definitions["MonetaryValueModel"];
   };
+  /**
+   * @example {
+   *   "count": 50
+   * }
+   */
   CountModel: {
+    /** Format: int64 */
     count: number;
   };
+  /**
+   * @example {
+   *   "groupId": "XPGMSXGF",
+   *   "ratePlanId": "MUC-NONREF-SGL",
+   *   "from": "2024-03-11",
+   *   "to": "2024-03-14",
+   *   "grossDailyRate": {
+   *     "amount": 160.0,
+   *     "currency": "EUR"
+   *   },
+   *   "timeSlices": [
+   *     {
+   *       "blockedUnits": 3
+   *     },
+   *     {
+   *       "blockedUnits": 0
+   *     },
+   *     {
+   *       "blockedUnits": 7
+   *     }
+   *   ]
+   * }
+   */
   CreateBlockModel: {
-    /** ID of the group that reserved the block */
+    /** @description ID of the group that reserved the block */
     groupId: string;
-    /** The rate plan */
+    /** @description The rate plan */
     ratePlanId: string;
-    /** Start date and time from which the inventory will be blocked<br />Specify either a pure date or a date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /** @description Start date and time from which the inventory will be blocked<br />Specify either a pure date or a date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
     from: string;
-    /** End date and time until which the inventory will be blocked. Cannot be more than 5 years after the start date.<br />Specify either a pure date or a date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /** @description End date and time until which the inventory will be blocked. Cannot be more than 5 years after the start date.<br />Specify either a pure date or a date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
     to: string;
     grossDailyRate: definitions["MonetaryValueModel"];
-    /** The list of blocked units for each time slice */
+    /** @description The list of blocked units for each time slice */
     timeSlices?: definitions["CreateBlockTimeSliceModel"][];
-    /** Number of units to block for the defined time period */
+    /**
+     * Format: int32
+     * @description Number of units to block for the defined time period
+     */
     blockedUnits?: number;
-    /** The promo code associated with a certain special offer */
+    /** @description The promo code associated with a certain special offer */
     promoCode?: string;
-    /** The corporate code associated with a certain special offer */
+    /** @description The corporate code associated with a certain special offer */
     corporateCode?: string;
   };
   CreateBlockTimeSliceModel: {
-    /** Number of units blocked for the time slice */
+    /**
+     * Format: int32
+     * @description Number of units blocked for the time slice
+     */
     blockedUnits: number;
   };
-  /** With this request you can create a booking */
+  /**
+   * @description With this request you can create a booking
+   * @example {
+   *   "paymentAccount": {
+   *     "accountNumber": "1111",
+   *     "accountHolder": "John Doe",
+   *     "expiryMonth": "8",
+   *     "expiryYear": "2018",
+   *     "paymentMethod": "visa",
+   *     "payerEmail": "s.hopper@test.com",
+   *     "payerReference": "4ea6462b-cca3-4c17-a035-c7b5132db83c",
+   *     "isVirtual": false
+   *   },
+   *   "booker": {
+   *     "title": "Mr",
+   *     "gender": "Male",
+   *     "firstName": "Jon",
+   *     "middleInitial": "D",
+   *     "lastName": "Doe",
+   *     "email": "john.d@doe.com",
+   *     "phone": "+4989123343",
+   *     "address": {
+   *       "addressLine1": "My Street 1",
+   *       "postalCode": "12453",
+   *       "city": "MyCity",
+   *       "countryCode": "GB"
+   *     }
+   *   },
+   *   "reservations": [
+   *     {
+   *       "arrival": "2024-03-08",
+   *       "departure": "2024-03-10",
+   *       "adults": 1,
+   *       "childrenAges": [
+   *         6
+   *       ],
+   *       "guestComment": "I need a wake up service",
+   *       "channelCode": "Direct",
+   *       "primaryGuest": {
+   *         "title": "Mr",
+   *         "gender": "Male",
+   *         "firstName": "Jon",
+   *         "middleInitial": "D",
+   *         "lastName": "Doe",
+   *         "email": "john.d@doe.com",
+   *         "phone": "+4989123343",
+   *         "address": {
+   *           "addressLine1": "My Street 1",
+   *           "postalCode": "12453",
+   *           "city": "MyCity",
+   *           "countryCode": "GB"
+   *         }
+   *       },
+   *       "guaranteeType": "Prepayment",
+   *       "travelPurpose": "Business",
+   *       "timeSlices": [
+   *         {
+   *           "ratePlanId": "MUC-NONREF-FAMILY"
+   *         },
+   *         {
+   *           "ratePlanId": "MUC-NONREF-FAMILY"
+   *         }
+   *       ],
+   *       "services": [
+   *         {
+   *           "serviceId": "MUC-BRKF"
+   *         },
+   *         {
+   *           "serviceId": "MUC-YOGA",
+   *           "dates": [
+   *             {
+   *               "serviceDate": "2024-03-09",
+   *               "amount": {
+   *                 "amount": 35.0,
+   *                 "currency": "EUR"
+   *               }
+   *             }
+   *           ]
+   *         }
+   *       ],
+   *       "prePaymentAmount": {
+   *         "amount": 50.0,
+   *         "currency": "EUR"
+   *       }
+   *     },
+   *     {
+   *       "arrival": "2024-03-09",
+   *       "departure": "2024-03-11",
+   *       "adults": 1,
+   *       "childrenAges": [
+   *         6
+   *       ],
+   *       "channelCode": "Direct",
+   *       "primaryGuest": {
+   *         "title": "Mr",
+   *         "gender": "Male",
+   *         "firstName": "Eric",
+   *         "middleInitial": "E",
+   *         "lastName": "Steinmetz",
+   *         "email": "eric.e@steinmetz.com",
+   *         "phone": "+4989123343",
+   *         "address": {
+   *           "addressLine1": "My Street 1",
+   *           "postalCode": "12453",
+   *           "city": "MyCity",
+   *           "countryCode": "GB"
+   *         }
+   *       },
+   *       "guaranteeType": "CreditCard",
+   *       "timeSlices": [
+   *         {
+   *           "ratePlanId": "BER-FLEX-DBL",
+   *           "totalAmount": {
+   *             "amount": 120.0,
+   *             "currency": "EUR"
+   *           }
+   *         },
+   *         {
+   *           "ratePlanId": "BER-FLEX-DBL",
+   *           "totalAmount": {
+   *             "amount": 125.0,
+   *             "currency": "EUR"
+   *           }
+   *         }
+   *       ],
+   *       "companyId": "BER-UMBRELLA",
+   *       "commission": {
+   *         "commissionAmount": {
+   *           "amount": 20.0,
+   *           "currency": "EUR"
+   *         },
+   *         "beforeCommissionAmount": {
+   *           "amount": 100.0,
+   *           "currency": "EUR"
+   *         }
+   *       }
+   *     }
+   *   ],
+   *   "transactionReference": "564578124534890J"
+   * }
+   */
   CreateBookingModel: {
     paymentAccount?: definitions["CreatePaymentAccountModel"];
     booker: definitions["BookerModel"];
-    /** Additional information and comments */
+    /** @description Additional information and comments */
     comment?: string;
-    /** Additional information and comments by the booker */
+    /** @description Additional information and comments by the booker */
     bookerComment?: string;
-    /** List of reservations to create */
+    /** @description List of reservations to create */
     reservations: definitions["CreateReservationModel"][];
     /**
-     * The reference of a payment transaction. This should be set when a payment transaction has been initiated and should be used to complete the transaction upon reservation creation.
+     * @description The reference of a payment transaction. This should be set when a payment transaction has been initiated and should be used to complete the transaction upon reservation creation.
      * When set, the payment transaction completion is always triggered regardless of the reservation guarantee type and payment automation settings.
      */
     transactionReference?: string;
   };
-  /** With this request you can create a group booking request */
+  /**
+   * @description With this request you can create a group booking request
+   * @example {
+   *   "name": "apaleo Summer Festival 2025",
+   *   "booker": {
+   *     "title": "Mr",
+   *     "gender": "Male",
+   *     "firstName": "Jon",
+   *     "middleInitial": "D",
+   *     "lastName": "Doe",
+   *     "email": "john.d@doe.com",
+   *     "phone": "+4989123343",
+   *     "address": {
+   *       "addressLine1": "My Street 1",
+   *       "postalCode": "12453",
+   *       "city": "MyCity",
+   *       "countryCode": "GB"
+   *     }
+   *   },
+   *   "paymentAccount": {
+   *     "accountNumber": "1111",
+   *     "accountHolder": "John Doe",
+   *     "expiryMonth": "8",
+   *     "expiryYear": "2018",
+   *     "paymentMethod": "visa",
+   *     "payerEmail": "s.hopper@test.com",
+   *     "payerReference": "4ea6462b-cca3-4c17-a035-c7b5132db83c",
+   *     "isVirtual": false
+   *   },
+   *   "propertyIds": [
+   *     "MUC"
+   *   ]
+   * }
+   */
   CreateGroupModel: {
-    /** Name of the group */
+    /** @description Name of the group */
     name: string;
     booker: definitions["BookerModel"];
-    /** Additional information and comments */
+    /** @description Additional information and comments */
     comment?: string;
-    /** Additional information and comment by the booker */
+    /** @description Additional information and comment by the booker */
     bookerComment?: string;
     paymentAccount?: definitions["CreatePaymentAccountModel"];
-    /** List of property ids the group booking belongs to */
+    /** @description List of property ids the group booking belongs to */
     propertyIds: string[];
   };
   CreatePaymentAccountModel: {
-    /** The account number (e.g. masked credit card number or last 4 digits) */
+    /** @description The account number (e.g. masked credit card number or last 4 digits) */
     accountNumber?: string;
-    /** The account holder (e.g. card holder) */
+    /** @description The account holder (e.g. card holder) */
     accountHolder?: string;
-    /** The credit card's expiration month */
+    /** @description The credit card's expiration month */
     expiryMonth?: string;
-    /** The credit card's expiration year */
+    /** @description The credit card's expiration year */
     expiryYear?: string;
-    /** The payment method (e.g. visa) */
+    /** @description The payment method (e.g. visa) */
     paymentMethod?: string;
-    /** The email address of the shopper / customer */
+    /** @description The email address of the shopper / customer */
     payerEmail?: string;
-    /** The reference used to uniquely identify the shopper (e.g. user ID or account ID). Used for recurring payments */
+    /** @description The reference used to uniquely identify the shopper (e.g. user ID or account ID). Used for recurring payments */
     payerReference?: string;
-    /** Indicates if the payment account is a virtual credit card. If not specified it defaults to 'false' */
+    /** @description Indicates if the payment account is a virtual credit card. If not specified it defaults to 'false' */
     isVirtual?: boolean;
-    /** A reason why account is inactive when PayerReference was not provided */
+    /** @description A reason why account is inactive when PayerReference was not provided */
     inactiveReason?: string;
   };
-  /** With this request you can create a reservation */
+  /** @description With this request you can create a reservation */
   CreateReservationModel: {
-    /** Date and optional time of arrival<br />Specify either a pure date or a date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /** @description Date and optional time of arrival<br />Specify either a pure date or a date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
     arrival: string;
-    /** Date and optional time of departure. Cannot be more than 5 years after arrival.<br />Specify either a pure date or a date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /** @description Date and optional time of departure. Cannot be more than 5 years after arrival.<br />Specify either a pure date or a date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
     departure: string;
-    /** Number of adults */
+    /**
+     * Format: int32
+     * @description Number of adults
+     */
     adults: number;
-    /** Ages of the children */
+    /** @description Ages of the children */
     childrenAges?: number[];
-    /** Additional information and comments */
+    /** @description Additional information and comments */
     comment?: string;
-    /** Additional information and comments by the guest */
+    /** @description Additional information and comments by the guest */
     guestComment?: string;
-    /** Code in some system */
+    /** @description Code in some system */
     externalCode?: string;
-    /** Channel code */
+    /** @description Channel code */
     channelCode:
       | "Direct"
       | "BookingCom"
@@ -737,401 +1635,689 @@ export interface definitions {
       | "Expedia"
       | "Homelike"
       | "Hrs"
-      | "AltoVita";
-    /** Source of the reservation */
+      | "AltoVita"
+      | "DesVu";
+    /** @description Source of the reservation */
     source?: string;
     primaryGuest?: definitions["GuestModel"];
-    /** Additional guests of the reservation. */
+    /** @description Additional guests of the reservation. */
     additionalGuests?: definitions["GuestModel"][];
     /**
-     * The guarantee that has to be applied for this reservation. It has to be the same or stronger than
+     * @description The guarantee that has to be applied for this reservation. It has to be the same or stronger than
      * the minimum guarantee required by the selected rate plan
      */
     guaranteeType?: "PM6Hold" | "CreditCard" | "Prepayment" | "Company";
-    /** Purpose of the trip, leisure or business */
+    /** @description Purpose of the trip, leisure or business */
     travelPurpose?: "Business" | "Leisure";
     /**
-     * Gross prices including services and taxes for each time slice. They will be applied to the reservation timeslices
+     * @description Gross prices including services and taxes for each time slice. They will be applied to the reservation timeslices
      * in the order specified from arrival to departure
      */
     timeSlices: definitions["CreateReservationTimeSliceModel"][];
-    /** Additional services (extras, add-ons) that should be added to the reservation */
+    /** @description Additional services (extras, add-ons) that should be added to the reservation */
     services?: definitions["BookReservationServiceModel"][];
-    /** Set this if this reservation belongs to a company */
+    /** @description Set this if this reservation belongs to a company */
     companyId?: string;
-    /** Corporate code provided during creation. Used to find offers during amend. */
+    /** @description Corporate code provided during creation. Used to find offers during amend. */
     corporateCode?: string;
     prePaymentAmount?: definitions["MonetaryValueModel"];
     commission?: definitions["CommissionModel"];
-    /** The promo code associated with a certain special offer */
+    /** @description The promo code associated with a certain special offer */
     promoCode?: string;
   };
   CreateReservationTimeSliceModel: {
-    /** The rate plan id for this time slice */
+    /** @description The rate plan id for this time slice */
     ratePlanId: string;
     totalAmount?: definitions["MonetaryValueModel"];
   };
   Date: {
-    /** The date the service is delivered */
+    /**
+     * Format: date
+     * @description The date the service is delivered
+     * @example 2020-10-10
+     */
     serviceDate: string;
-    /** The number of services to book for this date. It defaults to the service offer count when not specified. */
+    /**
+     * Format: int32
+     * @description The number of services to book for this date. It defaults to the service offer count when not specified.
+     */
     count?: number;
     amount?: definitions["MonetaryValueModel"];
   };
+  /**
+   * @example {
+   *   "arrival": "2024-03-08T17:00:00+01:00",
+   *   "departure": "2024-03-10T11:00:00+01:00",
+   *   "adults": 1,
+   *   "childrenAges": [
+   *     6
+   *   ],
+   *   "requote": false,
+   *   "timeSlices": [
+   *     {
+   *       "ratePlanId": "MUC-NONREF-DBL",
+   *       "totalGrossAmount": {
+   *         "amount": 86.00,
+   *         "currency": "EUR"
+   *       }
+   *     },
+   *     {
+   *       "ratePlanId": "MUC-NONREF-DBL",
+   *       "totalGrossAmount": {
+   *         "amount": 101.00,
+   *         "currency": "EUR"
+   *       }
+   *     }
+   *   ]
+   * }
+   */
   DesiredStayDetailsModel: {
-    /** Date and optional time of arrival<br />Specify either a pure date or a date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /** @description Date and optional time of arrival<br />Specify either a pure date or a date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
     arrival: string;
-    /** Date and optional time of departure. Cannot be more than 5 years after arrival.<br />Specify either a pure date or a date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /** @description Date and optional time of departure. Cannot be more than 5 years after arrival.<br />Specify either a pure date or a date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
     departure: string;
-    /** Number of adults */
+    /**
+     * Format: int32
+     * @description Number of adults
+     */
     adults: number;
-    /** Ages of the children */
+    /** @description Ages of the children */
     childrenAges?: number[];
     /**
-     * Whether the prices for time slices with no change to the rate plan should be re-quoted based on current prices, or if
+     * @description Whether the prices for time slices with no change to the rate plan should be re-quoted based on current prices, or if
      * only additions like change of number of adults should be calculated. Defaults to 'false'.
      */
     requote?: boolean;
-    /** The list of time slices */
+    /** @description The list of time slices */
     timeSlices: definitions["DesiredTimeSliceModel"][];
   };
   DesiredTimeSliceModel: {
-    /** The rate plan id for this time slice */
+    /** @description The rate plan id for this time slice */
     ratePlanId: string;
     totalGrossAmount?: definitions["MonetaryValueModel"];
   };
   EmbeddedCompanyModel: {
-    /** The company ID */
+    /** @description The company ID */
     id: string;
-    /** The code of the company */
+    /** @description The code of the company */
     code?: string;
-    /** The name of the company */
+    /** @description The name of the company */
     name?: string;
-    /** Whether or not the company can check out on AR */
+    /** @description Whether or not the company can check out on AR */
     canCheckOutOnAr?: boolean;
   };
   EmbeddedGroupModel: {
-    /** Group booking id */
+    /** @description Group booking id */
     id: string;
-    /** Name of the group */
+    /** @description Name of the group */
     name?: string;
   };
   EmbeddedMarketSegmentModel: {
-    /** The market segment id */
+    /** @description The market segment id */
     id: string;
-    /** The market segment code */
+    /** @description The market segment code */
     code: string;
-    /** The market segment name */
+    /** @description The market segment name */
     name: string;
   };
   EmbeddedPropertyModel: {
-    /** The property id */
+    /** @description The property id */
     id: string;
-    /** The code for the property that can be shown in reports and table views */
+    /** @description The code for the property that can be shown in reports and table views */
     code?: string;
-    /** The name for the property */
+    /** @description The name for the property */
     name?: string;
-    /** The description for the property */
+    /** @description The description for the property */
     description?: string;
   };
   EmbeddedRatePlanModel: {
-    /** The rate plan id */
+    /** @description The rate plan id */
     id: string;
-    /** The code for the rate plan that can be shown in reports and table views */
+    /** @description The code for the rate plan that can be shown in reports and table views */
     code?: string;
-    /** The name for the rate plan */
+    /** @description The name for the rate plan */
     name?: string;
-    /** The description for the rate plan */
+    /** @description The description for the rate plan */
     description?: string;
-    /** Whether the rate plan is subject to city tax or not */
+    /** @description Whether the rate plan is subject to city tax or not */
     isSubjectToCityTax: boolean;
   };
   EmbeddedServiceModel: {
-    /** The service id */
+    /** @description The service id */
     id: string;
-    /** The code for the service */
+    /** @description The code for the service */
     code?: string;
-    /** The name for the service */
+    /** @description The name for the service */
     name?: string;
-    /** The description for the service */
+    /** @description The description for the service */
     description?: string;
   };
   EmbeddedUnitGroupModel: {
-    /** The unit group id */
+    /** @description The unit group id */
     id: string;
-    /** The code for the unit group that can be shown in reports and table views */
+    /** @description The code for the unit group that can be shown in reports and table views */
     code?: string;
-    /** The name for the unit group */
+    /** @description The name for the unit group */
     name?: string;
-    /** The description for the unit group */
+    /** @description The description for the unit group */
     description?: string;
-    /** The unit group type */
+    /** @description The unit group type */
     type?: "BedRoom" | "MeetingRoom" | "EventSpace" | "ParkingLot" | "Other";
   };
   EmbeddedUnitModel: {
-    /** The unit id */
+    /** @description The unit id */
     id: string;
-    /** The name for the unit */
+    /** @description The name for the unit */
     name?: string;
-    /** The description for the unit */
+    /** @description The description for the unit */
     description?: string;
-    /** The unit group id */
+    /** @description The unit group id */
     unitGroupId?: string;
   };
   GroupBlockModel: {
-    /** Block id */
+    /** @description Block id */
     id: string;
-    /** Status of the block */
+    /** @description Status of the block */
     status: "Tentative" | "Definite" | "Canceled";
     property: definitions["EmbeddedPropertyModel"];
     ratePlan: definitions["EmbeddedRatePlanModel"];
     unitGroup: definitions["EmbeddedUnitGroupModel"];
     grossDailyRate: definitions["MonetaryValueModel"];
-    /** Start date and time from which the inventory will be blocked<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Start date and time from which the inventory will be blocked<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     from: string;
-    /** End date and time until which the inventory will be blocked<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description End date and time until which the inventory will be blocked<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     to: string;
-    /** Number of units blocked */
+    /**
+     * Format: int32
+     * @description Number of units blocked
+     */
     blockedUnits: number;
-    /** Number of reservations already picked from this block */
+    /**
+     * Format: int32
+     * @description Number of reservations already picked from this block
+     */
     pickedReservations: number;
-    /** Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     created: string;
-    /** Date of last modification<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of last modification<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     modified: string;
   };
+  /**
+   * @example {
+   *   "id": "XPGMSXGF"
+   * }
+   */
   GroupCreatedModel: {
-    /** Id of newly created group booking */
+    /** @description Id of newly created group booking */
     id: string;
   };
   GroupItemModel: {
-    /** Group id */
+    /** @description Group id */
     id: string;
-    /** Start date and time of the earliest block for this group<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Start date and time of the earliest block for this group<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     from?: string;
-    /** End date and time of the latest block for this group<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description End date and time of the latest block for this group<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     to?: string;
-    /** Name of the group */
+    /** @description Name of the group */
     name: string;
     booker?: definitions["BookerModel"];
-    /** Additional information and comments */
+    /** @description Additional information and comments */
     comment?: string;
-    /** Additional information and comment by the booker */
+    /** @description Additional information and comment by the booker */
     bookerComment?: string;
     paymentAccount?: definitions["PaymentAccountModel"];
-    /** Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     created: string;
-    /** Date of last modification<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of last modification<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     modified: string;
-    /** Blocks within this group */
+    /** @description Blocks within this group */
     blocks?: definitions["GroupBlockModel"][];
-    /** The list of actions for this group */
+    /** @description The list of actions for this group */
     actions?: definitions["ActionModel[GroupAction,NotAllowedGroupActionReason]"][];
-    /** The list of property ids this group belongs to */
+    /** @description The list of property ids this group belongs to */
     propertyIds: string[];
   };
+  /**
+   * @example {
+   *   "groups": [
+   *     {
+   *       "id": "XPGMSXGF",
+   *       "name": "apaleo Summer Festival 2025",
+   *       "booker": {
+   *         "title": "Mr",
+   *         "gender": "Male",
+   *         "firstName": "Jon",
+   *         "middleInitial": "D",
+   *         "lastName": "Doe",
+   *         "email": "john.d@doe.com",
+   *         "phone": "+4989123343",
+   *         "address": {
+   *           "addressLine1": "My Street 5",
+   *           "postalCode": "12453",
+   *           "city": "MyCity",
+   *           "countryCode": "GB"
+   *         }
+   *       },
+   *       "paymentAccount": {
+   *         "accountNumber": "1111",
+   *         "accountHolder": "John Doe",
+   *         "expiryMonth": "8",
+   *         "expiryYear": "2018",
+   *         "paymentMethod": "visa",
+   *         "payerEmail": "s.hopper@test.com",
+   *         "isVirtual": false,
+   *         "isActive": false
+   *       },
+   *       "created": "0001-01-01T00:00:00Z",
+   *       "modified": "0001-01-01T00:00:00Z",
+   *       "propertyIds": [
+   *         "MUC"
+   *       ]
+   *     }
+   *   ],
+   *   "count": 1
+   * }
+   */
   GroupListModel: {
     groups: definitions["GroupItemModel"][];
-    /** Total count of items */
+    /**
+     * Format: int64
+     * @description Total count of items
+     */
     count: number;
   };
+  /**
+   * @example {
+   *   "id": "XPGMSXGF",
+   *   "name": "apaleo Summer Festival 2025",
+   *   "from": "2024-03-11T15:35:59.8074838+01:00",
+   *   "to": "2024-03-18T15:35:59.8074838+01:00",
+   *   "booker": {
+   *     "title": "Mr",
+   *     "gender": "Male",
+   *     "firstName": "Jon",
+   *     "middleInitial": "D",
+   *     "lastName": "Doe",
+   *     "email": "john.d@doe.com",
+   *     "phone": "+4989123343",
+   *     "address": {
+   *       "addressLine1": "My Street 5",
+   *       "postalCode": "12453",
+   *       "city": "MyCity",
+   *       "countryCode": "GB"
+   *     }
+   *   },
+   *   "paymentAccount": {
+   *     "accountNumber": "1111",
+   *     "accountHolder": "John Doe",
+   *     "expiryMonth": "8",
+   *     "expiryYear": "2018",
+   *     "paymentMethod": "visa",
+   *     "payerEmail": "s.hopper@test.com",
+   *     "isVirtual": false,
+   *     "isActive": false
+   *   },
+   *   "created": "0001-01-01T00:00:00Z",
+   *   "modified": "0001-01-01T00:00:00Z",
+   *   "blocks": [
+   *     {
+   *       "id": "MUC-HSGTDG",
+   *       "status": "Tentative",
+   *       "property": {
+   *         "id": "MUC",
+   *         "code": "MUC",
+   *         "name": "Demo Hotel Munich",
+   *         "description": "This is the demo hotel Munich"
+   *       },
+   *       "ratePlan": {
+   *         "id": "MUC-NONREF_SGL",
+   *         "code": "NONREF",
+   *         "name": "Non Refundable",
+   *         "description": "Non Refundable",
+   *         "isSubjectToCityTax": false
+   *       },
+   *       "unitGroup": {
+   *         "id": "MUC-SGL",
+   *         "code": "SGL",
+   *         "name": "Single",
+   *         "description": "Single",
+   *         "type": "BedRoom"
+   *       },
+   *       "grossDailyRate": {
+   *         "amount": 160.0,
+   *         "currency": "EUR"
+   *       },
+   *       "from": "2024-03-11T15:35:59.8074838+01:00",
+   *       "to": "2024-03-16T15:35:59.8074838+01:00",
+   *       "blockedUnits": 10,
+   *       "pickedReservations": 0,
+   *       "created": "2024-03-06T15:35:59.8074838+01:00",
+   *       "modified": "2024-03-06T15:35:59.8074838+01:00"
+   *     },
+   *     {
+   *       "id": "MUC-JAIULS",
+   *       "status": "Definite",
+   *       "property": {
+   *         "id": "MUC",
+   *         "code": "MUC",
+   *         "name": "Demo Hotel Munich",
+   *         "description": "This is the demo hotel Munich"
+   *       },
+   *       "ratePlan": {
+   *         "id": "MUC-NONREF_DBL",
+   *         "code": "NONREF",
+   *         "name": "Non Refundable",
+   *         "description": "Non Refundable",
+   *         "isSubjectToCityTax": false
+   *       },
+   *       "unitGroup": {
+   *         "id": "MUC-DBL",
+   *         "code": "DBL",
+   *         "name": "Double",
+   *         "description": "Double",
+   *         "type": "BedRoom"
+   *       },
+   *       "grossDailyRate": {
+   *         "amount": 190.0,
+   *         "currency": "EUR"
+   *       },
+   *       "from": "2024-03-12T15:35:59.8074838+01:00",
+   *       "to": "2024-03-18T15:35:59.8074838+01:00",
+   *       "blockedUnits": 8,
+   *       "pickedReservations": 3,
+   *       "created": "2024-03-06T15:35:59.8074838+01:00",
+   *       "modified": "2024-03-06T15:35:59.8074838+01:00"
+   *     }
+   *   ],
+   *   "propertyIds": [
+   *     "MUC"
+   *   ]
+   * }
+   */
   GroupModel: {
-    /** Group id */
+    /** @description Group id */
     id: string;
-    /** Name of the group */
+    /** @description Name of the group */
     name: string;
-    /** Start date and time of the earliest block for this group<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Start date and time of the earliest block for this group<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     from?: string;
-    /** End date and time of the latest block for this group<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description End date and time of the latest block for this group<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     to?: string;
     booker?: definitions["BookerModel"];
-    /** Additional information and comments */
+    /** @description Additional information and comments */
     comment?: string;
-    /** Additional information and comment by the booker */
+    /** @description Additional information and comment by the booker */
     bookerComment?: string;
     paymentAccount?: definitions["PaymentAccountModel"];
-    /** Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     created: string;
-    /** Date of last modification<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of last modification<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     modified: string;
-    /** Blocks within this group */
+    /** @description Blocks within this group */
     blocks?: definitions["GroupBlockModel"][];
-    /** The list of actions for this group */
+    /** @description The list of actions for this group */
     actions?: definitions["ActionModel[GroupAction,NotAllowedGroupActionReason]"][];
-    /** The list of property ids this group belongs to */
+    /** @description The list of property ids this group belongs to */
     propertyIds: string[];
   };
   GuestModel: {
-    /** Title of the guest */
+    /** @description Title of the guest */
     title?: "Mr" | "Ms" | "Dr" | "Prof" | "Mrs" | "Other";
-    /** Gender of the booker */
+    /** @description Gender of the booker */
     gender?: "Female" | "Male" | "Other";
-    /** First name of the guest */
+    /** @description First name of the guest */
     firstName?: string;
-    /** Middle initial of the guest */
+    /** @description Middle initial of the guest */
     middleInitial?: string;
-    /** Last name of the guest */
+    /** @description Last name of the guest */
     lastName: string;
-    /** Email address of the guest */
+    /** @description Email address of the guest */
     email?: string;
-    /** Phone number of the guest */
+    /** @description Phone number of the guest */
     phone?: string;
     address?: definitions["PersonAddressModel"];
-    /** The guest's nationality, in ISO 3166-1 alpha-2 code */
+    /** @description The guest's nationality, in ISO 3166-1 alpha-2 code */
     nationalityCountryCode?: string;
-    /** The guest's identification number for the given identificationType. */
+    /** @description The guest's identification number for the given identificationType. */
     identificationNumber?: string;
-    /** The issue date of the guest's identification document. */
+    /**
+     * Format: date
+     * @description The issue date of the guest's identification document.
+     * @example 2020-10-10
+     */
     identificationIssueDate?: string;
-    /** The type of the identificationNumber */
+    /**
+     * Format: date
+     * @description The expiry date of the guest's identification document.
+     * @example 2020-10-10
+     */
+    identificationExpiryDate?: string;
+    /** @description The type of the identificationNumber */
     identificationType?:
       | "SocialInsuranceNumber"
       | "PassportNumber"
       | "IdNumber"
       | "DriverLicenseNumber";
     company?: definitions["PersonCompanyModel"];
-    /** Two-letter code (ISO Alpha-2) of a language preferred for contact */
+    /** @description Two-letter code (ISO Alpha-2) of a language preferred for contact */
     preferredLanguage?: string;
-    /** Guest's birthdate */
+    /**
+     * Format: date
+     * @description Guest's birthdate
+     * @example 2020-10-10
+     */
     birthDate?: string;
-    /** Guest's place of birth */
+    /** @description Guest's place of birth */
     birthPlace?: string;
   };
   MessageItemCollection: {
     messages?: string[];
   };
   MonetaryValueModel: {
+    /** Format: double */
     amount: number;
     currency: string;
   };
   OfferCancellationFeeModel: {
-    /** The code of the cancellation policy applied */
+    /** @description The code of the cancellation policy applied */
     code: string;
-    /** The name of the cancellation policy applied */
+    /** @description The name of the cancellation policy applied */
     name: string;
-    /** The description of the cancellation policy applied */
+    /** @description The description of the cancellation policy applied */
     description: string;
     /**
-     * The date and time the cancellation fee will be due. After that time this fee will
+     * Format: date-time
+     * @description The date and time the cancellation fee will be due. After that time this fee will
      * be charged in case of cancellation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
      */
     dueDateTime: string;
     fee: definitions["MonetaryValueModel"];
   };
   OfferCityTaxItemModel: {
-    /** The date for this city tax */
+    /**
+     * Format: date
+     * @description The date for this city tax
+     * @example 2020-10-10
+     */
     serviceDate: string;
     amount: definitions["AmountModel"];
   };
   OfferCityTaxModel: {
-    /** The id of the city tax */
+    /** @description The id of the city tax */
     id: string;
-    /** The code of the city tax */
+    /** @description The code of the city tax */
     code: string;
-    /** The name for the city tax */
+    /** @description The name for the city tax */
     name: string;
     totalGrossAmount: definitions["MonetaryValueModel"];
-    /** Split per day for the city tax */
+    /** @description Split per day for the city tax */
     dates: definitions["OfferCityTaxItemModel"][];
   };
   OfferFeeModel: {
-    /** The fee id */
+    /** @description The fee id */
     id: string;
-    /** The code for the fee */
+    /** @description The code for the fee */
     code: string;
-    /** The name for the fee */
+    /** @description The name for the fee */
     name: string;
     totalAmount: definitions["AmountModel"];
   };
   OfferModel: {
-    /** The earliest arrival date and time for this offer<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description The earliest arrival date and time for this offer<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     arrival: string;
-    /** The latest departure date and time for this offer<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description The latest departure date and time for this offer<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     departure: string;
     unitGroup: definitions["OfferUnitGroupModel"];
-    /** The minimum guarantee type for this offer */
+    /** @description The minimum guarantee type for this offer */
     minGuaranteeType: "PM6Hold" | "CreditCard" | "Prepayment" | "Company";
-    /** The number of available units for that offer */
+    /**
+     * Format: int32
+     * @description The number of available units for that offer
+     */
     availableUnits: number;
     ratePlan: definitions["EmbeddedRatePlanModel"];
     totalGrossAmount: definitions["MonetaryValueModel"];
     cancellationFee: definitions["OfferCancellationFeeModel"];
     noShowFee: definitions["OfferNoShowFeeModel"];
-    /** The breakdown for each time slice for this offer */
+    /** @description The breakdown for each time slice for this offer */
     timeSlices: definitions["OfferTimeSliceModel"][];
-    /** The list of the mandatory services for this offer. Such services will be automatically booked when booking this offer */
+    /** @description The list of the mandatory services for this offer. Such services will be automatically booked when booking this offer */
     services?: definitions["ServiceOfferModel"][];
-    /** The details of the fees that will be added on top of the Apaleo.Api.Modules.Booking.Models.Offer.StayOffer.OfferModel.TotalGrossAmount when creating the booking */
+    /** @description The details of the fees that will be added on top of the Apaleo.Api.Modules.Booking.Models.Offer.StayOffer.OfferModel.TotalGrossAmount when creating the booking */
     fees?: definitions["OfferFeeModel"][];
-    /** Tax breakdown, displaying net and tax amount for each VAT type */
+    /** @description Tax breakdown, displaying net and tax amount for each VAT type */
     taxDetails: definitions["TaxDetailModel"][];
-    /** Validation rules that were applied to the offer and show the reason why the offer is not bookable */
+    /** @description Validation rules that were applied to the offer and show the reason why the offer is not bookable */
     validationMessages?: definitions["OfferValidationMessageModel"][];
-    /** ID of the company the offer is created for */
+    /** @description ID of the company the offer is created for */
     companyId?: string;
-    /** The corporate rate code the offer is created for */
+    /** @description The corporate rate code the offer is created for */
     corporateCode?: string;
-    /** Whether the offer is for a corporate rate plan */
+    /** @description Whether the offer is for a corporate rate plan */
     isCorporate: boolean;
     prePaymentAmount: definitions["MonetaryValueModel"];
-    cityTax?: definitions["AmountModel"];
-    /** Details of city taxes for this offer, if any */
+    /** @description Details of city taxes for this offer, if any */
     cityTaxes?: definitions["OfferCityTaxModel"][];
   };
   OfferNoShowFeeModel: {
-    /** The code of the no-show policy applied */
+    /** @description The code of the no-show policy applied */
     code: string;
-    /** The name of the no-show policy applied */
+    /** @description The name of the no-show policy applied */
     name: string;
-    /** The description of the no-show policy applied */
+    /** @description The description of the no-show policy applied */
     description: string;
     fee: definitions["MonetaryValueModel"];
   };
   OfferServiceModel: {
     service: definitions["EmbeddedServiceModel"];
-    /** The date this service is delivered */
+    /**
+     * Format: date
+     * @description The date this service is delivered
+     * @example 2020-10-10
+     */
     serviceDate: string;
-    /** The default count of offered services. For services whose pricing unit is 'Person' it will be based on the adults and children specified, otherwise 1. */
+    /**
+     * Format: int32
+     * @description The default count of offered services. For services whose pricing unit is 'Person' it will be based on the adults and children specified, otherwise 1.
+     */
     count: number;
     /**
-     * If set - the number of services available (only for the limited service).
+     * Format: int32
+     * @description If set - the number of services available (only for the limited service).
      * If not set - the service is unlimited.
      */
     availableCount?: number;
     amount: definitions["AmountModel"];
-    /** Whether the service price is included in or added to the base rate */
+    /** @description Whether the service price is included in or added to the base rate */
     pricingMode: "Included" | "Additional";
   };
   OfferTimeSliceModel: {
-    /** The start date and time for this time slice<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description The start date and time for this time slice<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     from: string;
-    /** The end date and time for this time slice<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description The end date and time for this time slice<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     to: string;
-    /** The number of available units for that time slice */
+    /**
+     * Format: int32
+     * @description The number of available units for that time slice
+     */
     availableUnits: number;
     baseAmount: definitions["AmountModel"];
     totalGrossAmount: definitions["MonetaryValueModel"];
-    /** The breakdown for services included in the offer */
+    /** @description The breakdown for services included in the offer */
     includedServices?: definitions["OfferServiceModel"][];
   };
   OfferUnitGroupModel: {
-    /** The unit group id */
+    /** @description The unit group id */
     id: string;
-    /** The code for the unit group that can be shown in reports and table views */
+    /** @description The code for the unit group that can be shown in reports and table views */
     code: string;
-    /** The name for the unit group */
+    /** @description The name for the unit group */
     name: string;
-    /** The description for the unit group */
+    /** @description The description for the unit group */
     description: string;
-    /** Maximum number of persons for the unit group */
+    /**
+     * Format: int32
+     * @description Maximum number of persons for the unit group
+     */
     maxPersons: number;
-    /** The unit group rank */
+    /**
+     * Format: int32
+     * @description The unit group rank
+     */
     rank?: number;
-    /** The unit group type */
+    /** @description The unit group type */
     type: "BedRoom" | "MeetingRoom" | "EventSpace" | "ParkingLot" | "Other";
   };
   OfferValidationMessageModel: {
-    /** The message Code */
+    /** @description The message Code */
     code:
       | "UnitGroupFullyBooked"
       | "UnitGroupCapacityExceeded"
@@ -1143,11 +2329,11 @@ export interface definitions {
       | "BlockFullyBooked"
       | "IncludedServicesAmountExceededRateAmount"
       | "ServiceFullyBooked";
-    /** The message description */
+    /** @description The message description */
     message: string;
   };
   Operation: {
-    value?: { [key: string]: unknown };
+    value?: unknown;
     path?: string;
     op?: string;
     from?: string;
@@ -1156,41 +2342,53 @@ export interface definitions {
     guest: definitions["MonetaryValueModel"];
   };
   PaymentAccountModel: {
-    /** The account number (e.g. masked credit card number or last 4 digits) */
+    /** @description The account number (e.g. masked credit card number or last 4 digits) */
     accountNumber?: string;
-    /** The account holder (e.g. card holder) */
+    /** @description The account holder (e.g. card holder) */
     accountHolder?: string;
-    /** The credit card's expiration month */
+    /** @description The credit card's expiration month */
     expiryMonth?: string;
-    /** The credit card's expiration year */
+    /** @description The credit card's expiration year */
     expiryYear?: string;
-    /** The payment method (e.g. visa) */
+    /** @description The payment method (e.g. visa) */
     paymentMethod?: string;
-    /** The email address of the shopper / customer */
+    /** @description The email address of the shopper / customer */
     payerEmail?: string;
     /**
-     * The payer reference. It is used to make recurring captures and its usage is allowed only in the scope of the booking.
+     * @description The payer reference. It is used to make recurring captures and its usage is allowed only in the scope of the booking.
      * For the reason above this is a write-only field.
      */
     payerReference?: string;
-    /** Indicates if the payment account is a virtual credit card. If not specified it defaults to 'false' */
+    /** @description Indicates if the payment account is a virtual credit card. If not specified it defaults to 'false' */
     isVirtual?: boolean;
-    /** Indicates if the payment account can be used for capturing payments. A payment account is active, when it has a valid payer reference set */
+    /** @description Indicates if the payment account can be used for capturing payments. A payment account is active, when it has a valid payer reference set */
     isActive: boolean;
-    /** A reason why account is inactive */
+    /** @description A reason why account is inactive */
     inactiveReason?: string;
   };
   PerOccupancyPriceItemModel: {
-    /** Number of adults */
+    /**
+     * Format: int32
+     * @description Number of adults
+     */
     adults: number;
     price: definitions["PriceModel"];
   };
   PeriodModel: {
-    /** The number of hours within the period */
+    /**
+     * Format: int64
+     * @description The number of hours within the period
+     */
     hours?: number;
-    /** The number of days within the period */
+    /**
+     * Format: int32
+     * @description The number of days within the period
+     */
     days?: number;
-    /** The number of months within the period */
+    /**
+     * Format: int32
+     * @description The number of months within the period
+     */
     months?: number;
   };
   PersonAddressModel: {
@@ -1202,49 +2400,129 @@ export interface definitions {
     countryCode?: string;
   };
   PersonCompanyModel: {
-    /** Name of the company */
+    /** @description Name of the company */
     name?: string;
-    /** Tax or Vat ID of the company */
+    /** @description Tax or Vat ID of the company */
     taxId?: string;
   };
-  /** With this request you can pick up a reservation */
+  /** @description With this request you can pick up a reservation */
   PickUpReservationModel: {
-    /** ID of the block */
+    /** @description ID of the block */
     blockId: string;
-    /** Additional services (extras, add-ons) that should be added to the reservation */
+    /** @description Additional services (extras, add-ons) that should be added to the reservation */
     services?: definitions["BookReservationServiceModel"][];
-    /** Date of arrival and the optional time with UTC offset<br />Specify either a pure date or a date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /** @description Date of arrival and the optional time with UTC offset<br />Specify either a pure date or a date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
     arrival: string;
-    /** Date of departure and the optional time with UTC offset<br />Specify either a pure date or a date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /** @description Date of departure and the optional time with UTC offset<br />Specify either a pure date or a date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
     departure: string;
-    /** Number of adults */
+    /**
+     * Format: int32
+     * @description Number of adults
+     */
     adults: number;
-    /** The ages of the children */
+    /** @description The ages of the children */
     childrenAges?: number[];
-    /** Additional information and comments */
+    /** @description Additional information and comments */
     comment?: string;
-    /** Additional information and comment by the guest */
+    /** @description Additional information and comment by the guest */
     guestComment?: string;
     primaryGuest?: definitions["GuestModel"];
-    /** Additional guests of the reservation. */
+    /** @description Additional guests of the reservation. */
     additionalGuests?: definitions["GuestModel"][];
-    /** The purpose of the trip, leisure or business */
+    /** @description The purpose of the trip, leisure or business */
     travelPurpose?: "Business" | "Leisure";
   };
-  /** With this request you can pick up reservations to an existing group booking */
+  /**
+   * @description With this request you can pick up reservations to an existing group booking
+   * @example {
+   *   "reservations": [
+   *     {
+   *       "blockId": "MUC-QJNXJR",
+   *       "arrival": "2024-03-08",
+   *       "departure": "2024-03-10",
+   *       "adults": 1,
+   *       "comment": "I need a wake up service",
+   *       "primaryGuest": {
+   *         "title": "Mr",
+   *         "gender": "Male",
+   *         "firstName": "Jon",
+   *         "middleInitial": "D",
+   *         "lastName": "Doe",
+   *         "email": "john.d@doe.com",
+   *         "phone": "+4989123343",
+   *         "address": {
+   *           "addressLine1": "My Street 1",
+   *           "postalCode": "12453",
+   *           "city": "MyCity",
+   *           "countryCode": "GB"
+   *         },
+   *         "company": {
+   *           "name": "Company GmbH",
+   *           "taxId": "1442"
+   *         }
+   *       }
+   *     },
+   *     {
+   *       "blockId": "MUC-WKMCKT",
+   *       "arrival": "2024-03-09",
+   *       "departure": "2024-03-11",
+   *       "adults": 1,
+   *       "childrenAges": [
+   *         6
+   *       ],
+   *       "primaryGuest": {
+   *         "title": "Mr",
+   *         "gender": "Male",
+   *         "firstName": "Eric",
+   *         "middleInitial": "E",
+   *         "lastName": "Steinmetz",
+   *         "email": "eric.e@steinmetz.com",
+   *         "phone": "+4989123343",
+   *         "address": {
+   *           "addressLine1": "My Street 1",
+   *           "postalCode": "12453",
+   *           "city": "MyCity",
+   *           "countryCode": "GB"
+   *         }
+   *       }
+   *     }
+   *   ]
+   * }
+   */
   PickUpReservationsModel: {
-    /** List of reservations to pick up to the existing group booking */
+    /** @description List of reservations to pick up to the existing group booking */
     reservations: definitions["PickUpReservationModel"][];
   };
+  /**
+   * @example {
+   *   "grossAmount": 100.0,
+   *   "beforeTax": 91.57,
+   *   "afterTax": 101.71,
+   *   "taxes": {
+   *     "tax": 8.43,
+   *     "cityTax": 1.71
+   *   },
+   *   "currency": "USD"
+   * }
+   */
   PriceModel: {
-    /** Price including all included services and VAT - <b>DEPRECATED: This field will be removed soon, use BeforeTax + Taxes.Tax instead</b> */
+    /**
+     * Format: double
+     * @description Price including all included services and VAT - <b>DEPRECATED: This field will be removed soon, use BeforeTax + Taxes.Tax instead</b>
+     */
     grossAmount: number;
-    /** Price including all included services without VAT or any other taxes like city tax */
+    /**
+     * Format: double
+     * @description Price including all included services without VAT or any other taxes like city tax
+     */
     beforeTax: number;
-    /** Price including all included services, VAT and any other taxes like city tax */
+    /**
+     * Format: double
+     * @description Price including all included services, VAT and any other taxes like city tax
+     */
     afterTax: number;
     taxes: definitions["TaxesModel"];
-    /** The currency for all prices and tax details */
+    /** @description The currency for all prices and tax details */
     currency: string;
   };
   PropertyValueModel: {
@@ -1254,80 +2532,122 @@ export interface definitions {
   };
   RateRestrictionsModel: {
     /**
-     * The minimum length of stay in order to book the rate. If at least this number
+     * Format: int32
+     * @description The minimum length of stay in order to book the rate. If at least this number
      * of time slices are covered by the stay duration the rate will be offered.
      */
     minLengthOfStay?: number;
     /**
-     * The maximum length of stay in order to book the rate. If not more than this number
+     * Format: int32
+     * @description The maximum length of stay in order to book the rate. If not more than this number
      * of time slices are covered by the stay duration the rate will be offered.
      */
     maxLengthOfStay?: number;
-    /** Whether the rate can be booked for a stay-through reservation */
+    /** @description Whether the rate can be booked for a stay-through reservation */
     closed: boolean;
-    /** Whether the rate can be booked on the reservation's arrival date */
+    /** @description Whether the rate can be booked on the reservation's arrival date */
     closedOnArrival: boolean;
-    /** Whether the rate can be booked on the reservation's departure date */
+    /** @description Whether the rate can be booked on the reservation's departure date */
     closedOnDeparture: boolean;
   };
+  /**
+   * @example {
+   *   "from": "2024-03-11",
+   *   "to": "2024-03-14",
+   *   "grossDailyRate": {
+   *     "amount": 160.0,
+   *     "currency": "EUR"
+   *   },
+   *   "timeSlices": [
+   *     {
+   *       "blockedUnits": 3
+   *     },
+   *     {
+   *       "blockedUnits": 0
+   *     },
+   *     {
+   *       "blockedUnits": 7
+   *     }
+   *   ]
+   * }
+   */
   ReplaceBlockModel: {
-    /** Start date and time from which the inventory will be blocked<br />Specify either a pure date or a date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /** @description Start date and time from which the inventory will be blocked<br />Specify either a pure date or a date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
     from: string;
-    /** End date and time until which the inventory will be blocked. Cannot be more than 5 years after the start date.<br />Specify either a pure date or a date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /** @description End date and time until which the inventory will be blocked. Cannot be more than 5 years after the start date.<br />Specify either a pure date or a date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
     to: string;
     grossDailyRate: definitions["MonetaryValueModel"];
-    /** The list of time slices */
+    /** @description The list of time slices */
     timeSlices: definitions["CreateBlockTimeSliceModel"][];
   };
   ReservationAssignedUnitModel: {
     unit: definitions["EmbeddedUnitModel"];
-    /** The time ranges for which the unit is assigned to the reservation */
+    /** @description The time ranges for which the unit is assigned to the reservation */
     timeRanges: definitions["ReservationAssignedUnitTimeRangeModel"][];
   };
   ReservationAssignedUnitTimeRangeModel: {
-    /** The start date and time of the period for which the unit is assigned to the reservation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description The start date and time of the period for which the unit is assigned to the reservation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     from: string;
-    /** The end date and time of the period for which the unit is assigned to the reservation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description The end date and time of the period for which the unit is assigned to the reservation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     to: string;
   };
   ReservationCancellationFeeModel: {
-    /** The id of the cancellation policy applied */
+    /** @description The id of the cancellation policy applied */
     id: string;
-    /** The code of the cancellation policy applied */
+    /** @description The code of the cancellation policy applied */
     code: string;
-    /** The name of the cancellation policy applied */
+    /** @description The name of the cancellation policy applied */
     name: string;
-    /** The description of the cancellation policy applied */
+    /** @description The description of the cancellation policy applied */
     description: string;
     /**
-     * The date and time the cancellation fee will be due. After that time this fee will
+     * Format: date-time
+     * @description The date and time the cancellation fee will be due. After that time this fee will
      * be charged in case of cancellation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
      */
     dueDateTime: string;
     fee: definitions["MonetaryValueModel"];
   };
   ReservationCreatedModel: {
-    /** Id of the reservation */
+    /** @description Id of the reservation */
     id: string;
   };
   ReservationItemModel: {
-    /** Reservation id */
+    /** @description Reservation id */
     id: string;
-    /** Booking id */
+    /** @description Booking id */
     bookingId: string;
-    /** Block id */
+    /** @description Block id */
     blockId?: string;
-    /** Name of the group */
+    /** @description Name of the group */
     groupName?: string;
-    /** Status of the reservation */
+    /** @description Status of the reservation */
     status: "Confirmed" | "InHouse" | "CheckedOut" | "Canceled" | "NoShow";
-    /** Time of check-in<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Time of check-in<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     checkInTime?: string;
-    /** Time of check-out<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Time of check-out<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     checkOutTime?: string;
-    /** Time of cancellation, if the reservation was canceled<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Time of cancellation, if the reservation was canceled<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     cancellationTime?: string;
-    /** Time of setting no-show reservation status<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Time of setting no-show reservation status<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     noShowTime?: string;
     property: definitions["EmbeddedPropertyModel"];
     ratePlan: definitions["EmbeddedRatePlanModel"];
@@ -1335,25 +2655,40 @@ export interface definitions {
     unit?: definitions["EmbeddedUnitModel"];
     marketSegment?: definitions["EmbeddedMarketSegmentModel"];
     totalGrossAmount: definitions["MonetaryValueModel"];
-    /** Date of arrival<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of arrival<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     arrival: string;
-    /** Date of departure<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of departure<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     departure: string;
-    /** Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     created: string;
-    /** Date of last modification<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of last modification<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     modified: string;
-    /** Number of adults */
+    /**
+     * Format: int32
+     * @description Number of adults
+     */
     adults: number;
-    /** The ages of the children */
+    /** @description The ages of the children */
     childrenAges?: number[];
-    /** Additional information and comments */
+    /** @description Additional information and comments */
     comment?: string;
-    /** Additional information and comment by the guest */
+    /** @description Additional information and comment by the guest */
     guestComment?: string;
-    /** Code in external system */
+    /** @description Code in external system */
     externalCode?: string;
-    /** Channel code */
+    /** @description Channel code */
     channelCode:
       | "Direct"
       | "BookingCom"
@@ -1362,96 +2697,769 @@ export interface definitions {
       | "Expedia"
       | "Homelike"
       | "Hrs"
-      | "AltoVita";
-    /** Source of the reservation (e.g Hotels.com, Orbitz, etc.) */
+      | "AltoVita"
+      | "DesVu";
+    /** @description Source of the reservation (e.g Hotels.com, Orbitz, etc.) */
     source?: string;
     primaryGuest?: definitions["GuestModel"];
-    /** Additional guests of the reservation. */
+    /** @description Additional guests of the reservation. */
     additionalGuests?: definitions["GuestModel"][];
     booker?: definitions["BookerModel"];
     paymentAccount?: definitions["PaymentAccountModel"];
-    /** The strongest guarantee for the rate plans booked in this reservation */
+    /** @description The strongest guarantee for the rate plans booked in this reservation */
     guaranteeType: "PM6Hold" | "CreditCard" | "Prepayment" | "Company" | "Ota";
     cancellationFee: definitions["ReservationCancellationFeeModel"];
     noShowFee: definitions["ReservationNoShowFeeModel"];
-    /** The purpose of the trip, leisure or business */
+    /** @description The purpose of the trip, leisure or business */
     travelPurpose?: "Business" | "Leisure";
     balance: definitions["MonetaryValueModel"];
-    /** The list of units assigned to this reservation */
+    /** @description The list of units assigned to this reservation */
     assignedUnits?: definitions["ReservationAssignedUnitModel"][];
-    /** The list of time slices with the reserved units / unit groups for the stay */
+    /** @description The list of time slices with the reserved units / unit groups for the stay */
     timeSlices?: definitions["TimeSliceModel"][];
-    /** The list of additional services (extras, add-ons) reserved for the stay */
+    /** @description The list of additional services (extras, add-ons) reserved for the stay */
     services?: definitions["ReservationServiceItemModel"][];
     /**
-     * Validation rules are applied to reservations during their lifetime.
+     * @description Validation rules are applied to reservations during their lifetime.
      * For example a reservation that was created while the house or unit group is already fully booked.
      * Whenever a rule was or is currently violated, a validation message will be added to this list.
      * They can be deleted whenever the hotel staff worked them off.
      */
     validationMessages?: definitions["ReservationValidationMessageModel"][];
-    /** The list of actions for this reservation */
+    /** @description The list of actions for this reservation */
     actions?: definitions["ActionModel[ReservationAction,NotAllowedReservationActionReason]"][];
     company?: definitions["EmbeddedCompanyModel"];
-    /** Corporate code provided during creation. Used to find offers during amend. */
+    /** @description Corporate code provided during creation. Used to find offers during amend. */
     corporateCode?: string;
-    /** Whether all folios of a reservation have an invoice */
+    /** @description Whether all folios of a reservation have an invoice */
     allFoliosHaveInvoice?: boolean;
-    /** Whether the city tax has already been added to the reservation. Set to false, if the property does not have city tax configured */
+    /** @description Whether the city tax has already been added to the reservation. Set to false, if the property does not have city tax configured */
     hasCityTax: boolean;
     commission?: definitions["CommissionModel"];
-    /** The promo code associated with a certain special offer used to create the reservation */
+    /** @description The promo code associated with a certain special offer used to create the reservation */
     promoCode?: string;
   };
+  /**
+   * @example {
+   *   "reservations": [
+   *     {
+   *       "id": "XPGMSXGF-1",
+   *       "bookingId": "XPGMSXGF",
+   *       "status": "Confirmed",
+   *       "property": {
+   *         "id": "MUC",
+   *         "code": "MUC",
+   *         "name": "Demo Hotel Munich",
+   *         "description": "This is the demo hotel Munich"
+   *       },
+   *       "ratePlan": {
+   *         "id": "MUC-NONREF_SGL",
+   *         "code": "NONREF",
+   *         "name": "Non Refundable",
+   *         "description": "Non Refundable",
+   *         "isSubjectToCityTax": false
+   *       },
+   *       "unitGroup": {
+   *         "id": "MUC-SGL",
+   *         "code": "SGL",
+   *         "name": "Single",
+   *         "description": "Single",
+   *         "type": "BedRoom"
+   *       },
+   *       "unit": {
+   *         "id": "MUC-MTA",
+   *         "name": "A.101",
+   *         "description": "Single room",
+   *         "unitGroupId": "MUC-SGL"
+   *       },
+   *       "totalGrossAmount": {
+   *         "amount": 110.0,
+   *         "currency": "EUR"
+   *       },
+   *       "arrival": "2024-03-08T17:00:00+01:00",
+   *       "departure": "2024-03-10T11:00:00+01:00",
+   *       "created": "2024-03-06T15:35:59.8074838+01:00",
+   *       "modified": "2024-03-06T15:35:59.8074838+01:00",
+   *       "adults": 1,
+   *       "channelCode": "Direct",
+   *       "primaryGuest": {
+   *         "title": "Mr",
+   *         "gender": "Male",
+   *         "firstName": "Jon",
+   *         "middleInitial": "D",
+   *         "lastName": "Doe",
+   *         "email": "john.d@doe.com",
+   *         "phone": "+4989123343",
+   *         "address": {
+   *           "addressLine1": "My Street 3",
+   *           "postalCode": "12453",
+   *           "city": "MyCity",
+   *           "countryCode": "GB"
+   *         }
+   *       },
+   *       "paymentAccount": {
+   *         "accountNumber": "1111",
+   *         "accountHolder": "John Doe",
+   *         "expiryMonth": "8",
+   *         "expiryYear": "2018",
+   *         "paymentMethod": "visa",
+   *         "payerEmail": "s.hopper@test.com",
+   *         "isVirtual": false,
+   *         "isActive": false
+   *       },
+   *       "guaranteeType": "CreditCard",
+   *       "cancellationFee": {
+   *         "id": "MUC-NONREF",
+   *         "code": "NONREF",
+   *         "name": "Non Refundable",
+   *         "description": "100% of the accommodation.",
+   *         "dueDateTime": "2024-03-06T15:35:59.8074838+01:00",
+   *         "fee": {
+   *           "amount": 110.0,
+   *           "currency": "EUR"
+   *         }
+   *       },
+   *       "noShowFee": {
+   *         "id": "MUC-NOSHOW",
+   *         "code": "NOSHOW",
+   *         "name": "Non Refundable",
+   *         "description": "No free no-show",
+   *         "fee": {
+   *           "amount": 110.0,
+   *           "currency": "EUR"
+   *         }
+   *       },
+   *       "balance": {
+   *         "amount": -110.0,
+   *         "currency": "EUR"
+   *       },
+   *       "timeSlices": [
+   *         {
+   *           "from": "2024-03-08T17:00:00+01:00",
+   *           "to": "2024-03-09T17:00:00+01:00",
+   *           "serviceDate": "2024-03-08",
+   *           "ratePlan": {
+   *             "id": "MUC-NONREF_SGL",
+   *             "code": "NONREF",
+   *             "name": "Non Refundable",
+   *             "description": "Non Refundable",
+   *             "isSubjectToCityTax": false
+   *           },
+   *           "unitGroup": {
+   *             "id": "MUC-SGL",
+   *             "code": "SGL",
+   *             "name": "Single",
+   *             "description": "Single",
+   *             "type": "BedRoom"
+   *           },
+   *           "unit": {
+   *             "id": "MUC-MTA",
+   *             "name": "A.101",
+   *             "description": "Single room",
+   *             "unitGroupId": "MUC-SGL"
+   *           },
+   *           "baseAmount": {
+   *             "grossAmount": 65.0,
+   *             "netAmount": 60.75,
+   *             "vatType": "Reduced",
+   *             "vatPercent": 7.0,
+   *             "currency": "EUR"
+   *           },
+   *           "totalGrossAmount": {
+   *             "amount": 86.0,
+   *             "currency": "EUR"
+   *           },
+   *           "includedServices": [
+   *             {
+   *               "service": {
+   *                 "id": "MUC-BRKF",
+   *                 "code": "BRKF",
+   *                 "name": "Breakfast",
+   *                 "description": "Best breakfast on this side of the Weißwurstäquator."
+   *               },
+   *               "serviceDate": "2024-03-08",
+   *               "count": 0,
+   *               "amount": {
+   *                 "grossAmount": 9.99,
+   *                 "netAmount": 8.39,
+   *                 "vatType": "Normal",
+   *                 "vatPercent": 19.0,
+   *                 "currency": "EUR"
+   *               },
+   *               "bookedAsExtra": false
+   *             }
+   *           ]
+   *         }
+   *       ],
+   *       "company": {
+   *         "id": "MUC-UMBRELLA",
+   *         "code": "UMBRELLA",
+   *         "name": "Umbrella Corp.",
+   *         "canCheckOutOnAr": false
+   *       },
+   *       "corporateCode": "UMBRELLA-DBL",
+   *       "allFoliosHaveInvoice": false,
+   *       "hasCityTax": false
+   *     },
+   *     {
+   *       "id": "APFDRQSX-1",
+   *       "bookingId": "APFDRQSX",
+   *       "status": "CheckedOut",
+   *       "property": {
+   *         "id": "MUC",
+   *         "code": "MUC",
+   *         "name": "Demo Hotel Munich",
+   *         "description": "This is the demo hotel Munich"
+   *       },
+   *       "ratePlan": {
+   *         "id": "MUC-FLEX_DBL",
+   *         "code": "FLEX",
+   *         "name": "Flexible",
+   *         "description": "Flexible",
+   *         "isSubjectToCityTax": false
+   *       },
+   *       "unitGroup": {
+   *         "id": "MUC-DBL",
+   *         "code": "DBL",
+   *         "name": "Double",
+   *         "description": "Double",
+   *         "type": "BedRoom"
+   *       },
+   *       "unit": {
+   *         "id": "MUC-JQI",
+   *         "name": "A.102",
+   *         "description": "Double room",
+   *         "unitGroupId": "MUC-DBL"
+   *       },
+   *       "totalGrossAmount": {
+   *         "amount": 120.0,
+   *         "currency": "EUR"
+   *       },
+   *       "arrival": "2024-03-11T15:35:59.8074838+01:00",
+   *       "departure": "2024-03-13T15:35:59.8074838+01:00",
+   *       "created": "2024-03-06T15:35:59.8074838+01:00",
+   *       "modified": "2024-03-06T15:35:59.8074838+01:00",
+   *       "adults": 1,
+   *       "childrenAges": [
+   *         6
+   *       ],
+   *       "channelCode": "Direct",
+   *       "primaryGuest": {
+   *         "title": "Ms",
+   *         "gender": "Female",
+   *         "firstName": "Jane",
+   *         "middleInitial": "D",
+   *         "lastName": "Doe",
+   *         "email": "jane.d@doe.com",
+   *         "phone": "+4989123789",
+   *         "address": {
+   *           "addressLine1": "My Street 5",
+   *           "postalCode": "12453",
+   *           "city": "MyCity",
+   *           "countryCode": "GB"
+   *         }
+   *       },
+   *       "guaranteeType": "CreditCard",
+   *       "cancellationFee": {
+   *         "id": "MUC-FLEX",
+   *         "code": "FLEX",
+   *         "name": "Flexible",
+   *         "description": "Free cancellation.",
+   *         "dueDateTime": "2024-03-08T17:00:00+01:00",
+   *         "fee": {
+   *           "amount": 120.0,
+   *           "currency": "EUR"
+   *         }
+   *       },
+   *       "noShowFee": {
+   *         "id": "MUC-NOSHOW",
+   *         "code": "NOSHOW",
+   *         "name": "Non Refundable",
+   *         "description": "No free no-show",
+   *         "fee": {
+   *           "amount": 120.0,
+   *           "currency": "EUR"
+   *         }
+   *       },
+   *       "balance": {
+   *         "amount": -120.0,
+   *         "currency": "EUR"
+   *       },
+   *       "timeSlices": [
+   *         {
+   *           "from": "2024-03-11T15:35:59.8074838+01:00",
+   *           "to": "2024-03-12T15:35:59.8074838+01:00",
+   *           "serviceDate": "2024-03-11",
+   *           "ratePlan": {
+   *             "id": "MUC-FLEX_DBL",
+   *             "code": "FLEX",
+   *             "name": "Flexible",
+   *             "description": "Flexible",
+   *             "isSubjectToCityTax": false
+   *           },
+   *           "unitGroup": {
+   *             "id": "MUC-DBL",
+   *             "code": "DBL",
+   *             "name": "Double",
+   *             "description": "Double",
+   *             "type": "BedRoom"
+   *           },
+   *           "unit": {
+   *             "id": "MUC-JQI",
+   *             "name": "A.102",
+   *             "description": "Double room",
+   *             "unitGroupId": "MUC-DBL"
+   *           },
+   *           "baseAmount": {
+   *             "grossAmount": 65.0,
+   *             "netAmount": 60.75,
+   *             "vatType": "Reduced",
+   *             "vatPercent": 7.0,
+   *             "currency": "EUR"
+   *           },
+   *           "totalGrossAmount": {
+   *             "amount": 86.0,
+   *             "currency": "EUR"
+   *           },
+   *           "includedServices": [
+   *             {
+   *               "service": {
+   *                 "id": "MUC-BRKF",
+   *                 "code": "BRKF",
+   *                 "name": "Breakfast",
+   *                 "description": "Best breakfast on this side of the Weißwurstäquator."
+   *               },
+   *               "serviceDate": "2024-03-11",
+   *               "count": 0,
+   *               "amount": {
+   *                 "grossAmount": 9.99,
+   *                 "netAmount": 8.39,
+   *                 "vatType": "Normal",
+   *                 "vatPercent": 19.0,
+   *                 "currency": "EUR"
+   *               },
+   *               "bookedAsExtra": false
+   *             }
+   *           ]
+   *         },
+   *         {
+   *           "from": "2024-03-12T15:35:59.8074838+01:00",
+   *           "to": "2024-03-13T15:35:59.8074838+01:00",
+   *           "serviceDate": "2024-03-12",
+   *           "ratePlan": {
+   *             "id": "MUC-FLEX_DBL",
+   *             "code": "FLEX",
+   *             "name": "Flexible",
+   *             "description": "Flexible",
+   *             "isSubjectToCityTax": false
+   *           },
+   *           "unitGroup": {
+   *             "id": "MUC-DBL",
+   *             "code": "DBL",
+   *             "name": "Double",
+   *             "description": "Double",
+   *             "type": "BedRoom"
+   *           },
+   *           "unit": {
+   *             "id": "MUC-JQI",
+   *             "name": "A.102",
+   *             "description": "Double room",
+   *             "unitGroupId": "MUC-DBL"
+   *           },
+   *           "baseAmount": {
+   *             "grossAmount": 65.0,
+   *             "netAmount": 60.75,
+   *             "vatType": "Reduced",
+   *             "vatPercent": 7.0,
+   *             "currency": "EUR"
+   *           },
+   *           "totalGrossAmount": {
+   *             "amount": 86.0,
+   *             "currency": "EUR"
+   *           },
+   *           "includedServices": [
+   *             {
+   *               "service": {
+   *                 "id": "MUC-BRKF",
+   *                 "code": "BRKF",
+   *                 "name": "Breakfast",
+   *                 "description": "Best breakfast on this side of the Weißwurstäquator."
+   *               },
+   *               "serviceDate": "2024-03-12",
+   *               "count": 0,
+   *               "amount": {
+   *                 "grossAmount": 9.99,
+   *                 "netAmount": 8.39,
+   *                 "vatType": "Normal",
+   *                 "vatPercent": 19.0,
+   *                 "currency": "EUR"
+   *               },
+   *               "bookedAsExtra": false
+   *             }
+   *           ]
+   *         }
+   *       ],
+   *       "validationMessages": [
+   *         {
+   *           "category": "OfferNotAvailable",
+   *           "code": "RatePlanRestrictionsViolated",
+   *           "message": "The restrictions of the rate plan are not considered"
+   *         }
+   *       ],
+   *       "allFoliosHaveInvoice": false,
+   *       "hasCityTax": true,
+   *       "commission": {
+   *         "commissionAmount": {
+   *           "amount": 10.0,
+   *           "currency": "EUR"
+   *         },
+   *         "beforeCommissionAmount": {
+   *           "amount": 100.0,
+   *           "currency": "EUR"
+   *         }
+   *       }
+   *     }
+   *   ],
+   *   "count": 0
+   * }
+   */
   ReservationListModel: {
-    /** List of reservations */
+    /** @description List of reservations */
     reservations: definitions["ReservationItemModel"][];
-    /** Total count of items */
+    /**
+     * Format: int64
+     * @description Total count of items
+     */
     count: number;
   };
+  /**
+   * @example {
+   *   "id": "XPGMSXGF-1",
+   *   "bookingId": "XPGMSXGF",
+   *   "status": "Confirmed",
+   *   "unit": {
+   *     "id": "MUC-MTA",
+   *     "name": "A.101",
+   *     "description": "Single room",
+   *     "unitGroupId": "MUC-SGL"
+   *   },
+   *   "property": {
+   *     "id": "MUC",
+   *     "code": "MUC",
+   *     "name": "Demo Hotel Munich",
+   *     "description": "This is the demo hotel Munich"
+   *   },
+   *   "ratePlan": {
+   *     "id": "MUC-NONREF_SGL",
+   *     "code": "NONREF",
+   *     "name": "Non Refundable",
+   *     "description": "Non Refundable",
+   *     "isSubjectToCityTax": false
+   *   },
+   *   "unitGroup": {
+   *     "id": "MUC-SGL",
+   *     "code": "SGL",
+   *     "name": "Single",
+   *     "description": "Single",
+   *     "type": "BedRoom"
+   *   },
+   *   "totalGrossAmount": {
+   *     "amount": 222.0,
+   *     "currency": "EUR"
+   *   },
+   *   "arrival": "2024-03-08T17:00:00+01:00",
+   *   "departure": "2024-03-10T11:00:00+01:00",
+   *   "created": "2024-03-06T15:35:59.8074838+01:00",
+   *   "modified": "2024-03-06T15:35:59.8074838+01:00",
+   *   "adults": 1,
+   *   "childrenAges": [
+   *     6
+   *   ],
+   *   "externalCode": "812864414|369",
+   *   "channelCode": "BookingCom",
+   *   "primaryGuest": {
+   *     "title": "Mr",
+   *     "gender": "Male",
+   *     "firstName": "Jon",
+   *     "middleInitial": "D",
+   *     "lastName": "Doe",
+   *     "email": "john.d@doe.com",
+   *     "phone": "+4989123343",
+   *     "address": {
+   *       "addressLine1": "My Street 5",
+   *       "postalCode": "12453",
+   *       "city": "MyCity",
+   *       "countryCode": "GB"
+   *     }
+   *   },
+   *   "paymentAccount": {
+   *     "accountNumber": "1111",
+   *     "accountHolder": "John Doe",
+   *     "expiryMonth": "8",
+   *     "expiryYear": "2018",
+   *     "paymentMethod": "visa",
+   *     "payerEmail": "s.hopper@test.com",
+   *     "isVirtual": false,
+   *     "isActive": false
+   *   },
+   *   "timeSlices": [
+   *     {
+   *       "from": "2024-03-08T17:00:00+01:00",
+   *       "to": "2024-03-09T11:00:00+01:00",
+   *       "serviceDate": "2024-03-08",
+   *       "ratePlan": {
+   *         "id": "MUC-NONREF_SGL",
+   *         "code": "NONREF",
+   *         "name": "Non Refundable",
+   *         "description": "Non Refundable",
+   *         "isSubjectToCityTax": false
+   *       },
+   *       "unitGroup": {
+   *         "id": "MUC-SGL",
+   *         "code": "SGL",
+   *         "name": "Single",
+   *         "description": "Single",
+   *         "type": "BedRoom"
+   *       },
+   *       "unit": {
+   *         "id": "MUC-MTA",
+   *         "name": "A.101",
+   *         "description": "Single room",
+   *         "unitGroupId": "MUC-SGL"
+   *       },
+   *       "baseAmount": {
+   *         "grossAmount": 65.0,
+   *         "netAmount": 60.75,
+   *         "vatType": "Reduced",
+   *         "vatPercent": 7.0,
+   *         "currency": "EUR"
+   *       },
+   *       "totalGrossAmount": {
+   *         "amount": 86.0,
+   *         "currency": "EUR"
+   *       },
+   *       "includedServices": [
+   *         {
+   *           "service": {
+   *             "id": "MUC-BRKF",
+   *             "code": "BRKF",
+   *             "name": "Breakfast",
+   *             "description": "Best breakfast on this side of the Weißwurstäquator."
+   *           },
+   *           "serviceDate": "2024-03-09",
+   *           "count": 0,
+   *           "amount": {
+   *             "grossAmount": 9.99,
+   *             "netAmount": 8.39,
+   *             "vatType": "Normal",
+   *             "vatPercent": 19.0,
+   *             "currency": "EUR"
+   *           },
+   *           "bookedAsExtra": false
+   *         }
+   *       ]
+   *     },
+   *     {
+   *       "from": "2024-03-09T17:00:00+01:00",
+   *       "to": "2024-03-10T11:00:00+01:00",
+   *       "serviceDate": "2024-03-09",
+   *       "ratePlan": {
+   *         "id": "MUC-NONREF_SGL",
+   *         "code": "NONREF",
+   *         "name": "Non Refundable",
+   *         "description": "Non Refundable",
+   *         "isSubjectToCityTax": false
+   *       },
+   *       "unitGroup": {
+   *         "id": "MUC-SGL",
+   *         "code": "SGL",
+   *         "name": "Single",
+   *         "description": "Single",
+   *         "type": "BedRoom"
+   *       },
+   *       "unit": {
+   *         "id": "MUC-MTA",
+   *         "name": "A.101",
+   *         "description": "Single room",
+   *         "unitGroupId": "MUC-SGL"
+   *       },
+   *       "baseAmount": {
+   *         "grossAmount": 91.01,
+   *         "netAmount": 85.06,
+   *         "vatType": "Reduced",
+   *         "vatPercent": 7.0,
+   *         "currency": "EUR"
+   *       },
+   *       "totalGrossAmount": {
+   *         "amount": 101.0,
+   *         "currency": "EUR"
+   *       },
+   *       "includedServices": [
+   *         {
+   *           "service": {
+   *             "id": "MUC-BRKF",
+   *             "code": "BRKF",
+   *             "name": "Breakfast",
+   *             "description": "Best breakfast on this side of the Weißwurstäquator."
+   *           },
+   *           "serviceDate": "2024-03-10",
+   *           "count": 0,
+   *           "amount": {
+   *             "grossAmount": 9.99,
+   *             "netAmount": 8.39,
+   *             "vatType": "Normal",
+   *             "vatPercent": 19.0,
+   *             "currency": "EUR"
+   *           },
+   *           "bookedAsExtra": false
+   *         }
+   *       ]
+   *     }
+   *   ],
+   *   "guaranteeType": "CreditCard",
+   *   "cancellationFee": {
+   *     "id": "MUC-FLEX",
+   *     "code": "FLEX",
+   *     "name": "Flexible",
+   *     "description": "Free cancellation.",
+   *     "dueDateTime": "2024-03-08T17:00:00+01:00",
+   *     "fee": {
+   *       "amount": 202.0,
+   *       "currency": "EUR"
+   *     }
+   *   },
+   *   "noShowFee": {
+   *     "id": "MUC-NOSHOW",
+   *     "code": "NOSHOW",
+   *     "name": "Non Refundable",
+   *     "description": "No free no-show",
+   *     "fee": {
+   *       "amount": 202.0,
+   *       "currency": "EUR"
+   *     }
+   *   },
+   *   "balance": {
+   *     "amount": -222.0,
+   *     "currency": "EUR"
+   *   },
+   *   "validationMessages": [
+   *     {
+   *       "category": "OfferNotAvailable",
+   *       "code": "RatePlanRestrictionsViolated",
+   *       "message": "The restrictions of the rate plan are not considered"
+   *     }
+   *   ],
+   *   "company": {
+   *     "id": "MUC-UMBRELLA",
+   *     "code": "UMBRELLA",
+   *     "name": "Umbrella Corp.",
+   *     "canCheckOutOnAr": false
+   *   },
+   *   "corporateCode": "UMBRELLA_DBL",
+   *   "allFoliosHaveInvoice": false,
+   *   "taxDetails": [
+   *     {
+   *       "vatType": "Null",
+   *       "vatPercent": 0.0,
+   *       "net": {
+   *         "amount": 10.0,
+   *         "currency": "EUR"
+   *       },
+   *       "tax": {
+   *         "amount": 10.0,
+   *         "currency": "EUR"
+   *       }
+   *     }
+   *   ],
+   *   "hasCityTax": true,
+   *   "commission": {
+   *     "commissionAmount": {
+   *       "amount": 10.0,
+   *       "currency": "EUR"
+   *     },
+   *     "beforeCommissionAmount": {
+   *       "amount": 100.0,
+   *       "currency": "EUR"
+   *     }
+   *   },
+   *   "payableAmount": {
+   *     "guest": {
+   *       "amount": 10.0,
+   *       "currency": "EUR"
+   *     }
+   *   }
+   * }
+   */
   ReservationModel: {
-    /** Reservation id */
+    /** @description Reservation id */
     id: string;
-    /** Booking id */
+    /** @description Booking id */
     bookingId: string;
-    /** Block id */
+    /** @description Block id */
     blockId?: string;
-    /** Name of the group */
+    /** @description Name of the group */
     groupName?: string;
-    /** Status of the reservation */
+    /** @description Status of the reservation */
     status: "Confirmed" | "InHouse" | "CheckedOut" | "Canceled" | "NoShow";
-    /** Time of check-in<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Time of check-in<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     checkInTime?: string;
-    /** Time of check-out<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Time of check-out<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     checkOutTime?: string;
-    /** Time of cancellation, if the reservation was canceled<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Time of cancellation, if the reservation was canceled<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     cancellationTime?: string;
-    /** Time of setting no-show reservation status<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Time of setting no-show reservation status<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     noShowTime?: string;
     unit?: definitions["EmbeddedUnitModel"];
     property: definitions["EmbeddedPropertyModel"];
     ratePlan: definitions["EmbeddedRatePlanModel"];
     unitGroup: definitions["EmbeddedUnitGroupModel"];
     totalGrossAmount: definitions["MonetaryValueModel"];
-    /** Date of arrival<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of arrival<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     arrival: string;
-    /** Date of departure<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of departure<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     departure: string;
-    /** Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     created: string;
-    /** Date of last modification<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of last modification<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     modified: string;
-    /** Number of adults */
+    /**
+     * Format: int32
+     * @description Number of adults
+     */
     adults: number;
-    /** The ages of the children */
+    /** @description The ages of the children */
     childrenAges?: number[];
-    /** Additional information and comments */
+    /** @description Additional information and comments */
     comment?: string;
-    /** Additional information and comment by the guest */
+    /** @description Additional information and comment by the guest */
     guestComment?: string;
-    /** Code in external system */
+    /** @description Code in external system */
     externalCode?: string;
-    /** Channel code */
+    /** @description Channel code */
     channelCode:
       | "Direct"
       | "BookingCom"
@@ -1460,152 +3468,628 @@ export interface definitions {
       | "Expedia"
       | "Homelike"
       | "Hrs"
-      | "AltoVita";
-    /** Source of the reservation (e.g Hotels.com, Orbitz, etc.) */
+      | "AltoVita"
+      | "DesVu";
+    /** @description Source of the reservation (e.g Hotels.com, Orbitz, etc.) */
     source?: string;
     primaryGuest?: definitions["GuestModel"];
-    /** Additional guests of the reservation. */
+    /** @description Additional guests of the reservation. */
     additionalGuests?: definitions["GuestModel"][];
     booker?: definitions["BookerModel"];
     paymentAccount?: definitions["PaymentAccountModel"];
-    /** The list of time slices with the reserved units / unit groups for the stay */
+    /** @description The list of time slices with the reserved units / unit groups for the stay */
     timeSlices?: definitions["TimeSliceModel"][];
-    /** The list of additional services (extras, add-ons) reserved for the stay */
+    /** @description The list of additional services (extras, add-ons) reserved for the stay */
     services?: definitions["ReservationServiceItemModel"][];
-    /** The strongest guarantee for the rate plans booked in this reservation */
+    /** @description The strongest guarantee for the rate plans booked in this reservation */
     guaranteeType: "PM6Hold" | "CreditCard" | "Prepayment" | "Company" | "Ota";
     cancellationFee: definitions["ReservationCancellationFeeModel"];
     noShowFee: definitions["ReservationNoShowFeeModel"];
-    /** The purpose of the trip, leisure or business */
+    /** @description The purpose of the trip, leisure or business */
     travelPurpose?: "Business" | "Leisure";
     balance: definitions["MonetaryValueModel"];
-    /** The list of units assigned to this reservation */
+    /** @description The list of units assigned to this reservation */
     assignedUnits?: definitions["ReservationAssignedUnitModel"][];
     /**
-     * Validation rules are applied to reservations during their lifetime.
+     * @description Validation rules are applied to reservations during their lifetime.
      * For example a reservation that was created while the house or unit group is already fully booked.
      * Whenever a rule was or is currently violated, a validation message will be added to this list.
      * They can be deleted whenever the hotel staff worked them off.
      */
     validationMessages?: definitions["ReservationValidationMessageModel"][];
-    /** The list of actions for this reservation */
+    /** @description The list of actions for this reservation */
     actions?: definitions["ActionModel[ReservationAction,NotAllowedReservationActionReason]"][];
     company?: definitions["EmbeddedCompanyModel"];
-    /** Corporate code provided during creation. Used to find offers during amend. */
+    /** @description Corporate code provided during creation. Used to find offers during amend. */
     corporateCode?: string;
-    /** Whether all folios of a reservation have an invoice */
+    /** @description Whether all folios of a reservation have an invoice */
     allFoliosHaveInvoice?: boolean;
-    /** Tax breakdown, displaying net and tax amount for each VAT type */
+    /** @description Tax breakdown, displaying net and tax amount for each VAT type */
     taxDetails: definitions["TaxDetailModel"][];
-    /** Whether the city tax has already been added to the reservation. Set to false, if the property does not have city tax configured */
+    /** @description Whether the city tax has already been added to the reservation. Set to false, if the property does not have city tax configured */
     hasCityTax: boolean;
     commission?: definitions["CommissionModel"];
-    /** The promo code associated with a certain special offer used to create the reservation */
+    /** @description The promo code associated with a certain special offer used to create the reservation */
     promoCode?: string;
     payableAmount: definitions["PayableAmountModel"];
     marketSegment?: definitions["EmbeddedMarketSegmentModel"];
   };
   ReservationNoShowFeeModel: {
-    /** The id of the no-show policy applied */
+    /** @description The id of the no-show policy applied */
     id: string;
-    /** The code of the no-show policy applied */
+    /** @description The code of the no-show policy applied */
     code: string;
-    /** The name of the no-show policy applied */
+    /** @description The name of the no-show policy applied */
     name: string;
-    /** The description of the no-show policy applied */
+    /** @description The description of the no-show policy applied */
     description: string;
     fee: definitions["MonetaryValueModel"];
   };
   ReservationServiceItemModel: {
     service: definitions["ServiceModel"];
     totalAmount: definitions["AmountModel"];
-    /** The dates the service will be delivered with its price */
+    /** @description The dates the service will be delivered with its price */
     dates: definitions["ServiceDateItemModel"][];
   };
+  /**
+   * @example {
+   *   "services": [
+   *     {
+   *       "service": {
+   *         "id": "MUC-YOGA",
+   *         "code": "YOGA",
+   *         "name": "Sun Salutation",
+   *         "description": "Start the day with a private Yoga session with one of our certified trainers.",
+   *         "pricingUnit": "Person",
+   *         "defaultGrossPrice": {
+   *           "amount": 35.0,
+   *           "currency": "EUR"
+   *         }
+   *       },
+   *       "totalAmount": {
+   *         "grossAmount": 30.0,
+   *         "netAmount": 25.0,
+   *         "vatType": "Normal",
+   *         "vatPercent": 19.0,
+   *         "currency": "EUR"
+   *       },
+   *       "dates": [
+   *         {
+   *           "serviceDate": "2024-03-06",
+   *           "count": 1,
+   *           "amount": {
+   *             "grossAmount": 30.0,
+   *             "netAmount": 25.0,
+   *             "vatType": "Normal",
+   *             "vatPercent": 19.0,
+   *             "currency": "EUR"
+   *           },
+   *           "isMandatory": false
+   *         }
+   *       ]
+   *     }
+   *   ],
+   *   "count": 1
+   * }
+   */
   ReservationServiceListModel: {
-    /** The list of services booked for the reservation */
+    /** @description The list of services booked for the reservation */
     services: definitions["ReservationServiceItemModel"][];
-    /** Total count of items */
+    /**
+     * Format: int64
+     * @description Total count of items
+     */
     count: number;
   };
   ReservationServiceModel: {
     service: definitions["EmbeddedServiceModel"];
-    /** The date this service is delivered */
+    /**
+     * Format: date
+     * @description The date this service is delivered
+     * @example 2020-10-10
+     */
     serviceDate: string;
-    /** The count of booked services */
+    /**
+     * Format: int32
+     * @description The count of booked services
+     */
     count: number;
     amount: definitions["AmountModel"];
-    /** Whether this service is already booked as extra */
+    /** @description Whether this service is already booked as extra */
     bookedAsExtra: boolean;
   };
   ReservationStayOfferModel: {
-    /** The earliest arrival date and time for this offer<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description The earliest arrival date and time for this offer<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     arrival: string;
-    /** The latest departure date and time for this offer<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description The latest departure date and time for this offer<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     departure: string;
-    /** The minimum guarantee type for this offer */
+    /** @description The minimum guarantee type for this offer */
     minGuaranteeType: "PM6Hold" | "CreditCard" | "Prepayment" | "Company";
-    /** The number of available units for that offer */
+    /**
+     * Format: int32
+     * @description The number of available units for that offer
+     */
     availableUnits: number;
     totalGrossAmount: definitions["MonetaryValueModel"];
     cancellationFee: definitions["OfferCancellationFeeModel"];
     noShowFee: definitions["OfferNoShowFeeModel"];
-    /** The breakdown for each time slice for this offer */
+    /** @description The breakdown for each time slice for this offer */
     timeSlices: definitions["ReservationStayOfferTimeSliceModel"][];
-    /** The breakdown for extra services reserved for this offer */
+    /** @description The breakdown for extra services reserved for this offer */
     services?: definitions["ServiceOfferModel"][];
-    /** Tax breakdown, displaying net and tax amount for each VAT type */
+    /** @description Tax breakdown, displaying net and tax amount for each VAT type */
     taxDetails: definitions["TaxDetailModel"][];
-    /** Validation rules that were applied to the offer and show the reason why the offer is not bookable */
+    /** @description Validation rules that were applied to the offer and show the reason why the offer is not bookable */
     validationMessages?: definitions["OfferValidationMessageModel"][];
-    /** ID of the company the offer is created for */
+    /** @description ID of the company the offer is created for */
     companyId?: string;
-    /** The corporate rate code the offer is created for */
+    /** @description The corporate rate code the offer is created for */
     corporateCode?: string;
-    /** Whether the offer is for a corporate rate plan */
+    /** @description Whether the offer is for a corporate rate plan */
     isCorporate: boolean;
-    cityTax?: definitions["AmountModel"];
-    /** Details of city taxes for this offer, if any */
+    /** @description Details of city taxes for this offer, if any */
     cityTaxes?: definitions["OfferCityTaxModel"][];
   };
   ReservationStayOfferServiceModel: {
     service: definitions["EmbeddedServiceModel"];
-    /** The date this service is delivered */
+    /**
+     * Format: date
+     * @description The date this service is delivered
+     * @example 2020-10-10
+     */
     serviceDate: string;
-    /** The default count of offered services. For services whose pricing unit is 'Person' it will be based on the adults and children specified, otherwise 1. */
+    /**
+     * Format: int32
+     * @description The default count of offered services. For services whose pricing unit is 'Person' it will be based on the adults and children specified, otherwise 1.
+     */
     count: number;
     /**
-     * If set - the number of services available (only for the limited service).
+     * Format: int32
+     * @description If set - the number of services available (only for the limited service).
      * If not set - the service is unlimited.
      */
     availableCount?: number;
     amount: definitions["AmountModel"];
-    /** Whether this service is already booked as extra */
+    /** @description Whether this service is already booked as extra */
     bookedAsExtra: boolean;
-    /** Whether the service price is included in or added to the base rate */
+    /** @description Whether the service price is included in or added to the base rate */
     pricingMode: "Included" | "Additional";
   };
   ReservationStayOfferTimeSliceModel: {
-    /** The start date and time for this time slice<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description The start date and time for this time slice<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     from: string;
-    /** The end date and time for this time slice<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description The end date and time for this time slice<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     to: string;
     ratePlan: definitions["EmbeddedRatePlanModel"];
     unitGroup: definitions["OfferUnitGroupModel"];
     baseAmount: definitions["AmountModel"];
     totalGrossAmount: definitions["MonetaryValueModel"];
-    /** The breakdown for services included in the offer */
+    /** @description The breakdown for services included in the offer */
     includedServices?: definitions["ReservationStayOfferServiceModel"][];
   };
+  /**
+   * @example {
+   *   "property": {
+   *     "id": "MUC",
+   *     "code": "MUC",
+   *     "name": "Demo Hotel Munich",
+   *     "description": "This is the demo hotel Munich"
+   *   },
+   *   "offers": [
+   *     {
+   *       "arrival": "2024-03-08T17:00:00+01:00",
+   *       "departure": "2024-03-10T11:00:00+01:00",
+   *       "minGuaranteeType": "PM6Hold",
+   *       "availableUnits": 4,
+   *       "totalGrossAmount": {
+   *         "amount": 214.0,
+   *         "currency": "EUR"
+   *       },
+   *       "cancellationFee": {
+   *         "code": "FLEX",
+   *         "name": "Flexible",
+   *         "description": "Free cancellation.",
+   *         "dueDateTime": "2024-03-08T17:00:00+01:00",
+   *         "fee": {
+   *           "amount": 214.0,
+   *           "currency": "EUR"
+   *         }
+   *       },
+   *       "noShowFee": {
+   *         "code": "NOSHOW",
+   *         "name": "Non Refundable",
+   *         "description": "No free no-show",
+   *         "fee": {
+   *           "amount": 214.0,
+   *           "currency": "EUR"
+   *         }
+   *       },
+   *       "timeSlices": [
+   *         {
+   *           "from": "2024-03-08T17:00:00+01:00",
+   *           "to": "2024-03-09T11:00:00+01:00",
+   *           "ratePlan": {
+   *             "id": "MUC-FLEX_DBL",
+   *             "code": "FLEX",
+   *             "name": "Flexible",
+   *             "description": "Flexible",
+   *             "isSubjectToCityTax": false
+   *           },
+   *           "unitGroup": {
+   *             "id": "MUC-DBL",
+   *             "code": "DBL",
+   *             "name": "Double",
+   *             "description": "Double",
+   *             "maxPersons": 2,
+   *             "rank": 1,
+   *             "type": "BedRoom"
+   *           },
+   *           "baseAmount": {
+   *             "grossAmount": 40.00,
+   *             "netAmount": 37.38,
+   *             "vatType": "Reduced",
+   *             "vatPercent": 7.0,
+   *             "currency": "EUR"
+   *           },
+   *           "totalGrossAmount": {
+   *             "amount": 50.00,
+   *             "currency": "EUR"
+   *           },
+   *           "includedServices": [
+   *             {
+   *               "service": {
+   *                 "id": "MUC-WLAN"
+   *               },
+   *               "serviceDate": "2024-03-08",
+   *               "count": 1,
+   *               "availableCount": 5,
+   *               "amount": {
+   *                 "grossAmount": 10.0,
+   *                 "netAmount": 8.4,
+   *                 "vatType": "Normal",
+   *                 "vatPercent": 19.0,
+   *                 "currency": "EUR"
+   *               },
+   *               "bookedAsExtra": false,
+   *               "pricingMode": "Included"
+   *             }
+   *           ]
+   *         },
+   *         {
+   *           "from": "2024-03-09T11:00:00+01:00",
+   *           "to": "2024-03-10T11:00:00+01:00",
+   *           "ratePlan": {
+   *             "id": "MUC-NONREF_SGL",
+   *             "code": "NONREF",
+   *             "name": "Non Refundable",
+   *             "description": "Non Refundable",
+   *             "isSubjectToCityTax": false
+   *           },
+   *           "unitGroup": {
+   *             "id": "MUC-SGL",
+   *             "code": "SGL",
+   *             "name": "Standard",
+   *             "description": "Standard",
+   *             "maxPersons": 1,
+   *             "rank": 2,
+   *             "type": "BedRoom"
+   *           },
+   *           "baseAmount": {
+   *             "grossAmount": 59.00,
+   *             "netAmount": 55.14,
+   *             "vatType": "Reduced",
+   *             "vatPercent": 7.0,
+   *             "currency": "EUR"
+   *           },
+   *           "totalGrossAmount": {
+   *             "amount": 69.00,
+   *             "currency": "EUR"
+   *           },
+   *           "includedServices": [
+   *             {
+   *               "service": {
+   *                 "id": "MUC-WLAN"
+   *               },
+   *               "serviceDate": "2024-03-08",
+   *               "count": 1,
+   *               "availableCount": 5,
+   *               "amount": {
+   *                 "grossAmount": 10.0,
+   *                 "netAmount": 8.4,
+   *                 "vatType": "Normal",
+   *                 "vatPercent": 19.0,
+   *                 "currency": "EUR"
+   *               },
+   *               "bookedAsExtra": false,
+   *               "pricingMode": "Included"
+   *             },
+   *             {
+   *               "service": {
+   *                 "id": "MUC-CLEANING"
+   *               },
+   *               "serviceDate": "2024-03-08",
+   *               "count": 1,
+   *               "availableCount": 2,
+   *               "amount": {
+   *                 "grossAmount": 25.0,
+   *                 "netAmount": 21.0,
+   *                 "vatType": "Normal",
+   *                 "vatPercent": 19.0,
+   *                 "currency": "EUR"
+   *               },
+   *               "bookedAsExtra": false,
+   *               "pricingMode": "Additional"
+   *             }
+   *           ]
+   *         }
+   *       ],
+   *       "services": [
+   *         {
+   *           "service": {
+   *             "id": "MUC-BRKF",
+   *             "code": "BRKF",
+   *             "name": "Breakfast",
+   *             "description": "Best breakfast on this side of the Weißwurstäquator.",
+   *             "pricingUnit": "Person",
+   *             "defaultGrossPrice": {
+   *               "amount": 10.0,
+   *               "currency": "EUR"
+   *             }
+   *           },
+   *           "count": 1,
+   *           "totalAmount": {
+   *             "grossAmount": 11.9,
+   *             "netAmount": 10.0,
+   *             "vatType": "Normal",
+   *             "vatPercent": 19.0,
+   *             "currency": "EUR"
+   *           },
+   *           "prePaymentAmount": {
+   *             "amount": 27.0,
+   *             "currency": "EUR"
+   *           },
+   *           "dates": [
+   *             {
+   *               "serviceDate": "2024-03-09",
+   *               "amount": {
+   *                 "grossAmount": 11.9,
+   *                 "netAmount": 10.0,
+   *                 "vatType": "Normal",
+   *                 "vatPercent": 19.0,
+   *                 "currency": "EUR"
+   *               },
+   *               "isDefaultDate": false,
+   *               "isMandatory": false
+   *             }
+   *           ]
+   *         }
+   *       ],
+   *       "taxDetails": [
+   *         {
+   *           "vatType": "Normal",
+   *           "vatPercent": 14.0,
+   *           "net": {
+   *             "amount": 200.0,
+   *             "currency": "EUR"
+   *           },
+   *           "tax": {
+   *             "amount": 14.0,
+   *             "currency": "EUR"
+   *           }
+   *         }
+   *       ],
+   *       "isCorporate": false,
+   *       "cityTaxes": [
+   *         {
+   *           "id": "MUC",
+   *           "code": "MUC",
+   *           "name": "Munich City Tax",
+   *           "totalGrossAmount": {
+   *             "amount": 11.9,
+   *             "currency": "EUR"
+   *           },
+   *           "dates": [
+   *             {
+   *               "serviceDate": "2024-03-09",
+   *               "amount": {
+   *                 "grossAmount": 11.9,
+   *                 "netAmount": 10.0,
+   *                 "vatType": "Normal",
+   *                 "vatPercent": 19.0,
+   *                 "currency": "EUR"
+   *               }
+   *             }
+   *           ]
+   *         }
+   *       ]
+   *     },
+   *     {
+   *       "arrival": "2024-03-08T17:00:00+01:00",
+   *       "departure": "2024-03-10T11:00:00+01:00",
+   *       "minGuaranteeType": "PM6Hold",
+   *       "availableUnits": 8,
+   *       "totalGrossAmount": {
+   *         "amount": 214.0,
+   *         "currency": "EUR"
+   *       },
+   *       "cancellationFee": {
+   *         "code": "FLEX",
+   *         "name": "Flexible",
+   *         "description": "Free cancellation.",
+   *         "dueDateTime": "2024-03-08T17:00:00+01:00",
+   *         "fee": {
+   *           "amount": 214.0,
+   *           "currency": "EUR"
+   *         }
+   *       },
+   *       "noShowFee": {
+   *         "code": "NOSHOW",
+   *         "name": "Non Refundable",
+   *         "description": "No free no-show",
+   *         "fee": {
+   *           "amount": 214.0,
+   *           "currency": "EUR"
+   *         }
+   *       },
+   *       "timeSlices": [
+   *         {
+   *           "from": "2024-03-08T17:00:00+01:00",
+   *           "to": "2024-03-09T11:00:00+01:00",
+   *           "ratePlan": {
+   *             "id": "MUC-FLEX_DBL",
+   *             "code": "FLEX",
+   *             "name": "Flexible",
+   *             "description": "Flexible",
+   *             "isSubjectToCityTax": false
+   *           },
+   *           "unitGroup": {
+   *             "id": "MUC-DBL",
+   *             "code": "DBL",
+   *             "name": "Double",
+   *             "description": "Double",
+   *             "maxPersons": 2,
+   *             "rank": 1,
+   *             "type": "BedRoom"
+   *           },
+   *           "baseAmount": {
+   *             "grossAmount": 90.00,
+   *             "netAmount": 84.11,
+   *             "vatType": "Reduced",
+   *             "vatPercent": 7.0,
+   *             "currency": "EUR"
+   *           },
+   *           "totalGrossAmount": {
+   *             "amount": 100.00,
+   *             "currency": "EUR"
+   *           },
+   *           "includedServices": [
+   *             {
+   *               "service": {
+   *                 "id": "MUC-WLAN"
+   *               },
+   *               "serviceDate": "2024-03-08",
+   *               "count": 1,
+   *               "availableCount": 5,
+   *               "amount": {
+   *                 "grossAmount": 10.0,
+   *                 "netAmount": 8.4,
+   *                 "vatType": "Normal",
+   *                 "vatPercent": 19.0,
+   *                 "currency": "EUR"
+   *               },
+   *               "bookedAsExtra": false,
+   *               "pricingMode": "Included"
+   *             }
+   *           ]
+   *         },
+   *         {
+   *           "from": "2024-03-09T11:00:00+01:00",
+   *           "to": "2024-03-10T11:00:00+01:00",
+   *           "ratePlan": {
+   *             "id": "MUC-NONREF_SGL",
+   *             "code": "NONREF",
+   *             "name": "Non Refundable",
+   *             "description": "Non Refundable",
+   *             "isSubjectToCityTax": false
+   *           },
+   *           "unitGroup": {
+   *             "id": "MUC-SGL",
+   *             "code": "SGL",
+   *             "name": "Standard",
+   *             "description": "Standard",
+   *             "maxPersons": 1,
+   *             "rank": 2,
+   *             "type": "BedRoom"
+   *           },
+   *           "baseAmount": {
+   *             "grossAmount": 124.00,
+   *             "netAmount": 115.89,
+   *             "vatType": "Reduced",
+   *             "vatPercent": 7.0,
+   *             "currency": "EUR"
+   *           },
+   *           "totalGrossAmount": {
+   *             "amount": 134.00,
+   *             "currency": "EUR"
+   *           },
+   *           "includedServices": [
+   *             {
+   *               "service": {
+   *                 "id": "MUC-WLAN"
+   *               },
+   *               "serviceDate": "2024-03-08",
+   *               "count": 1,
+   *               "availableCount": 5,
+   *               "amount": {
+   *                 "grossAmount": 10.0,
+   *                 "netAmount": 8.4,
+   *                 "vatType": "Normal",
+   *                 "vatPercent": 19.0,
+   *                 "currency": "EUR"
+   *               },
+   *               "bookedAsExtra": false,
+   *               "pricingMode": "Included"
+   *             },
+   *             {
+   *               "service": {
+   *                 "id": "MUC-CLEANING"
+   *               },
+   *               "serviceDate": "2024-03-08",
+   *               "count": 1,
+   *               "availableCount": 2,
+   *               "amount": {
+   *                 "grossAmount": 25.0,
+   *                 "netAmount": 21.0,
+   *                 "vatType": "Normal",
+   *                 "vatPercent": 19.0,
+   *                 "currency": "EUR"
+   *               },
+   *               "bookedAsExtra": false,
+   *               "pricingMode": "Additional"
+   *             }
+   *           ]
+   *         }
+   *       ],
+   *       "taxDetails": [
+   *         {
+   *           "vatType": "Reduced",
+   *           "vatPercent": 14.0,
+   *           "net": {
+   *             "amount": 100.0,
+   *             "currency": "EUR"
+   *           },
+   *           "tax": {
+   *             "amount": 14.0,
+   *             "currency": "EUR"
+   *           }
+   *         }
+   *       ],
+   *       "isCorporate": false
+   *     }
+   *   ]
+   * }
+   */
   ReservationStayOffersModel: {
     property: definitions["EmbeddedPropertyModel"];
-    /** List of offered unit groups with rates */
+    /** @description List of offered unit groups with rates */
     offers: definitions["ReservationStayOfferModel"][];
   };
   ReservationValidationMessageModel: {
-    /** The message category */
+    /** @description The message category */
     category: "OfferNotAvailable" | "AutoUnitAssignment";
-    /** The message Code */
+    /** @description The message Code */
     code:
       | "UnitGroupFullyBooked"
       | "UnitGroupCapacityExceeded"
@@ -1619,82 +4103,568 @@ export interface definitions {
       | "IncludedServicesAmountExceededRateAmount"
       | "RatePlanCompanyRestrictionsViolated"
       | "ServiceFullyBooked";
-    /** The message description */
+    /** @description The message description */
     message: string;
   };
+  /**
+   * @example {
+   *   "reservationIds": [
+   *     {
+   *       "id": "XPGMSXGF-1"
+   *     },
+   *     {
+   *       "id": "XPGMSXGF-2"
+   *     }
+   *   ]
+   * }
+   */
   ReservationsCreatedModel: {
-    /** List of ids for newly created reservations */
+    /** @description List of ids for newly created reservations */
     reservationIds: definitions["ReservationCreatedModel"][];
   };
   ServiceDateItemModel: {
-    /** The date this service is delivered */
+    /**
+     * Format: date
+     * @description The date this service is delivered
+     * @example 2020-10-10
+     */
     serviceDate: string;
-    /** The count of booked services */
+    /**
+     * Format: int32
+     * @description The count of booked services
+     */
     count: number;
     amount: definitions["AmountModel"];
     /**
-     * Rate plans can have additional services. When booking an offer for such rate plans, those services are automatically booked.
+     * @description Rate plans can have additional services. When booking an offer for such rate plans, those services are automatically booked.
      * They are marked as mandatory and they cannot be removed.
      */
     isMandatory: boolean;
   };
   ServiceModel: {
-    /** The service id */
+    /** @description The service id */
     id: string;
-    /** The code for the service */
+    /** @description The code for the service */
     code: string;
-    /** The name for the service */
+    /** @description The name for the service */
     name: string;
-    /** The description for the service */
+    /** @description The description for the service */
     description: string;
-    /** Defines the granularity (room, person) for which this item is offered and priced */
+    /** @description Defines the granularity (room, person) for which this item is offered and priced */
     pricingUnit: "Room" | "Person";
     defaultGrossPrice: definitions["MonetaryValueModel"];
   };
   ServiceOfferItemModel: {
-    /** The date this service is delivered */
+    /**
+     * Format: date
+     * @description The date this service is delivered
+     * @example 2020-10-10
+     */
     serviceDate: string;
     amount: definitions["AmountModel"];
     /**
-     * Depending on the postNextDay setting of the service it will by default be posted before or after midnight.
+     * @description Depending on the postNextDay setting of the service it will by default be posted before or after midnight.
      * Breakfast is usually delivered on the next morning, so all the dates from the day after arrival to the departure day
      * are default dates and will have this flag set to true. Those are also the dates the service will be booked for if
      * you do not specify dates in the book-service call. Still, you can override this and also book the dates set to IsDefaultDate = false.
      */
     isDefaultDate: boolean;
     /**
-     * Rate plans can have additional services. When booking an offer for such rate plans, those services are automatically booked.
+     * @description Rate plans can have additional services. When booking an offer for such rate plans, those services are automatically booked.
      * They are marked as mandatory and they cannot be removed.
      */
     isMandatory: boolean;
-    /** The number of services available. */
+    /**
+     * Format: int32
+     * @description The number of services available.
+     */
     availableCount?: number;
   };
   ServiceOfferModel: {
     service: definitions["ServiceModel"];
-    /** The default count of offered services. For services whose pricing unit is 'Person' it will be based on the adults and children specified, otherwise 1. */
+    /**
+     * Format: int32
+     * @description The default count of offered services. For services whose pricing unit is 'Person' it will be based on the adults and children specified, otherwise 1.
+     */
     count: number;
-    /** The number of services available. */
+    /**
+     * Format: int32
+     * @description The number of services available.
+     */
     availableCount?: number;
     totalAmount: definitions["AmountModel"];
     prePaymentAmount: definitions["MonetaryValueModel"];
-    /** The details of the fees that will be added on top of the Apaleo.Api.Modules.Booking.Models.Offer.ServiceOffer.ServiceOfferModel.TotalAmount when booking the service */
+    /** @description The details of the fees that will be added on top of the Apaleo.Api.Modules.Booking.Models.Offer.ServiceOffer.ServiceOfferModel.TotalAmount when booking the service */
     fees?: definitions["OfferFeeModel"][];
-    /** The dates the service will be delivered with its price */
+    /** @description The dates the service will be delivered with its price */
     dates: definitions["ServiceOfferItemModel"][];
-    /** Validation rules that were applied to the offer and show the reason why the offer is not bookable */
+    /** @description Validation rules that were applied to the offer and show the reason why the offer is not bookable */
     validationMessages?: definitions["OfferValidationMessageModel"][];
   };
+  /**
+   * @example {
+   *   "services": [
+   *     {
+   *       "service": {
+   *         "id": "MUC-WLAN",
+   *         "code": "WLAN",
+   *         "name": "High-Speed WLAN",
+   *         "description": "Upgrade the complimentary internet access to a high speed connection.",
+   *         "pricingUnit": "Room",
+   *         "defaultGrossPrice": {
+   *           "amount": 5.0,
+   *           "currency": "EUR"
+   *         }
+   *       },
+   *       "count": 1,
+   *       "availableCount": 2,
+   *       "totalAmount": {
+   *         "grossAmount": 20.0,
+   *         "netAmount": 16.8,
+   *         "vatType": "Normal",
+   *         "vatPercent": 19.0,
+   *         "currency": "EUR"
+   *       },
+   *       "prePaymentAmount": {
+   *         "amount": 20.0,
+   *         "currency": "EUR"
+   *       },
+   *       "dates": [
+   *         {
+   *           "serviceDate": "2024-03-06",
+   *           "amount": {
+   *             "grossAmount": 10.0,
+   *             "netAmount": 8.4,
+   *             "vatType": "Normal",
+   *             "vatPercent": 19.0,
+   *             "currency": "EUR"
+   *           },
+   *           "isDefaultDate": false,
+   *           "isMandatory": false,
+   *           "availableCount": 5
+   *         },
+   *         {
+   *           "serviceDate": "2024-03-07",
+   *           "amount": {
+   *             "grossAmount": 10.0,
+   *             "netAmount": 8.4,
+   *             "vatType": "Normal",
+   *             "vatPercent": 19.0,
+   *             "currency": "EUR"
+   *           },
+   *           "isDefaultDate": false,
+   *           "isMandatory": false,
+   *           "availableCount": 2
+   *         }
+   *       ]
+   *     },
+   *     {
+   *       "service": {
+   *         "id": "MUC-YOGA",
+   *         "code": "YOGA",
+   *         "name": "Sun Salutation",
+   *         "description": "Start the day with a private Yoga session with one of our certified trainers.",
+   *         "pricingUnit": "Person",
+   *         "defaultGrossPrice": {
+   *           "amount": 35.0,
+   *           "currency": "EUR"
+   *         }
+   *       },
+   *       "count": 1,
+   *       "totalAmount": {
+   *         "grossAmount": 30.0,
+   *         "netAmount": 25.2,
+   *         "vatType": "Normal",
+   *         "vatPercent": 19.0,
+   *         "currency": "EUR"
+   *       },
+   *       "prePaymentAmount": {
+   *         "amount": 30.0,
+   *         "currency": "EUR"
+   *       },
+   *       "dates": [
+   *         {
+   *           "serviceDate": "2024-03-07",
+   *           "amount": {
+   *             "grossAmount": 30.0,
+   *             "netAmount": 25.2,
+   *             "vatType": "Normal",
+   *             "vatPercent": 19.0,
+   *             "currency": "EUR"
+   *           },
+   *           "isDefaultDate": false,
+   *           "isMandatory": false
+   *         }
+   *       ]
+   *     }
+   *   ]
+   * }
+   */
   ServiceOffersModel: {
     services: definitions["ServiceOfferModel"][];
   };
+  /**
+   * @example {
+   *   "sources": [
+   *     "Booking.com",
+   *     "Expedia"
+   *   ]
+   * }
+   */
   SourceListModel: {
-    /** List of sources. */
+    /** @description List of sources. */
     sources: string[];
   };
+  /**
+   * @example {
+   *   "property": {
+   *     "id": "MUC",
+   *     "code": "MUC",
+   *     "name": "Demo Hotel Munich",
+   *     "description": "This is the demo hotel Munich"
+   *   },
+   *   "offers": [
+   *     {
+   *       "arrival": "2024-03-08T17:00:00+01:00",
+   *       "departure": "2024-03-10T11:00:00+01:00",
+   *       "unitGroup": {
+   *         "id": "MUC-SGL",
+   *         "code": "SGL",
+   *         "name": "Standard",
+   *         "description": "Standard",
+   *         "maxPersons": 1,
+   *         "rank": 2,
+   *         "type": "BedRoom"
+   *       },
+   *       "minGuaranteeType": "PM6Hold",
+   *       "availableUnits": 4,
+   *       "ratePlan": {
+   *         "id": "MUC-NONREF_SGL",
+   *         "code": "NONREF",
+   *         "name": "Non Refundable",
+   *         "description": "Non Refundable",
+   *         "isSubjectToCityTax": false
+   *       },
+   *       "totalGrossAmount": {
+   *         "amount": 214.0,
+   *         "currency": "EUR"
+   *       },
+   *       "cancellationFee": {
+   *         "code": "FLEX",
+   *         "name": "Flexible",
+   *         "description": "Free cancellation.",
+   *         "dueDateTime": "2024-03-08T17:00:00+01:00",
+   *         "fee": {
+   *           "amount": 214.0,
+   *           "currency": "EUR"
+   *         }
+   *       },
+   *       "noShowFee": {
+   *         "code": "NOSHOW",
+   *         "name": "Non Refundable",
+   *         "description": "No free no-show",
+   *         "fee": {
+   *           "amount": 214.0,
+   *           "currency": "EUR"
+   *         }
+   *       },
+   *       "timeSlices": [
+   *         {
+   *           "from": "2024-03-08T17:00:00+01:00",
+   *           "to": "2024-03-09T11:00:00+01:00",
+   *           "availableUnits": 4,
+   *           "baseAmount": {
+   *             "grossAmount": 59.00,
+   *             "netAmount": 55.14,
+   *             "vatType": "Reduced",
+   *             "vatPercent": 7.0,
+   *             "currency": "EUR"
+   *           },
+   *           "totalGrossAmount": {
+   *             "amount": 50.00,
+   *             "currency": "EUR"
+   *           },
+   *           "includedServices": [
+   *             {
+   *               "service": {
+   *                 "id": "MUC-WLAN"
+   *               },
+   *               "serviceDate": "2024-03-08",
+   *               "count": 1,
+   *               "availableCount": 5,
+   *               "amount": {
+   *                 "grossAmount": 10.0,
+   *                 "netAmount": 8.4,
+   *                 "vatType": "Normal",
+   *                 "vatPercent": 19.0,
+   *                 "currency": "EUR"
+   *               },
+   *               "pricingMode": "Included"
+   *             }
+   *           ]
+   *         },
+   *         {
+   *           "from": "2024-03-09T11:00:00+01:00",
+   *           "to": "2024-03-10T11:00:00+01:00",
+   *           "availableUnits": 5,
+   *           "baseAmount": {
+   *             "grossAmount": 59.00,
+   *             "netAmount": 55.14,
+   *             "vatType": "Reduced",
+   *             "vatPercent": 7.0,
+   *             "currency": "EUR"
+   *           },
+   *           "totalGrossAmount": {
+   *             "amount": 50.00,
+   *             "currency": "EUR"
+   *           },
+   *           "includedServices": [
+   *             {
+   *               "service": {
+   *                 "id": "MUC-WLAN"
+   *               },
+   *               "serviceDate": "2024-03-08",
+   *               "count": 1,
+   *               "availableCount": 5,
+   *               "amount": {
+   *                 "grossAmount": 10.0,
+   *                 "netAmount": 8.4,
+   *                 "vatType": "Normal",
+   *                 "vatPercent": 19.0,
+   *                 "currency": "EUR"
+   *               },
+   *               "pricingMode": "Included"
+   *             },
+   *             {
+   *               "service": {
+   *                 "id": "MUC-CLEANING"
+   *               },
+   *               "serviceDate": "2024-03-08",
+   *               "count": 1,
+   *               "availableCount": 2,
+   *               "amount": {
+   *                 "grossAmount": 25.0,
+   *                 "netAmount": 21.01,
+   *                 "vatType": "Normal",
+   *                 "vatPercent": 19.0,
+   *                 "currency": "EUR"
+   *               },
+   *               "pricingMode": "Additional"
+   *             }
+   *           ]
+   *         }
+   *       ],
+   *       "taxDetails": [
+   *         {
+   *           "vatType": "Reduced",
+   *           "vatPercent": 14.0,
+   *           "net": {
+   *             "amount": 100.0,
+   *             "currency": "EUR"
+   *           },
+   *           "tax": {
+   *             "amount": 14.0,
+   *             "currency": "EUR"
+   *           }
+   *         }
+   *       ],
+   *       "isCorporate": false,
+   *       "prePaymentAmount": {
+   *         "amount": 0.0,
+   *         "currency": "EUR"
+   *       },
+   *       "cityTaxes": [
+   *         {
+   *           "id": "MUC-TAX",
+   *           "code": "TAX",
+   *           "name": "City tax",
+   *           "totalGrossAmount": {
+   *             "amount": 119.0,
+   *             "currency": "EUR"
+   *           },
+   *           "dates": [
+   *             {
+   *               "serviceDate": "2021-08-27",
+   *               "amount": {
+   *                 "grossAmount": 119.0,
+   *                 "netAmount": 100.0,
+   *                 "vatType": "Normal",
+   *                 "vatPercent": 19.0,
+   *                 "currency": "EUR"
+   *               }
+   *             }
+   *           ]
+   *         }
+   *       ]
+   *     },
+   *     {
+   *       "arrival": "2024-03-08T17:00:00+01:00",
+   *       "departure": "2024-03-10T11:00:00+01:00",
+   *       "unitGroup": {
+   *         "id": "MUC-SGL",
+   *         "code": "SGL",
+   *         "name": "Standard",
+   *         "description": "Standard",
+   *         "maxPersons": 1,
+   *         "rank": 2,
+   *         "type": "BedRoom"
+   *       },
+   *       "minGuaranteeType": "Prepayment",
+   *       "availableUnits": 4,
+   *       "ratePlan": {
+   *         "id": "MUC-FLEX_SGL",
+   *         "code": "FLEX",
+   *         "name": "Flexible",
+   *         "description": "Flexible",
+   *         "isSubjectToCityTax": false
+   *       },
+   *       "totalGrossAmount": {
+   *         "amount": 321.0,
+   *         "currency": "EUR"
+   *       },
+   *       "cancellationFee": {
+   *         "code": "NONREF",
+   *         "name": "Non Refundable",
+   *         "description": "Full stay amount due 24 hours after booking.",
+   *         "dueDateTime": "2024-03-07T15:35:59.8074838+01:00",
+   *         "fee": {
+   *           "amount": 321.0,
+   *           "currency": "EUR"
+   *         }
+   *       },
+   *       "noShowFee": {
+   *         "code": "NOSHOW",
+   *         "name": "Non Refundable",
+   *         "description": "No free no-show",
+   *         "fee": {
+   *           "amount": 107.0,
+   *           "currency": "EUR"
+   *         }
+   *       },
+   *       "timeSlices": [
+   *         {
+   *           "from": "2024-03-08T17:00:00+01:00",
+   *           "to": "2024-03-09T11:00:00+01:00",
+   *           "availableUnits": 4,
+   *           "baseAmount": {
+   *             "grossAmount": 124.00,
+   *             "netAmount": 115.89,
+   *             "vatType": "Reduced",
+   *             "vatPercent": 7.0,
+   *             "currency": "EUR"
+   *           },
+   *           "totalGrossAmount": {
+   *             "amount": 100.00,
+   *             "currency": "EUR"
+   *           },
+   *           "includedServices": [
+   *             {
+   *               "service": {
+   *                 "id": "MUC-WLAN"
+   *               },
+   *               "serviceDate": "2024-03-08",
+   *               "count": 1,
+   *               "availableCount": 5,
+   *               "amount": {
+   *                 "grossAmount": 10.0,
+   *                 "netAmount": 8.4,
+   *                 "vatType": "Normal",
+   *                 "vatPercent": 19.0,
+   *                 "currency": "EUR"
+   *               },
+   *               "pricingMode": "Included"
+   *             }
+   *           ]
+   *         },
+   *         {
+   *           "from": "2024-03-09T11:00:00+01:00",
+   *           "to": "2024-03-10T11:00:00+01:00",
+   *           "availableUnits": 5,
+   *           "baseAmount": {
+   *             "grossAmount": 124.00,
+   *             "netAmount": 115.89,
+   *             "vatType": "Reduced",
+   *             "vatPercent": 7.0,
+   *             "currency": "EUR"
+   *           },
+   *           "totalGrossAmount": {
+   *             "amount": 100.00,
+   *             "currency": "EUR"
+   *           },
+   *           "includedServices": [
+   *             {
+   *               "service": {
+   *                 "id": "MUC-WLAN"
+   *               },
+   *               "serviceDate": "2024-03-08",
+   *               "count": 1,
+   *               "availableCount": 5,
+   *               "amount": {
+   *                 "grossAmount": 10.0,
+   *                 "netAmount": 8.4,
+   *                 "vatType": "Normal",
+   *                 "vatPercent": 19.0,
+   *                 "currency": "EUR"
+   *               },
+   *               "pricingMode": "Included"
+   *             },
+   *             {
+   *               "service": {
+   *                 "id": "MUC-CLEANING"
+   *               },
+   *               "serviceDate": "2024-03-08",
+   *               "count": 1,
+   *               "availableCount": 2,
+   *               "amount": {
+   *                 "grossAmount": 25.0,
+   *                 "netAmount": 21.01,
+   *                 "vatType": "Normal",
+   *                 "vatPercent": 19.0,
+   *                 "currency": "EUR"
+   *               },
+   *               "pricingMode": "Additional"
+   *             }
+   *           ]
+   *         }
+   *       ],
+   *       "taxDetails": [
+   *         {
+   *           "vatType": "Reduced",
+   *           "vatPercent": 14.0,
+   *           "net": {
+   *             "amount": 100.0,
+   *             "currency": "EUR"
+   *           },
+   *           "tax": {
+   *             "amount": 14.0,
+   *             "currency": "EUR"
+   *           }
+   *         },
+   *         {
+   *           "vatType": "Null",
+   *           "vatPercent": 0.0,
+   *           "net": {
+   *             "amount": 100.0,
+   *             "currency": "EUR"
+   *           },
+   *           "tax": {
+   *             "amount": 0.0,
+   *             "currency": "EUR"
+   *           }
+   *         }
+   *       ],
+   *       "isCorporate": false,
+   *       "prePaymentAmount": {
+   *         "amount": 321.0,
+   *         "currency": "EUR"
+   *       }
+   *     }
+   *   ]
+   * }
+   */
   StayOffersModel: {
     property: definitions["EmbeddedPropertyModel"];
-    /** List of offered unit groups with rates */
+    /** @description List of offered unit groups with rates */
     offers: definitions["OfferModel"][];
   };
   TaxDetailModel: {
@@ -1707,50 +4677,183 @@ export interface definitions {
       | "Special"
       | "ReducedCovid19"
       | "NormalCovid19";
+    /** Format: double */
     vatPercent: number;
     net: definitions["MonetaryValueModel"];
     tax: definitions["MonetaryValueModel"];
   };
   TaxesModel: {
-    /** The amount of taxes, which are VAT or Sales Taxes depending on the country of the property */
+    /**
+     * Format: double
+     * @description The amount of taxes, which are VAT or Sales Taxes depending on the country of the property
+     */
     tax: number;
-    /** The amount of City Tax including VAT */
+    /**
+     * Format: double
+     * @description The amount of City Tax including VAT
+     */
     cityTax: number;
   };
   TimeSliceItemModel: {
-    /** Date and time the time slice begins<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date and time the time slice begins<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     from: string;
-    /** Date and time the time slice ends<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date and time the time slice ends<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     to: string;
-    /** List of offers for this time slice */
+    /** @description List of offers for this time slice */
     offers?: definitions["TimeSliceOfferItemModel"][];
   };
+  /**
+   * @example {
+   *   "timeSlices": [
+   *     {
+   *       "from": "2024-03-06T17:00:00+01:00",
+   *       "to": "2024-03-07T11:00:00+01:00",
+   *       "offers": [
+   *         {
+   *           "unitGroup": {
+   *             "id": "MUC-SGL",
+   *             "code": "SGL",
+   *             "name": "Single",
+   *             "description": "Single",
+   *             "type": "BedRoom"
+   *           },
+   *           "minGuaranteeType": "PM6Hold",
+   *           "available": 4,
+   *           "availableUnits": 0,
+   *           "restrictions": {
+   *             "minLengthOfStay": 2,
+   *             "maxLengthOfStay": 30,
+   *             "closed": false,
+   *             "closedOnArrival": true,
+   *             "closedOnDeparture": true
+   *           },
+   *           "prices": [
+   *             {
+   *               "adults": 1,
+   *               "price": {
+   *                 "grossAmount": 123.0,
+   *                 "beforeTax": 111.81,
+   *                 "afterTax": 133.0,
+   *                 "taxes": {
+   *                   "tax": 11.19,
+   *                   "cityTax": 10.0
+   *                 },
+   *                 "currency": "EUR"
+   *               }
+   *             },
+   *             {
+   *               "adults": 2,
+   *               "price": {
+   *                 "grossAmount": 170.0,
+   *                 "beforeTax": 154.54,
+   *                 "afterTax": 180.0,
+   *                 "taxes": {
+   *                   "tax": 15.46,
+   *                   "cityTax": 10.0
+   *                 },
+   *                 "currency": "EUR"
+   *               }
+   *             }
+   *           ]
+   *         },
+   *         {
+   *           "unitGroup": {
+   *             "id": "MUC-DBL",
+   *             "code": "DBL",
+   *             "name": "Double",
+   *             "description": "Double",
+   *             "type": "BedRoom"
+   *           },
+   *           "minGuaranteeType": "PM6Hold",
+   *           "available": 2,
+   *           "availableUnits": 0,
+   *           "restrictions": {
+   *             "minLengthOfStay": 2,
+   *             "maxLengthOfStay": 30,
+   *             "closed": false,
+   *             "closedOnArrival": true,
+   *             "closedOnDeparture": true
+   *           },
+   *           "prices": [
+   *             {
+   *               "adults": 1,
+   *               "price": {
+   *                 "grossAmount": 456.0,
+   *                 "beforeTax": 414.54,
+   *                 "afterTax": 466.0,
+   *                 "taxes": {
+   *                   "tax": 41.46,
+   *                   "cityTax": 10.0
+   *                 },
+   *                 "currency": "EUR"
+   *               }
+   *             },
+   *             {
+   *               "adults": 2,
+   *               "price": {
+   *                 "grossAmount": 630.0,
+   *                 "beforeTax": 572.72,
+   *                 "afterTax": 610.0,
+   *                 "taxes": {
+   *                   "tax": 57.28,
+   *                   "cityTax": 10.0
+   *                 },
+   *                 "currency": "EUR"
+   *               }
+   *             }
+   *           ]
+   *         }
+   *       ]
+   *     }
+   *   ],
+   *   "count": 1
+   * }
+   */
   TimeSliceListModel: {
-    /** List of time slices */
+    /** @description List of time slices */
     timeSlices?: definitions["TimeSliceItemModel"][];
-    /** Total count of items */
+    /**
+     * Format: int64
+     * @description Total count of items
+     */
     count: number;
   };
   TimeSliceModel: {
-    /** The start date and time for this time slice<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description The start date and time for this time slice<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     from: string;
-    /** The end date and time for this time slice<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description The end date and time for this time slice<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     to: string;
-    /** The service date for this time slice */
+    /**
+     * Format: date
+     * @description The service date for this time slice
+     * @example 2020-10-10
+     */
     serviceDate: string;
     ratePlan: definitions["EmbeddedRatePlanModel"];
     unitGroup: definitions["EmbeddedUnitGroupModel"];
     unit?: definitions["EmbeddedUnitModel"];
     baseAmount: definitions["AmountModel"];
     totalGrossAmount: definitions["MonetaryValueModel"];
-    /** The list of services included in the rate plan (package elements) */
+    /** @description The list of services included in the rate plan (package elements) */
     includedServices?: definitions["ReservationServiceModel"][];
-    /** The list of actions allowed for this time slice */
+    /** @description The list of actions allowed for this time slice */
     actions?: definitions["ActionModel[ReservationTimeSliceAction,NotAllowedReservationTimeSliceActionReason]"][];
   };
   TimeSliceOfferItemModel: {
     unitGroup: definitions["EmbeddedUnitGroupModel"];
-    /** The minimum guarantee type for the offer */
+    /** @description The minimum guarantee type for the offer */
     minGuaranteeType?:
       | "PM6Hold"
       | "CreditCard"
@@ -1759,12 +4862,18 @@ export interface definitions {
       | "Ota";
     minAdvance?: definitions["PeriodModel"];
     maxAdvance?: definitions["PeriodModel"];
-    /** The number of available units for the offer */
+    /**
+     * Format: int32
+     * @description The number of available units for the offer
+     */
     available: number;
-    /** The number of available units for the offer considering overbookings */
+    /**
+     * Format: int32
+     * @description The number of available units for the offer considering overbookings
+     */
     availableUnits: number;
     restrictions?: definitions["RateRestrictionsModel"];
-    /** The prices for this offer */
+    /** @description The prices for this offer */
     prices?: definitions["PerOccupancyPriceItemModel"][];
   };
 }
@@ -2249,6 +5358,7 @@ export interface operations {
           | "Homelike"
           | "Hrs"
           | "AltoVita"
+          | "DesVu"
         )[];
         /** Filter result by the external code. The result set will contain all bookings having reservations with external code starting with provided value */
         externalCode?: string;
@@ -2913,7 +6023,8 @@ export interface operations {
           | "Expedia"
           | "Homelike"
           | "Hrs"
-          | "AltoVita";
+          | "AltoVita"
+          | "DesVu";
         /** The promo code associated with a certain special offer */
         promoCode?: string;
         /** The code associated with a corporate rate */
@@ -2970,7 +6081,8 @@ export interface operations {
           | "Expedia"
           | "Homelike"
           | "Hrs"
-          | "AltoVita";
+          | "AltoVita"
+          | "DesVu";
         /** The number of adults you want offers for */
         adults: number;
         /** The ages of the children you want offers for */
@@ -3025,7 +6137,8 @@ export interface operations {
           | "Expedia"
           | "Homelike"
           | "Hrs"
-          | "AltoVita";
+          | "AltoVita"
+          | "DesVu";
         /** The number of adults you want offers for */
         adults: number;
         /** The ages of the children you want offers for */
@@ -3084,7 +6197,8 @@ export interface operations {
           | "Expedia"
           | "Homelike"
           | "Hrs"
-          | "AltoVita";
+          | "AltoVita"
+          | "DesVu";
         /** Page number, 1-based. Default value is 1 (if this is not set or not positive). Results in 204 if there are no items on that page. */
         pageNumber?: number;
         /** Page size. If this is not set or not positive, the pageNumber is ignored and all items are returned. */
@@ -3178,6 +6292,7 @@ export interface operations {
           | "Homelike"
           | "Hrs"
           | "AltoVita"
+          | "DesVu"
         )[];
         /** Filter result by source */
         sources?: string[];
@@ -3323,6 +6438,7 @@ export interface operations {
           | "Homelike"
           | "Hrs"
           | "AltoVita"
+          | "DesVu"
         )[];
         /** Filter result by source */
         sources?: string[];
@@ -3487,7 +6603,8 @@ export interface operations {
           | "Expedia"
           | "Homelike"
           | "Hrs"
-          | "AltoVita";
+          | "AltoVita"
+          | "DesVu";
         /** The promo code associated with a certain special offer, like corporate rate */
         promoCode?: string;
         /**
@@ -3543,7 +6660,8 @@ export interface operations {
           | "Expedia"
           | "Homelike"
           | "Hrs"
-          | "AltoVita";
+          | "AltoVita"
+          | "DesVu";
         /**
          * Depending on the postNextDay setting of a service it will by default be posted before or after midnight.
          * Breakfast is usually delivered on the next morning, so all the dates from the day after arrival to the departure day

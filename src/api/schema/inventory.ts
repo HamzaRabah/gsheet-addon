@@ -180,48 +180,128 @@ export interface definitions {
     bic?: string;
     bank?: string;
   };
+  /**
+   * @example {
+   *   "units": [
+   *     {
+   *       "propertyId": "MUC",
+   *       "name": "A.201",
+   *       "description": {
+   *         "en": "Single room",
+   *         "de": "Einzelzimmer"
+   *       },
+   *       "unitGroupId": "MUC-SGL",
+   *       "maxPersons": 1,
+   *       "condition": "Clean",
+   *       "attributes": [],
+   *       "connectedUnits": []
+   *     },
+   *     {
+   *       "propertyId": "MUC",
+   *       "name": "A.103",
+   *       "description": {
+   *         "en": "Double room",
+   *         "de": "Doppelzimmer"
+   *       },
+   *       "unitGroupId": "MUC-DBL",
+   *       "maxPersons": 2,
+   *       "condition": "Clean",
+   *       "attributes": [],
+   *       "connectedUnits": []
+   *     },
+   *     {
+   *       "propertyId": "MUC",
+   *       "name": "S.102",
+   *       "description": {
+   *         "en": "Suite room",
+   *         "de": "Suite Zimmer"
+   *       },
+   *       "unitGroupId": "MUC-SUI",
+   *       "maxPersons": 3,
+   *       "condition": "Clean",
+   *       "attributes": [],
+   *       "connectedUnits": [
+   *         {
+   *           "unitId": "MUC-MTA"
+   *         },
+   *         {
+   *           "unitId": "MUC-JQI"
+   *         }
+   *       ]
+   *     }
+   *   ]
+   * }
+   */
   BulkCreateUnitsModel: {
     units: definitions["CreateUnitModel"][];
   };
+  /**
+   * @example {
+   *   "ids": [
+   *     "MUC-CFP",
+   *     "MUC-XTA",
+   *     "MUC-CPZ"
+   *   ]
+   * }
+   */
   BulkUnitsCreatedModel: {
-    /** The unit ids */
+    /** @description The unit ids */
     ids: string[];
   };
   ConnectedUnitGroupModel: {
-    /** The unit group id */
+    /** @description The unit group id */
     id: string;
-    /** The name for the unit group */
+    /** @description The name for the unit group */
     name: string;
-    /** The description for the unit group */
+    /** @description The description for the unit group */
     description: string;
-    /** The number of units taken from this connected unit group */
+    /**
+     * Format: int32
+     * @description The number of units taken from this connected unit group
+     */
     memberCount: number;
-    /** Maximum number of persons for the unit group */
+    /**
+     * Format: int32
+     * @description Maximum number of persons for the unit group
+     */
     maxPersons?: number;
   };
   ConnectedUnitModel: {
-    /** The unit id */
+    /** @description The unit id */
     id: string;
-    /** The name for the unit */
+    /** @description The name for the unit */
     name: string;
-    /** The description for the unit */
+    /** @description The description for the unit */
     description: string;
-    /** The unit group id */
+    /** @description The unit group id */
     unitGroupId: string;
-    /** The current status of the unit */
+    /** @description The current status of the unit */
     condition: "Clean" | "CleanToBeInspected" | "Dirty";
-    /** Maximum number of persons for the unit */
+    /**
+     * Format: int32
+     * @description Maximum number of persons for the unit
+     */
     maxPersons: number;
   };
-  BulkUnitsCreatedModel: {
-    /** The unit ids */
-    ids: string[];
-  };
+  /**
+   * @example {
+   *   "count": 50
+   * }
+   */
   CountModel: {
+    /** Format: int64 */
     count: number;
   };
+  /**
+   * @example {
+   *   "countryCodes": [
+   *     "DE",
+   *     "US"
+   *   ]
+   * }
+   */
   CountryListModel: {
-    /** List of ISO country codes. */
+    /** @description List of ISO country codes. */
     countryCodes: string[];
   };
   CreateAddressModel: {
@@ -229,385 +309,741 @@ export interface definitions {
     addressLine2?: string;
     postalCode: string;
     city: string;
-    /** The ISO 3166-2 code */
+    /** @description The ISO 3166-2 code */
     regionCode?: string;
-    /** The country code, in ISO 3166-1 alpha-2 code */
+    /** @description The country code, in ISO 3166-1 alpha-2 code */
     countryCode: string;
   };
   CreateConnectedUnitGroupModel: {
-    /** The connected unit group id */
+    /** @description The connected unit group id */
     unitGroupId: string;
-    /** The number of units for this connected unit group */
+    /**
+     * Format: int32
+     * @description The number of units for this connected unit group
+     */
     memberCount: number;
   };
   CreateConnectedUnitModel: {
-    /** The connected unit id */
+    /** @description The connected unit id */
     unitId: string;
   };
+  /**
+   * @example {
+   *   "code": "MUC",
+   *   "name": {
+   *     "en": "Demo Hotel Munich",
+   *     "de": "Demo Hotel München"
+   *   },
+   *   "companyName": "Hotel Münchner GmbH",
+   *   "managingDirectors": "Franz-Josef Gruber",
+   *   "commercialRegisterEntry": "Amtsgericht München, HRB 279336",
+   *   "taxId": "DE311053702",
+   *   "description": {
+   *     "en": "This is the demo hotel Munich",
+   *     "de": "Dies ist das Demo Hotel München"
+   *   },
+   *   "location": {
+   *     "addressLine1": "Marienplatz 1",
+   *     "postalCode": "80331",
+   *     "city": "München",
+   *     "countryCode": "DE"
+   *   },
+   *   "bankAccount": {
+   *     "iban": "DE44 5001 0517 5407 3249 31",
+   *     "bic": "SSKMDEMMXXX",
+   *     "bank": "Stadtsparkasse München"
+   *   },
+   *   "paymentTerms": {
+   *     "en": "Pay on checkout",
+   *     "de": "Zahlung bei Checkout"
+   *   },
+   *   "timeZone": "Europe/Berlin",
+   *   "defaultCheckInTime": "17:00:00",
+   *   "defaultCheckOutTime": "11:00:00",
+   *   "currencyCode": "EUR"
+   * }
+   */
   CreatePropertyModel: {
-    /** The code for the property that can be shown in reports and table views */
+    /** @description The code for the property that can be shown in reports and table views */
     code: string;
-    /** The name for the property */
+    /** @description The name for the property */
     name: { [key: string]: string };
-    /** The legal name of the company running the property. */
+    /** @description The legal name of the company running the property. */
     companyName: string;
-    /** The managing director(s) of the company, as they should appear on invoices */
+    /** @description The managing director(s) of the company, as they should appear on invoices */
     managingDirectors?: string;
-    /** The entry in the Commercial Reigster of the company running the property, as it should appear on invoices */
+    /** @description The entry in the Commercial Reigster of the company running the property, as it should appear on invoices */
     commercialRegisterEntry: string;
-    /** The Tax-ID of the company running the property, as it should appear on invoices */
+    /** @description The Tax-ID of the company running the property, as it should appear on invoices */
     taxId: string;
-    /** The description for the property */
+    /** @description The description for the property */
     description?: { [key: string]: string };
     location: definitions["CreateAddressModel"];
     bankAccount?: definitions["BankAccountModel"];
-    /** The payment terms used for all rate plans */
+    /** @description The payment terms used for all rate plans */
     paymentTerms: { [key: string]: string };
     /**
-     * The time zone name of the property from the IANA Time Zone Database.
+     * @description The time zone name of the property from the IANA Time Zone Database.
      * (see: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
      */
     timeZone: string;
-    /** The default check-in time<br />A time (without fractional second part) as defined in the <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /** @description The default check-in time<br />A time (without fractional second part) as defined in the <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
     defaultCheckInTime: string;
-    /** The default check-out time<br />A time (without fractional second part) as defined in the <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /** @description The default check-out time<br />A time (without fractional second part) as defined in the <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
     defaultCheckOutTime: string;
-    /** The currency a property works with. */
+    /** @description The currency a property works with. */
     currencyCode: string;
   };
+  /**
+   * @example {
+   *   "name": "Floor 1",
+   *   "description": "Floor number"
+   * }
+   */
   CreateUnitAttributeDefinitionModel: {
-    /** The name of the unit attribute */
+    /** @description The name of the unit attribute */
     name: string;
-    /** The description of the unit attribute */
+    /** @description The description of the unit attribute */
     description?: string;
   };
   CreateUnitAttributeModel: {
-    /** Id of unit attribute */
+    /** @description Id of unit attribute */
     id: string;
   };
+  /**
+   * @example {
+   *   "code": "DBL",
+   *   "propertyId": "MUC",
+   *   "name": {
+   *     "en": "Double Room",
+   *     "de": "Doppelzimmer"
+   *   },
+   *   "description": {
+   *     "en": "This is a nice room with as kingsize bed and flat screen",
+   *     "de": "Dies ist ein schönes Zimmer mit Kingsize-Bett und Flachbildschirm"
+   *   },
+   *   "maxPersons": 4,
+   *   "rank": 1,
+   *   "type": "BedRoom"
+   * }
+   */
   CreateUnitGroupModel: {
-    /** The code for the unit group that can be shown in reports and table views */
+    /** @description The code for the unit group that can be shown in reports and table views */
     code: string;
-    /** The id of the property where unit group will be created */
+    /** @description The id of the property where unit group will be created */
     propertyId: string;
-    /** The name for the unit group */
+    /** @description The name for the unit group */
     name: { [key: string]: string };
-    /** The description for the unit group */
+    /** @description The description for the unit group */
     description: { [key: string]: string };
-    /** Maximum number of persons for the unit group */
+    /**
+     * Format: int32
+     * @description Maximum number of persons for the unit group
+     */
     maxPersons: number;
     /**
-     * The unit group rank
+     * Format: int32
+     * @description The unit group rank
      * Restrictions:
      * - Should be greater or equal to one
      */
     rank?: number;
-    /** The unit group type */
+    /** @description The unit group type */
     type?: "BedRoom" | "MeetingRoom" | "EventSpace" | "ParkingLot";
-    /** The list of connected unit groups this unit group is composed of */
+    /** @description The list of connected unit groups this unit group is composed of */
     connectedUnitGroups?: definitions["CreateConnectedUnitGroupModel"][];
   };
+  /**
+   * @example {
+   *   "propertyId": "MUC",
+   *   "name": "S.102",
+   *   "description": {
+   *     "en": "Suite room",
+   *     "de": "Suite Zimmer"
+   *   },
+   *   "unitGroupId": "MUC-SUI",
+   *   "maxPersons": 3,
+   *   "condition": "Clean",
+   *   "attributes": [],
+   *   "connectedUnits": [
+   *     {
+   *       "unitId": "MUC-MTA"
+   *     },
+   *     {
+   *       "unitId": "MUC-JQI"
+   *     }
+   *   ]
+   * }
+   */
   CreateUnitModel: {
-    /** The id of the property where the unit will be created */
+    /** @description The id of the property where the unit will be created */
     propertyId: string;
-    /** The name for the unit */
+    /** @description The name for the unit */
     name: string;
-    /** The description for the unit */
+    /** @description The description for the unit */
     description: { [key: string]: string };
-    /** The id of the unit group */
+    /** @description The id of the unit group */
     unitGroupId?: string;
-    /** Maximum number of persons for the unit */
+    /**
+     * Format: int32
+     * @description Maximum number of persons for the unit
+     */
     maxPersons: number;
-    /** Condition of the unit */
+    /** @description Condition of the unit */
     condition?: "Clean" | "CleanToBeInspected" | "Dirty";
-    /** Collection of user defined attributes of unit */
+    /** @description Collection of user defined attributes of unit */
     attributes?: definitions["CreateUnitAttributeModel"][];
-    /** The list of units this unit is composed of */
+    /** @description The list of units this unit is composed of */
     connectedUnits?: definitions["CreateConnectedUnitModel"][];
   };
   EmbeddedPropertyModel: {
-    /** The property id */
+    /** @description The property id */
     id: string;
-    /** The code for the property that can be shown in reports and table views */
+    /** @description The code for the property that can be shown in reports and table views */
     code?: string;
-    /** The name for the property */
+    /** @description The name for the property */
     name?: string;
-    /** The description for the property */
+    /** @description The description for the property */
     description?: string;
   };
   EmbeddedUnitGroupModel: {
-    /** The unit group id */
+    /** @description The unit group id */
     id: string;
-    /** The code for the unit group that can be shown in reports and table views */
+    /** @description The code for the unit group that can be shown in reports and table views */
     code?: string;
-    /** The name for the unit group */
+    /** @description The name for the unit group */
     name?: string;
-    /** The description for the unit group */
+    /** @description The description for the unit group */
     description?: string;
-    /** The unit group type */
+    /** @description The unit group type */
     type?: "BedRoom" | "MeetingRoom" | "EventSpace" | "ParkingLot" | "Other";
   };
   EmbeddedUnitModel: {
-    /** The unit id */
+    /** @description The unit id */
     id: string;
-    /** The name for the unit */
+    /** @description The name for the unit */
     name?: string;
-    /** The description for the unit */
+    /** @description The description for the unit */
     description?: string;
-    /** The unit group id */
+    /** @description The unit group id */
     unitGroupId?: string;
   };
   MessageItemCollection: {
     messages?: string[];
   };
   Operation: {
-    value?: { [key: string]: unknown };
+    value?: unknown;
     path?: string;
     op?: string;
     from?: string;
   };
+  /**
+   * @example {
+   *   "id": "MUC"
+   * }
+   */
   PropertyCreatedModel: {
-    /** The property id */
+    /** @description The property id */
     id: string;
   };
   PropertyItemModel: {
-    /** The property id */
+    /** @description The property id */
     id: string;
-    /** The code for the property that can be shown in reports and table views */
+    /** @description The code for the property that can be shown in reports and table views */
     code: string;
-    /** The id of the property used as a template while creating the property */
+    /** @description The id of the property used as a template while creating the property */
     propertyTemplateId?: string;
-    /** Whether the property can be used as a template for other properties */
+    /** @description Whether the property can be used as a template for other properties */
     isTemplate: boolean;
-    /** The name for the property */
+    /** @description The name for the property */
     name: string;
-    /** The description for the property */
+    /** @description The description for the property */
     description?: string;
-    /** The legal name of the company running the property. */
+    /** @description The legal name of the company running the property. */
     companyName: string;
-    /** The managing director(s) of the company, as they should appear on invoices */
+    /** @description The managing director(s) of the company, as they should appear on invoices */
     managingDirectors?: string;
-    /** The entry in the Commercial Register of the company running the property, as it should appear on invoices */
+    /** @description The entry in the Commercial Register of the company running the property, as it should appear on invoices */
     commercialRegisterEntry: string;
-    /** The Tax-ID of the company running the property, as it should appear on invoices */
+    /** @description The Tax-ID of the company running the property, as it should appear on invoices */
     taxId: string;
     location: definitions["AddressModel"];
     bankAccount?: definitions["BankAccountModel"];
-    /** The payment terms used for all rate plans */
+    /** @description The payment terms used for all rate plans */
     paymentTerms: { [key: string]: string };
     /**
-     * The time zone name of the property from the IANA Time Zone Database.
+     * @description The time zone name of the property from the IANA Time Zone Database.
      * (see: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
      */
     timeZone: string;
-    /** The currency a property works with. */
+    /** @description The currency a property works with. */
     currencyCode: string;
-    /** Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     created: string;
-    /** The status of the property */
+    /** @description The status of the property */
     status: "Test" | "Live";
-    /** Is the property archived */
+    /** @description Is the property archived */
     isArchived: boolean;
-    /** The list of actions for this property */
+    /** @description The list of actions for this property */
     actions?: definitions["ActionModel[PropertyAction,NotAllowedPropertyActionReason]"][];
   };
+  /**
+   * @example {
+   *   "properties": [
+   *     {
+   *       "id": "MUC",
+   *       "code": "MUC",
+   *       "isTemplate": true,
+   *       "name": "Demo Hotel Munich",
+   *       "description": "This is the demo hotel Munich",
+   *       "companyName": "Company",
+   *       "commercialRegisterEntry": "CRE",
+   *       "taxId": "Tax",
+   *       "location": {
+   *         "addressLine1": "Marienplatz 1",
+   *         "postalCode": "80331",
+   *         "city": "München",
+   *         "countryCode": "DE"
+   *       },
+   *       "paymentTerms": {
+   *         "de": "Zahlbar bei Check In",
+   *         "en": "Payment on check-in"
+   *       },
+   *       "timeZone": "Europe/Berlin",
+   *       "currencyCode": "EUR",
+   *       "created": "0001-01-01T00:00:00Z",
+   *       "status": "Test",
+   *       "isArchived": false
+   *     },
+   *     {
+   *       "id": "BER",
+   *       "code": "BER",
+   *       "propertyTemplateId": "MUC",
+   *       "isTemplate": false,
+   *       "name": "Demo Hotel Berlin",
+   *       "description": "This is the demo hotel Berlin",
+   *       "companyName": "Company",
+   *       "commercialRegisterEntry": "CRE",
+   *       "taxId": "Tax",
+   *       "location": {
+   *         "addressLine1": "Mohrenstraße 30",
+   *         "postalCode": "10117",
+   *         "city": "Berlin",
+   *         "countryCode": "DE"
+   *       },
+   *       "paymentTerms": {
+   *         "de": "Zahlbar bei Check In",
+   *         "en": "Payment on check-in"
+   *       },
+   *       "timeZone": "Europe/Berlin",
+   *       "currencyCode": "EUR",
+   *       "created": "0001-01-01T00:00:00Z",
+   *       "status": "Test",
+   *       "isArchived": false
+   *     }
+   *   ],
+   *   "count": 0
+   * }
+   */
   PropertyListModel: {
-    /** List of properties */
+    /** @description List of properties */
     properties: definitions["PropertyItemModel"][];
-    /** Total count of items */
+    /**
+     * Format: int64
+     * @description Total count of items
+     */
     count: number;
   };
-  /** With this request you can create a new property */
+  /**
+   * @description With this request you can create a new property
+   * @example {
+   *   "id": "MUC",
+   *   "code": "MUC",
+   *   "propertyTemplateId": "BER",
+   *   "isTemplate": false,
+   *   "name": {
+   *     "en": "Demo Hotel Munich",
+   *     "de": "Demo Hotel München"
+   *   },
+   *   "description": {
+   *     "en": "This is the demo hotel Munich",
+   *     "de": "Dies ist das Demo Hotel München"
+   *   },
+   *   "companyName": "Hotel Münchner GmbH",
+   *   "managingDirectors": "Franz-Josef Gruber",
+   *   "commercialRegisterEntry": "Amtsgericht München, HRB 279336",
+   *   "taxId": "DE311053702",
+   *   "location": {
+   *     "addressLine1": "Marienplatz 1",
+   *     "postalCode": "80331",
+   *     "city": "München",
+   *     "countryCode": "DE"
+   *   },
+   *   "bankAccount": {
+   *     "iban": "DE44 5001 0517 5407 3249 31",
+   *     "bic": "SSKMDEMMXXX",
+   *     "bank": "Stadtsparkasse München"
+   *   },
+   *   "paymentTerms": {
+   *     "en": "Pay on checkout",
+   *     "de": "Zahlung bei Checkout"
+   *   },
+   *   "timeZone": "Europe/Berlin",
+   *   "currencyCode": "EUR",
+   *   "created": "0001-01-01T00:00:00Z",
+   *   "status": "Test",
+   *   "isArchived": false
+   * }
+   */
   PropertyModel: {
-    /** The property id */
+    /** @description The property id */
     id: string;
-    /** The code for the property that can be shown in reports and table views */
+    /** @description The code for the property that can be shown in reports and table views */
     code: string;
-    /** The id of the property used as a template while creating the property */
+    /** @description The id of the property used as a template while creating the property */
     propertyTemplateId?: string;
-    /** Whether the property can be used as a template for other properties */
+    /** @description Whether the property can be used as a template for other properties */
     isTemplate: boolean;
-    /** The name for the property */
+    /** @description The name for the property */
     name: { [key: string]: string };
-    /** The description for the property */
+    /** @description The description for the property */
     description?: { [key: string]: string };
-    /** The legal name of the company running the property. */
+    /** @description The legal name of the company running the property. */
     companyName: string;
-    /** The managing director(s) of the company, as they should appear on invoices */
+    /** @description The managing director(s) of the company, as they should appear on invoices */
     managingDirectors?: string;
-    /** The entry in the Commercial Register of the company running the property, as it should appear on invoices */
+    /** @description The entry in the Commercial Register of the company running the property, as it should appear on invoices */
     commercialRegisterEntry: string;
-    /** The Tax-ID of the company running the property, as it should appear on invoices */
+    /** @description The Tax-ID of the company running the property, as it should appear on invoices */
     taxId: string;
     location: definitions["AddressModel"];
     bankAccount?: definitions["BankAccountModel"];
-    /** The payment terms used for all rate plans */
+    /** @description The payment terms used for all rate plans */
     paymentTerms: { [key: string]: string };
     /**
-     * The time zone name of the property from the IANA Time Zone Database.
+     * @description The time zone name of the property from the IANA Time Zone Database.
      * (see: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
      */
     timeZone: string;
-    /** The currency a property works with. */
+    /** @description The currency a property works with. */
     currencyCode: string;
-    /** Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     created: string;
-    /** The status of the property */
+    /** @description The status of the property */
     status: "Test" | "Live";
-    /** Is the property archived */
+    /** @description Is the property archived */
     isArchived: boolean;
-    /** The list of actions for this property */
+    /** @description The list of actions for this property */
     actions?: definitions["ActionModel[PropertyAction,NotAllowedPropertyActionReason]"][];
   };
   ReplaceConnectedUnitGroupModel: {
-    /** The connected unit group id */
+    /** @description The connected unit group id */
     unitGroupId: string;
-    /** The number of units for this connected unit group */
+    /**
+     * Format: int32
+     * @description The number of units for this connected unit group
+     */
     memberCount: number;
   };
+  /**
+   * @example {
+   *   "name": {
+   *     "en": "Double Room",
+   *     "de": "Doppelzimmer"
+   *   },
+   *   "description": {
+   *     "en": "This is a nice room with as kingsize bed and flat screen",
+   *     "de": "Dies ist ein schönes Zimmer mit Kingsize-Bett und Flachbildschirm"
+   *   },
+   *   "maxPersons": 4,
+   *   "rank": 2
+   * }
+   */
   ReplaceUnitGroupModel: {
-    /** The name for the unit group */
+    /** @description The name for the unit group */
     name: { [key: string]: string };
-    /** The description for the unit group */
+    /** @description The description for the unit group */
     description: { [key: string]: string };
     /**
-     * Maximum number of persons for the unit group.
+     * Format: int32
+     * @description Maximum number of persons for the unit group.
      * If this value is increased, the surcharges for the related rate plans must be specified in order for the rate plans to be sellable for the new possible occupancies.
      */
     maxPersons?: number;
     /**
-     * The unit group rank
+     * Format: int32
+     * @description The unit group rank
      * Restrictions:
      * - Should be greater or equal to one
      */
     rank?: number;
-    /** The list of connected unit groups this unit group is composed of */
+    /** @description The list of connected unit groups this unit group is composed of */
     connectedUnitGroups?: definitions["ReplaceConnectedUnitGroupModel"][];
-    /**
-     * The time zone name of the property from the IANA Time Zone Database.
-     * (see: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
-     */
-    timeZone: string;
-    /** The currency a property works with. */
-    currencyCode: string;
-    /** Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
-    created: string;
-    /** The status of the property */
-    status: "Test" | "Live";
-    /** Is the property archived */
-    isArchived: boolean;
-    /** The list of actions for this property */
-    actions?: definitions["ActionModel[PropertyAction,NotAllowedPropertyActionReason]"][];
   };
+  /**
+   * @example {
+   *   "id": "FLOOR"
+   * }
+   */
   UnitAttributeDefinitionCreatedModel: {
-    /** The unit attribute id */
+    /** @description The unit attribute id */
     id: string;
   };
+  /**
+   * @example {
+   *   "unitAttributes": [
+   *     {
+   *       "id": "KQOSXHLS",
+   *       "name": "Floor 1",
+   *       "description": "Floor number"
+   *     },
+   *     {
+   *       "id": "ADVFSSUL",
+   *       "name": "Street view",
+   *       "description": "View from the room"
+   *     }
+   *   ],
+   *   "count": 2
+   * }
+   */
   UnitAttributeDefinitionListModel: {
-    /** List of unit attributes */
+    /** @description List of unit attributes */
     unitAttributes: definitions["UnitAttributeDefinitionModel"][];
-    /** Total count of items */
+    /**
+     * Format: int64
+     * @description Total count of items
+     */
     count: number;
   };
+  /**
+   * @example {
+   *   "id": "KQOSXHLS",
+   *   "name": "Floor 1",
+   *   "description": "Floor number"
+   * }
+   */
   UnitAttributeDefinitionModel: {
-    /** The id of the unit attribute */
+    /** @description The id of the unit attribute */
     id: string;
-    /** The name of the unit attribute */
+    /** @description The name of the unit attribute */
     name: string;
-    /** The description of the unit attribute */
+    /** @description The description of the unit attribute */
     description?: string;
   };
   UnitAttributeModel: {
-    /** Id of unit attribute */
+    /** @description Id of unit attribute */
     id: string;
-    /** The name of the unit attribute */
+    /** @description The name of the unit attribute */
     name: string;
-    /** Description of unit attribute */
+    /** @description Description of unit attribute */
     description?: string;
   };
+  /**
+   * @example {
+   *   "id": "MUC-CFP"
+   * }
+   */
   UnitCreatedModel: {
-    /** The unit id */
+    /** @description The unit id */
     id: string;
   };
+  /**
+   * @example {
+   *   "id": "MUC-DBL"
+   * }
+   */
   UnitGroupCreatedModel: {
-    /** The unit group id */
+    /** @description The unit group id */
     id: string;
   };
   UnitGroupItemModel: {
-    /** The unit group id */
+    /** @description The unit group id */
     id: string;
-    /** The code for the unit group that can be shown in reports and table views */
+    /** @description The code for the unit group that can be shown in reports and table views */
     code: string;
-    /** The name for the unit group */
+    /** @description The name for the unit group */
     name: string;
-    /** The description for the unit group */
+    /** @description The description for the unit group */
     description: string;
-    /** Number of units in this group */
+    /**
+     * Format: int32
+     * @description Number of units in this group
+     */
     memberCount: number;
-    /** Maximum number of persons for the unit group */
+    /**
+     * Format: int32
+     * @description Maximum number of persons for the unit group
+     */
     maxPersons?: number;
-    /** The unit group rank */
+    /**
+     * Format: int32
+     * @description The unit group rank
+     */
     rank?: number;
-    /** The unit group type */
+    /** @description The unit group type */
     type: "BedRoom" | "MeetingRoom" | "EventSpace" | "ParkingLot" | "Other";
     property: definitions["EmbeddedPropertyModel"];
-    /** The list of connected unit groups this unit group is composed of */
+    /** @description The list of connected unit groups this unit group is composed of */
     connectedUnitGroups?: definitions["ConnectedUnitGroupModel"][];
   };
+  /**
+   * @example {
+   *   "unitGroups": [
+   *     {
+   *       "id": "MUC-DBL",
+   *       "code": "DBL",
+   *       "name": "Double Room",
+   *       "description": "This is a nice room with as kingsize bed and flat screen",
+   *       "memberCount": 2,
+   *       "maxPersons": 4,
+   *       "rank": 2,
+   *       "type": "BedRoom",
+   *       "property": {
+   *         "id": "MUC",
+   *         "code": "MUC",
+   *         "name": "Demo Hotel Munich",
+   *         "description": "This is the demo hotel Munich"
+   *       }
+   *     },
+   *     {
+   *       "id": "BER-SUIT",
+   *       "code": "SUIT",
+   *       "name": "Suite Room",
+   *       "description": "This is a nice suite with two rooms combined",
+   *       "memberCount": 1,
+   *       "maxPersons": 3,
+   *       "rank": 1,
+   *       "type": "BedRoom",
+   *       "property": {
+   *         "id": "BER",
+   *         "code": "BER",
+   *         "name": "Demo Hotel Berlin",
+   *         "description": "This is the demo hotel Berlin"
+   *       },
+   *       "connectedUnitGroups": [
+   *         {
+   *           "id": "BER-SGL",
+   *           "name": "Single room",
+   *           "description": "This is a nice room with a single bed",
+   *           "memberCount": 2,
+   *           "maxPersons": 1
+   *         },
+   *         {
+   *           "id": "BER-DBL",
+   *           "name": "Double room",
+   *           "description": "This is a nice room with as kingsize bed and flat screen",
+   *           "memberCount": 1,
+   *           "maxPersons": 2
+   *         }
+   *       ]
+   *     }
+   *   ],
+   *   "count": 0
+   * }
+   */
   UnitGroupListModel: {
-    /** List of unit groups */
+    /** @description List of unit groups */
     unitGroups: definitions["UnitGroupItemModel"][];
-    /** Total count of items */
+    /**
+     * Format: int64
+     * @description Total count of items
+     */
     count: number;
   };
+  /**
+   * @example {
+   *   "id": "MUC-DBL",
+   *   "code": "DBL",
+   *   "property": {
+   *     "id": "MUC",
+   *     "code": "MUC",
+   *     "name": "Demo Hotel Munich",
+   *     "description": "This is the demo hotel Munich"
+   *   },
+   *   "name": {
+   *     "en": "Double Room",
+   *     "de": "Doppelzimmer"
+   *   },
+   *   "memberCount": 0,
+   *   "description": {
+   *     "en": "This is a nice room with as kingsize bed and flat screen",
+   *     "de": "Dies ist ein schönes Zimmer mit Kingsize-Bett und Flachbildschirm"
+   *   },
+   *   "maxPersons": 4,
+   *   "rank": 2,
+   *   "type": "BedRoom"
+   * }
+   */
   UnitGroupModel: {
-    /** The unit group id */
+    /** @description The unit group id */
     id: string;
-    /** The code for the unit group that can be shown in reports and table views */
+    /** @description The code for the unit group that can be shown in reports and table views */
     code: string;
     property: definitions["EmbeddedPropertyModel"];
-    /** The name for the unit group */
+    /** @description The name for the unit group */
     name: { [key: string]: string };
-    /** Number of units in this group */
+    /**
+     * Format: int32
+     * @description Number of units in this group
+     */
     memberCount: number;
-    /** The description for the unit group */
+    /** @description The description for the unit group */
     description: { [key: string]: string };
-    /** Maximum number of persons for the unit group */
+    /**
+     * Format: int32
+     * @description Maximum number of persons for the unit group
+     */
     maxPersons: number;
-    /** The unit group rank */
+    /**
+     * Format: int32
+     * @description The unit group rank
+     */
     rank?: number;
-    /** The unit group type */
+    /** @description The unit group type */
     type: "BedRoom" | "MeetingRoom" | "EventSpace" | "ParkingLot" | "Other";
-    /** The list of connected unit groups this unit group is composed of */
+    /** @description The list of connected unit groups this unit group is composed of */
     connectedUnitGroups?: definitions["ConnectedUnitGroupModel"][];
   };
   UnitItemMaintenanceModel: {
-    /** The id for the scheduled maintenance */
+    /** @description The id for the scheduled maintenance */
     id: string;
     /**
-     * The type of maintenance that is planned for the unit. A small repair (OutOfService),
+     * @description The type of maintenance that is planned for the unit. A small repair (OutOfService),
      * a bigger disfunction that does not allow to sell the unit (OutOfOrder) or is it
      * even under construction and should reduce the house count (OutOfInventory)
      */
     type: "OutOfService" | "OutOfOrder" | "OutOfInventory";
   };
   UnitItemModel: {
-    /** The unit id */
+    /** @description The unit id */
     id: string;
-    /** The name for the unit */
+    /** @description The name for the unit */
     name: string;
-    /** The description for the unit */
+    /** @description The description for the unit */
     description: string;
     property: definitions["EmbeddedPropertyModel"];
     unitGroup?: definitions["EmbeddedUnitGroupModel"];
+    connectingUnit?: definitions["EmbeddedUnitModel"];
     status: definitions["UnitItemStatusModel"];
-    /** Maximum number of persons for the unit */
+    /**
+     * Format: int32
+     * @description Maximum number of persons for the unit
+     */
     maxPersons: number;
-    /** Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     created: string;
-    /** Collection of user defined attributes of unit */
+    /** @description Collection of user defined attributes of unit */
     attributes?: definitions["UnitAttributeModel"][];
-    /** Collection of connected units */
+    /** @description Collection of connected units */
     connectedUnits?: definitions["ConnectedUnitModel"][];
   };
   UnitItemStatusModel: {
@@ -615,45 +1051,265 @@ export interface definitions {
     condition: "Clean" | "CleanToBeInspected" | "Dirty";
     maintenance?: definitions["UnitItemMaintenanceModel"];
   };
+  /**
+   * @example {
+   *   "units": [
+   *     {
+   *       "id": "MUC-MTA",
+   *       "name": "A.101",
+   *       "description": "Single room",
+   *       "property": {
+   *         "id": "MUC",
+   *         "code": "MUC",
+   *         "name": "Demo Hotel Munich",
+   *         "description": "This is the demo hotel Munich"
+   *       },
+   *       "unitGroup": {
+   *         "id": "MUC-SGL",
+   *         "code": "SGL",
+   *         "name": "Single",
+   *         "description": "Single",
+   *         "type": "BedRoom"
+   *       },
+   *       "connectingUnit": {
+   *         "id": "MUC-QKY",
+   *         "name": "S.101",
+   *         "description": "Suite room",
+   *         "unitGroupId": "MUC-SUI"
+   *       },
+   *       "status": {
+   *         "isOccupied": true,
+   *         "condition": "Dirty",
+   *         "maintenance": {
+   *           "id": "MUC-MTA-SGHZD",
+   *           "type": "OutOfService"
+   *         }
+   *       },
+   *       "maxPersons": 1,
+   *       "created": "0001-01-01T00:00:00Z",
+   *       "attributes": [
+   *         {
+   *           "id": "GRTDTLDD",
+   *           "name": "Floor 2",
+   *           "description": "Floor number"
+   *         },
+   *         {
+   *           "id": "KQOSXHLS",
+   *           "name": "Street view",
+   *           "description": "View from the room"
+   *         }
+   *       ],
+   *       "connectedUnits": []
+   *     },
+   *     {
+   *       "id": "MUC-JQI",
+   *       "name": "A.102",
+   *       "description": "Double room",
+   *       "property": {
+   *         "id": "MUC",
+   *         "code": "MUC",
+   *         "name": "Demo Hotel Munich",
+   *         "description": "This is the demo hotel Munich"
+   *       },
+   *       "unitGroup": {
+   *         "id": "MUC-DBL",
+   *         "code": "DBL",
+   *         "name": "Double",
+   *         "description": "Double",
+   *         "type": "BedRoom"
+   *       },
+   *       "connectingUnit": {
+   *         "id": "MUC-QKY",
+   *         "name": "S.101",
+   *         "description": "Suite room",
+   *         "unitGroupId": "MUC-SUI"
+   *       },
+   *       "status": {
+   *         "isOccupied": false,
+   *         "condition": "Clean",
+   *         "maintenance": {
+   *           "id": "MUC-JQI-GSZGK",
+   *           "type": "OutOfOrder"
+   *         }
+   *       },
+   *       "maxPersons": 2,
+   *       "created": "0001-01-01T00:00:00Z",
+   *       "attributes": [
+   *         {
+   *           "id": "GRTDTLDD",
+   *           "name": "Floor 2",
+   *           "description": "Floor number"
+   *         }
+   *       ],
+   *       "connectedUnits": []
+   *     },
+   *     {
+   *       "id": "MUC-QKY",
+   *       "name": "S.101",
+   *       "description": "Suite room",
+   *       "property": {
+   *         "id": "MUC",
+   *         "code": "MUC",
+   *         "name": "Demo Hotel Munich",
+   *         "description": "This is the demo hotel Munich"
+   *       },
+   *       "unitGroup": {
+   *         "id": "MUC-SUI",
+   *         "code": "SUI",
+   *         "name": "Suite",
+   *         "description": "Suite",
+   *         "type": "BedRoom"
+   *       },
+   *       "status": {
+   *         "isOccupied": false,
+   *         "condition": "Clean",
+   *         "maintenance": {
+   *           "id": "MUC-JQI-GSZGK",
+   *           "type": "OutOfOrder"
+   *         }
+   *       },
+   *       "maxPersons": 3,
+   *       "created": "0001-01-01T00:00:00Z",
+   *       "attributes": [
+   *         {
+   *           "id": "GRTDTLDD",
+   *           "name": "Floor 2",
+   *           "description": "Floor number"
+   *         }
+   *       ],
+   *       "connectedUnits": [
+   *         {
+   *           "id": "MUC-MTA",
+   *           "name": "A.101",
+   *           "description": "Single room",
+   *           "unitGroupId": "MUC-SGL",
+   *           "condition": "Clean",
+   *           "maxPersons": 1
+   *         },
+   *         {
+   *           "id": "MUC-JQI",
+   *           "name": "A.102",
+   *           "description": "Double room",
+   *           "unitGroupId": "MUC-DBL",
+   *           "condition": "Clean",
+   *           "maxPersons": 2
+   *         }
+   *       ]
+   *     }
+   *   ],
+   *   "count": 3
+   * }
+   */
   UnitListModel: {
-    /** List of units */
+    /** @description List of units */
     units: definitions["UnitItemModel"][];
-    /** Total count of items */
+    /**
+     * Format: int64
+     * @description Total count of items
+     */
     count: number;
   };
   UnitMaintenanceModel: {
-    /** The id for the scheduled maintenance */
+    /** @description The id for the scheduled maintenance */
     id: string;
-    /** Date and time the scheduled maintenance window starts<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date and time the scheduled maintenance window starts<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     from: string;
-    /** Date and time the scheduled maintenance window ends<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date and time the scheduled maintenance window ends<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     to: string;
     /**
-     * The type of maintenance that is planned for the unit. A small repair (OutOfService),
+     * @description The type of maintenance that is planned for the unit. A small repair (OutOfService),
      * a bigger disfunction that does not allow to sell the unit (OutOfOrder) or is it
      * even under construction and should reduce the house count (OutOfInventory)
      */
     type: "OutOfService" | "OutOfOrder" | "OutOfInventory";
-    /** The description text for the maintenance */
+    /** @description The description text for the maintenance */
     description?: string;
   };
+  /**
+   * @example {
+   *   "id": "MUC-MTA",
+   *   "name": "A.101",
+   *   "description": {
+   *     "en": "First Floor Room 1",
+   *     "de": "1.OG Zimmer 1"
+   *   },
+   *   "property": {
+   *     "id": "MUC",
+   *     "code": "MUC",
+   *     "name": "Demo Hotel Munich",
+   *     "description": "This is the demo hotel Munich"
+   *   },
+   *   "unitGroup": {
+   *     "id": "MUC-DBL",
+   *     "code": "DBL",
+   *     "name": "Double",
+   *     "description": "Double",
+   *     "type": "BedRoom"
+   *   },
+   *   "connectingUnit": {
+   *     "id": "MUC-QKY",
+   *     "name": "S.101",
+   *     "description": "Suite room",
+   *     "unitGroupId": "MUC-SUI"
+   *   },
+   *   "status": {
+   *     "isOccupied": false,
+   *     "condition": "Clean",
+   *     "maintenance": {
+   *       "id": "MUC-MTA-SGHZD",
+   *       "from": "2024-03-06T15:24:59.2921259+01:00",
+   *       "to": "2024-03-08T15:24:59.2921259+01:00",
+   *       "type": "OutOfService",
+   *       "description": "The remote control for the TV needs to be replaced."
+   *     }
+   *   },
+   *   "maxPersons": 2,
+   *   "created": "0001-01-01T00:00:00Z",
+   *   "attributes": [
+   *     {
+   *       "id": "KQOSXHLS",
+   *       "name": "Floor 3",
+   *       "description": "Floor number"
+   *     },
+   *     {
+   *       "id": "ADVFSSUL",
+   *       "name": "Street view",
+   *       "description": "View from the room"
+   *     }
+   *   ],
+   *   "connectedUnits": []
+   * }
+   */
   UnitModel: {
-    /** The unit id */
+    /** @description The unit id */
     id: string;
-    /** The name for the unit */
+    /** @description The name for the unit */
     name: string;
-    /** The description for the unit */
+    /** @description The description for the unit */
     description: { [key: string]: string };
     property: definitions["EmbeddedPropertyModel"];
     unitGroup?: definitions["EmbeddedUnitGroupModel"];
+    connectingUnit?: definitions["EmbeddedUnitModel"];
     status: definitions["UnitStatusModel"];
-    /** Maximum number of persons for the unit */
+    /**
+     * Format: int32
+     * @description Maximum number of persons for the unit
+     */
     maxPersons: number;
-    /** Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a> */
+    /**
+     * Format: date-time
+     * @description Date of creation<br />A date and time (without fractional second part) in UTC or with UTC offset as defined in <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601:2004</a>
+     */
     created: string;
-    /** Collection of user defined attributes of unit */
+    /** @description Collection of user defined attributes of unit */
     attributes?: definitions["UnitAttributeModel"][];
-    /** Collection of connected units */
+    /** @description Collection of connected units */
     connectedUnits?: definitions["ConnectedUnitModel"][];
   };
   UnitStatusModel: {

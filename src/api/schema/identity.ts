@@ -42,13 +42,16 @@ export interface paths {
 
 export interface definitions {
   CreateInvitationModel: {
-    /** Email address, used as the login */
+    /**
+     * Format: email
+     * @description Email address, used as the login
+     */
     email: string;
-    /** Properties that user has access to. If the user is invited as account admin, this will be ignored. */
+    /** @description Properties that user has access to. If the user is invited as account admin, this will be ignored. */
     properties?: string[];
-    /** If set to `true`, user has full access to all properties. Defaults to false. */
+    /** @description If set to `true`, user has full access to all properties. Defaults to false. */
     isAccountAdmin?: boolean;
-    /** Roles that user has access to. If the user is invited as account admin, this will be ignored. */
+    /** @description Roles that user has access to. If the user is invited as account admin, this will be ignored. */
     roles?: (
       | "AccountAdmin"
       | "PropertyAdmin"
@@ -58,9 +61,10 @@ export interface definitions {
       | "FrontDesk"
       | "FrontDeskSenior"
       | "Housekeeping"
+      | "Auditor"
     )[];
     /**
-     * The role to be assigned to the user. If you specfiy this and 'Roles', the combination of both will be used.
+     * @description The role to be assigned to the user. If you specfiy this and 'Roles', the combination of both will be used.
      * If the user is invited as account admin, this will be ignored.
      */
     role?:
@@ -70,20 +74,21 @@ export interface definitions {
       | "RevenueManager"
       | "ReservationOffice"
       | "FrontOffice"
-      | "Housekeeping";
+      | "Housekeeping"
+      | "Auditor";
   };
   InvitationListModel: {
-    /** All invitations to the current account */
+    /** @description All invitations to the current account */
     invitations: definitions["InvitationModel"][];
   };
   InvitationModel: {
-    /** Email address, used as the login */
+    /** @description Email address, used as the login */
     email: string;
-    /** Properties that user has access to */
+    /** @description Properties that user has access to */
     properties?: string[];
-    /** If set to `true`, user has full access to all properties. */
+    /** @description If set to `true`, user has full access to all properties. */
     isAccountAdmin: boolean;
-    /** Role this user is invited to. If more than one, returns the first. */
+    /** @description Role this user is invited to. If more than one, returns the first. */
     role?:
       | "AccountAdmin"
       | "PropertyAdmin"
@@ -91,8 +96,9 @@ export interface definitions {
       | "RevenueManager"
       | "ReservationOffice"
       | "FrontOffice"
-      | "Housekeeping";
-    /** Roles that user has access to */
+      | "Housekeeping"
+      | "Auditor";
+    /** @description Roles that user has access to */
     roles?: (
       | "AccountAdmin"
       | "PropertyAdmin"
@@ -102,14 +108,18 @@ export interface definitions {
       | "FrontDesk"
       | "FrontDeskSenior"
       | "Housekeeping"
+      | "Auditor"
     )[];
-    /** Email of the user making the invitation */
+    /** @description Email of the user making the invitation */
     invitedBy: string;
-    /** Date the invitation was made */
+    /**
+     * Format: date-time
+     * @description Date the invitation was made
+     */
     created: string;
   };
   InvitedUserToAccountResponseModel: {
-    /** Email of invited user */
+    /** @description Email of invited user */
     email: string;
   };
   MessageItemCollection: {
@@ -131,10 +141,11 @@ export interface definitions {
       | "FrontDesk"
       | "FrontDeskSenior"
       | "Housekeeping"
+      | "Auditor"
     )[];
   };
   RoleListModel: {
-    /** A list of all existing roles */
+    /** @description A list of all existing roles */
     roles: (
       | "AccountAdmin"
       | "PropertyAdmin"
@@ -144,48 +155,105 @@ export interface definitions {
       | "FrontDesk"
       | "FrontDeskSenior"
       | "Housekeeping"
+      | "Auditor"
     )[];
   };
   UserItemModel: {
-    /** Unique user identifier. */
+    /**
+     * Format: uuid
+     * @description Unique user identifier.
+     */
     subjectId: string;
-    /** First name */
+    /** @description First name */
     firstName: string;
-    /** Last name */
+    /** @description Last name */
     lastName: string;
-    /** Email address, used as the login */
+    /** @description Email address, used as the login */
     email: string;
-    /** Properties that user has access to */
+    /** @description Properties that user has access to */
     properties?: definitions["PropertyRolesItemModel"][];
-    /** If set to `false`, the user is disabled for this account and cannot log in */
+    /** @description If set to `false`, the user is disabled for this account and cannot log in */
     enabled: boolean;
-    /** If set to `true`, user has full access to all properties. */
+    /** @description If set to `true`, user has full access to all properties. */
     isAccountAdmin: boolean;
-    /** If set to `true`, user is considered managed in external Identity Provider. */
-    isReadOnly: boolean;
   };
+  /**
+   * @example {
+   *   "subjectId": "50ff45e2-9393-4040-8138-a782ce121c13",
+   *   "firstName": "Milosz",
+   *   "lastName": "Jones",
+   *   "email": "user1@apaleo.com",
+   *   "enabled": true,
+   *   "isAccountAdmin": false,
+   *   "properties": [
+   *     "MUC"
+   *   ],
+   *   "propertyRoles": [
+   *     {
+   *       "id": "MUC",
+   *       "roles": [
+   *         "FrontDesk",
+   *         "Accountant"
+   *       ]
+   *     }
+   *   ]
+   * }
+   */
   UserModel: {
-    /** Unique user identifier. */
+    /**
+     * Format: uuid
+     * @description Unique user identifier.
+     */
     subjectId: string;
-    /** First name */
+    /** @description First name */
     firstName: string;
-    /** Last name */
+    /** @description Last name */
     lastName: string;
-    /** Email address, used as the login */
+    /** @description Email address, used as the login */
     email: string;
-    /** If set to `false`, the user is disabled for this account and cannot log in */
+    /** @description If set to `false`, the user is disabled for this account and cannot log in */
     enabled?: boolean;
-    /** If set to `true`, user has full access to all properties. */
+    /** @description If set to `true`, user has full access to all properties. */
     isAccountAdmin: boolean;
-    /** If set to `true`, user is considered managed in external Identity Provider. */
-    isReadOnly: boolean;
-    /** List of properties to which user has access. */
+    /** @description List of properties to which user has access. */
     properties?: string[];
-    /** List of properties to which user has access. */
+    /** @description List of properties to which user has access. */
     propertyRoles?: definitions["PropertyRolesItemModel"][];
   };
+  /**
+   * @example {
+   *   "users": [
+   *     {
+   *       "subjectId": "3cdb2db2-3be9-48c7-8422-0265f4a1b9d2",
+   *       "firstName": "Riaz",
+   *       "lastName": "Sparks",
+   *       "email": "user1@apaleo.com",
+   *       "properties": [],
+   *       "enabled": true,
+   *       "isAccountAdmin": true
+   *     },
+   *     {
+   *       "subjectId": "98e3788d-3060-4f95-beb1-ec0cd27006d1",
+   *       "firstName": "Milosz",
+   *       "lastName": "Jones",
+   *       "email": "user1@apaleo.com",
+   *       "properties": [
+   *         {
+   *           "id": "MUC",
+   *           "roles": [
+   *             "FrontDesk",
+   *             "Accountant"
+   *           ]
+   *         }
+   *       ],
+   *       "enabled": true,
+   *       "isAccountAdmin": false
+   *     }
+   *   ]
+   * }
+   */
   UsersListModel: {
-    /** A collection of users that have access to the current account */
+    /** @description A collection of users that have access to the current account */
     users: definitions["UserItemModel"][];
   };
 }
