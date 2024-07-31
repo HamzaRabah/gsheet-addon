@@ -31,7 +31,9 @@ function generateBerlinCityTax(sheet: GoogleAppsScript.Spreadsheet.Sheet, transa
 
     const _ = DateUtility.lodash();
 
-    const transactionsWithReservations = _.map(transactions, item => _.merge(item, _.find(reservations, {'id': item.reference})));
+    const transactionsWithReservations = _.map(transactions, item => {
+        return _.merge(item, _.find(reservations, function(reservation) { return reservation.id == item.reference || reservation.bookingId == item.reference; }));
+    });
     const summarizedData = _(transactionsWithReservations)
         .groupBy(value => value.source ?? value.channelCode)
         .map((value, key) => {
@@ -72,9 +74,10 @@ function generateBerlinCityTax(sheet: GoogleAppsScript.Spreadsheet.Sheet, transa
 
 function generateHamburgCityTax(sheet: GoogleAppsScript.Spreadsheet.Sheet, transactions: FinanceModels["AccountingTransactionModel"][], reservations: BookingModels["ReservationItemModel"][]) {
     let rows: any[][] = [];
-
     const _ = DateUtility.lodash();
-    const transactionsWithReservations = _.map(transactions, item => _.merge(item, _.find(reservations, {'id': item.reference})));
+    const transactionsWithReservations = _.map(transactions, item => {
+        return _.merge(item, _.find(reservations, function(reservation) { return reservation.id == item.reference || reservation.bookingId == item.reference; }));
+    });
     const summarizedData = _(transactionsWithReservations)
         .groupBy(value => value.amount.amount / value.adults)
         .map((value, key) => {
