@@ -8,7 +8,7 @@ export function generateCityTaxReport(city: CityTax, property: string, startDate
     const transactionStartDate = DateUtility.addDays(startDate, -60);
     const transactionEndDate = DateUtility.addDays(endDate, 60);
     const transactions = getTransactions(property, transactionStartDate, transactionEndDate, startDate, endDate);
-    const reservations = APIData.getReservations(property, DateUtility.addDays(startDate, -480), DateUtility.addDays(startDate, 120));
+    const reservations = APIData.getReservations(property, DateUtility.addDays(startDate, -120), DateUtility.addDays(startDate, 120));
 
     const sheet = createSheetWithReportInfo(city, property, endDate, startDate);
 

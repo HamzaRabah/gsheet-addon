@@ -9,12 +9,12 @@
     "docs": "http-server ./docs -p 4100"
   },
   "devDependencies": {
-    "@google/clasp": "^2.4.1",
+    "@google/clasp": "^2.4.2",
     "@types/google-apps-script": "^1.0.37",
     "@types/google-apps-script-oauth2": "^38.0.0",
     "@types/lodash": "^4.14.194",
     "http-server": "^14.1.1",
     "openapi-typescript": "^4.0.2",
-    "typescript": "^4.3.5"
+    "typescript": "^4.9.5"
   }
 }
